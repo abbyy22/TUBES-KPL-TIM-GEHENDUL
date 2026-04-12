@@ -4,7 +4,7 @@ Sistem pemesanan makanan digital untuk kantin sekolah/kampus. Dibangun dengan HT
 
 ## 📋 Deskripsi
 
-Smart Canteen adalah aplikasi web yang memungkinkan siswa memesan makanan dari kantin secara digital — tanpa perlu antre. Admin kantin dapat mengelola menu dan memperbarui status pesanan secara real-time.
+Smart Canteen adalah aplikasi web yang memungkinkan siswa memesan makanan dari kantin secara digital tanpa perlu antre. Admin kantin dapat mengelola menu dan memperbarui status pesanan secara real-time.
 
 ## ✨ Fitur
 
