@@ -1,14 +1,10 @@
 # 🍽️ Smart Canteen Ordering System
 
-Sistem pemesanan makanan digital untuk kantin sekolah/kampus. Dibangun dengan HTML/CSS/JavaScript (Vanilla), Node.js, dan MySQL.
-
----
+Sistem pemesanan makanan digital untuk kantin sekolah/kampus. Dibangun dengan HTML/CSS/JavaScript, Node.js, dan MySQL.
 
 ## 📋 Deskripsi
 
 Smart Canteen adalah aplikasi web yang memungkinkan siswa memesan makanan dari kantin secara digital — tanpa perlu antre. Admin kantin dapat mengelola menu dan memperbarui status pesanan secara real-time.
-
----
 
 ## ✨ Fitur
 
@@ -25,17 +21,14 @@ Smart Canteen adalah aplikasi web yang memungkinkan siswa memesan makanan dari k
 - Update status pesanan: `ORDERED → COOKING → READY → DONE`
 - Lihat seluruh pesanan masuk
 
----
-
 ## 🛠️ Tech Stack
 
 | Layer | Teknologi |
 |-------|-----------|
-| Frontend | HTML, CSS, JavaScript (Vanilla) |
+| Frontend | HTML, CSS, JavaScript |
 | Backend | Node.js, Express.js |
 | Database | MySQL |
 
----
 
 ## 👥 Role
 
@@ -44,7 +37,6 @@ Smart Canteen adalah aplikasi web yang memungkinkan siswa memesan makanan dari k
 | `siswa` | Lihat menu, pesan, lihat status & riwayat |
 | `admin` | Semua akses siswa + kelola menu + update status pesanan |
 
----
 
 ## 👨‍👩‍👧‍👦 Tim Pengembang
 
