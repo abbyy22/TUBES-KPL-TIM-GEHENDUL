@@ -31,7 +31,7 @@ Smart Canteen adalah aplikasi web yang memungkinkan siswa memesan makanan dari k
 
 | Layer | Teknologi |
 |-------|-----------|
-| Frontend | HTML, CSS, JavaScript (Vanilla) |
+| Frontend | HTML, TailwindCSS, JavaScript (Vanilla) |
 | Backend | Node.js, Express.js |
 | Database | MySQL |
 
