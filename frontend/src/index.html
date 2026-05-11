@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>telFood - Smart Canteen</title>
+  <link href="./frontend/src/output.css" rel="stylesheet">
+</head>
+<body class="bg-[#F0E8D5] dark:bg-gray-900 transition-colors">
+
+  <div id="sidebar-placeholder"></div>
+
+  <main id="main-content" class="ml-72 p-8 min-h-screen">
+    <div id="page-loader" class="flex justify-center items-center h-full">
+      <p>Memuat halaman...</p>
+    </div>
+  </main>
+
+  <script>
+    // 1. Fungsi Load Sidebar
+    async function initApp() {
+      try {
+        // Load Sidebar dari folder partials
+        const resSidebar = await fetch('./frontend/src/pages/partials/sidebar.html');
+        const sidebarHtml = await resSidebar.text();
+        document.getElementById('sidebar-placeholder').innerHTML = sidebarHtml;
+
+        // Inisialisasi Navigasi setelah sidebar muncul
+        setupNavigation();
+        
+        // Load halaman pertama kali (Home)
+        loadPage('home');
+      } catch (err) {
+        console.error("Gagal inisialisasi:", err);
+      }
+    }
+
+    // 2. Fungsi Load Halaman Dinamis
+    async function loadPage(pageName) {
+      const contentArea = document.getElementById('main-content');
+      
+      // Tentukan path file berdasarkan folder src/pages kamu
+      let filePath = '';
+      if (pageName === 'home') filePath = './frontend/src/pages/index.html'; // atau sesuaikan path-nya
+      else if (pageName === 'booking') filePath = './frontend/src/pages/booking.html';
+      else if (pageName === 'account') filePath = './frontend/src/pages/account/index.html';
+
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) throw new Error("Page not found");
+        const html = await response.text();
+        
+        // Masukkan konten ke area utama
+        contentArea.innerHTML = html;
+        
+        // Update status active di sidebar
+        updateSidebarActive(pageName);
+      } catch (err) {
+        contentArea.innerHTML = `<h2 class="text-red-500">Halaman tidak ditemukan: ${pageName}</h2>`;
+      }
+    }
+
+    // 3. Setup klik menu di sidebar
+    function setupNavigation() {
+      document.body.addEventListener('click', (e) => {
+        const link = e.target.closest('a[data-page]');
+        if (link) {
+          e.preventDefault();
+          const page = link.getAttribute('data-page').replace('page-', '');
+          loadPage(page);
+        }
+      });
+    }
+
+    // 4. Update UI Menu Aktif
+    function updateSidebarActive(pageName) {
+      document.querySelectorAll('.sidebar-nav a').forEach(nav => {
+        if (nav.getAttribute('data-page') === `page-${pageName}`) {
+          nav.classList.add('text-[#D2691E]', 'font-bold');
+          nav.classList.remove('text-gray-400');
+        } else {
+          nav.classList.remove('text-[#D2691E]', 'font-bold');
+          nav.classList.add('text-gray-400');
+        }
+      });
+    }
+
+    // Jalankan aplikasi
+    window.onload = initApp;
+  </script>
+</body>
+</html>
