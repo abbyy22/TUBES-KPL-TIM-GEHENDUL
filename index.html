@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TelFood – Sistem Manajemen Kantin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#FFF7F0', 100:'#FDF0EA', 200:'#FADCC8', 300:'#F0BFA0', 400:'#D97A3C', 500:'#C04A10', 600:'#A33A0A', 700:'#7D2D08', 800:'#5A2006', 900:'#3D1604' },
+        surface: { 50:'#FFFDF9', 100:'#FAFAF6', 200:'#F5F0E8', 300:'#F0E8DA', 400:'#EAE4D8', 500:'#E0D8CC', 600:'#D5CCBE', 700:'#B0A090', 800:'#8A7A65', 900:'#5A4A38', 950:'#3D2E1E', 1000:'#1A1208' },
+        danger: { 400:'#F87171', 500:'#E24B4A', 600:'#A32D2D' },
+        success: { 500:'#0F6E56', 600:'#0A5442' },
+        info: { 500:'#185FA5', 100:'#E6F3FF' }
+      },
+      fontFamily: { sans: ['Popins', 'sans-serif'] }
+    }
+  }
+}
+</script>
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="h-screen overflow-hidden bg-surface-200 font-sans text-surface-1000">
+
+<div class="flex h-screen w-screen overflow-hidden">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside id="sidebar" class="w-60 flex-shrink-0 bg-surface-50 border-r border-surface-400 flex flex-col transition-all duration-300 max-lg:-translate-x-full max-lg:fixed max-lg:z-50 max-lg:h-full">
+    <div class="px-6 pt-7 pb-5 border-b border-surface-400">
+      <div class="text-[26px] font-extrabold tracking-tight text-brand-500">tel<span class="text-surface-1000">Food.</span></div>
+      <div class="text-[10px] font-semibold text-surface-700 uppercase tracking-widest mt-1">Canteen System</div>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <div class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer text-surface-800 hover:bg-surface-200" data-page="dashboard" onclick="switchPage('dashboard',this)">
+        <i class="ti ti-layout-dashboard text-lg"></i> Dashboard
+      </div>
+      <div class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer bg-brand-500 text-white shadow-md shadow-brand-500/20" data-page="menu" onclick="switchPage('menu',this)">
+        <i class="ti ti-tools-kitchen-2 text-lg"></i> Edit Menu
+      </div>
+      <div class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer text-surface-800 hover:bg-surface-200" data-page="report" onclick="switchPage('report',this)">
+        <i class="ti ti-chart-bar text-lg"></i> Laporan
+      </div>
+      <div class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer text-surface-800 hover:bg-surface-200" data-page="settings" onclick="switchPage('settings',this)">
+        <i class="ti ti-settings text-lg"></i> Pengaturan
+      </div>
+    </nav>
+    <div class="px-5 py-4 border-t border-surface-400 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">NM</div>
+      <div class="min-w-0">
+        <div class="text-[13px] font-bold text-surface-1000 truncate">Namimaw</div>
+        <div class="text-[11px] text-surface-700 truncate">mimaw@gmail.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <!-- ═══════ MAIN AREA ═══════ -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+
+    <!-- Topbar -->
+    <header class="bg-surface-50 border-b border-surface-400 px-6 lg:px-8 py-4 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-4">
+        <button class="lg:hidden p-2 rounded-lg hover:bg-surface-200 text-surface-800" onclick="toggleSidebar()">
+          <i class="ti ti-menu-2 text-xl"></i>
+        </button>
+        <div>
+          <h1 id="pageTitle" class="text-xl lg:text-2xl font-extrabold text-surface-1000">Kantin NEO 2</h1>
+          <p id="pageSubtitle" class="text-xs text-surface-700 mt-0.5">Rabu, 7 Mei 2026 &nbsp;·&nbsp; Shift Pagi 07.00–16.00</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <button class="relative p-2 rounded-xl hover:bg-surface-200 text-surface-800 transition-colors">
+          <i class="ti ti-bell text-xl"></i>
+          <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-brand-500 rounded-full pulse-dot"></span>
+        </button>
+        <div class="hidden sm:flex items-center gap-3">
+          <div class="text-right">
+            <div class="text-[13px] font-bold text-surface-1000">Namimaw</div>
+            <div class="text-[11px] text-surface-700">Admin</div>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white text-sm font-bold">NM</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════ PAGE: DASHBOARD ═══════ -->
+    <div id="page-dashboard" class="page flex-col flex-1 overflow-y-auto p-6 lg:p-8 gap-6">
+      <!-- Stats cards diisi via JS -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-coins text-brand-500"></i> Pendapatan Hari Ini</div><div class="text-3xl font-extrabold text-surface-1000 mt-2">Rp 2.450.000</div><div class="text-[11px] font-semibold text-success-500 mt-1 flex items-center gap-1"><i class="ti ti-trending-up text-xs"></i> +12.4%</div></div>
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-receipt text-brand-500"></i> Transaksi</div><div class="text-3xl font-extrabold text-surface-1000 mt-2">87</div><div class="text-[11px] font-semibold text-success-500 mt-1 flex items-center gap-1"><i class="ti ti-trending-up text-xs"></i> +8.1%</div></div>
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-users text-brand-500"></i> Pengunjung</div><div class="text-3xl font-extrabold text-surface-1000 mt-2">142</div><div class="text-[11px] font-semibold text-danger-500 mt-1 flex items-center gap-1"><i class="ti ti-trending-down text-xs"></i> -3.2%</div></div>
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-star text-brand-500"></i> Menu Favorit</div><div class="text-lg font-extrabold text-surface-1000 mt-2 truncate">Nasi Goreng Spesial</div><div class="text-[11px] font-semibold text-surface-700 mt-1">34 pesanan hari ini</div></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-surface-50 rounded-2xl border border-surface-400 p-6"><div class="flex items-center justify-between mb-5"><div><h3 class="text-base font-bold text-surface-1000">Pendapatan Mingguan</h3><p class="text-[11px] text-surface-700 mt-0.5">28 Apr – 4 Mei 2026</p></div></div><div class="relative h-48" id="revenueChart"></div></div>
+        <div class="bg-surface-50 rounded-2xl border border-surface-400 p-6"><h3 class="text-base font-bold text-surface-1000 mb-1">Penjualan per Kategori</h3><p class="text-[11px] text-surface-700 mb-5">Hari ini</p><div class="flex justify-center mb-5"><canvas id="pieChart" width="160" height="160"></canvas></div><div class="space-y-2.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand-500"></span><span class="text-xs font-semibold text-surface-900">Makanan</span></div><span class="text-xs font-bold text-surface-1000">68%</span></div><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-info-500"></span><span class="text-xs font-semibold text-surface-900">Minuman</span></div><span class="text-xs font-bold text-surface-1000">24%</span></div><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-surface-600"></span><span class="text-xs font-semibold text-surface-900">Snack</span></div><span class="text-xs font-bold text-surface-1000">8%</span></div></div></div>
+      </div>
+      <div class="bg-surface-50 rounded-2xl border border-surface-400 overflow-hidden"><div class="px-6 py-4 border-b border-surface-300"><h3 class="text-base font-bold text-surface-1000">Pesanan Terkini</h3></div><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-surface-200/60"><th class="text-left px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">ID</th><th class="text-left px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Pemesan</th><th class="text-left px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Menu</th><th class="text-left px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Total</th><th class="text-center px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Status</th></tr></thead><tbody id="recentOrders"></tbody></table></div></div>
+    </div>
+
+    <!-- ═══════ PAGE: EDIT MENU ═══════ -->
+    <div id="page-menu" class="page active flex-col flex-1 overflow-hidden gap-5 p-6 lg:p-8">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-border-all text-brand-500"></i> Total Menu</div><div class="stat-num text-4xl font-extrabold text-surface-1000 mt-2" id="totalCount">0</div></div>
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-tools-kitchen-2 text-brand-500"></i> Makanan</div><div class="stat-num text-4xl font-extrabold text-surface-1000 mt-2" id="foodCount">0</div></div>
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-glass text-brand-500"></i> Minuman</div><div class="stat-num text-4xl font-extrabold text-surface-1000 mt-2" id="drinkCount">0</div></div>
+        <div class="bg-surface-50 rounded-2xl p-5 border border-surface-400"><div class="text-[11px] font-bold text-danger-500 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-alert-circle text-danger-500"></i> Menu Habis</div><div class="stat-num text-4xl font-extrabold text-danger-500 mt-2" id="emptyCount">0</div></div>
+      </div>
+
+      <div class="bg-surface-50 rounded-2xl border border-surface-400 overflow-hidden flex-1 flex flex-col min-h-0">
+        <div class="px-6 lg:px-7 py-5 flex items-center justify-between border-b border-surface-300 flex-shrink-0">
+          <h2 class="text-xl font-extrabold text-surface-1000 flex items-center gap-2.5"><i class="ti ti-menu-2 text-brand-500"></i> Manajemen Menu</h2>
+          <button onclick="openAdd()" class="bg-brand-500 hover:bg-brand-600 text-white rounded-xl px-5 py-2.5 text-[13px] font-bold flex items-center gap-1.5 transition-colors shadow-md shadow-brand-500/20"><i class="ti ti-plus text-base"></i> Tambah Menu Baru</button>
+        </div>
+        <div class="px-6 lg:px-7 py-3.5 flex items-center gap-3 border-b border-surface-300 flex-shrink-0 flex-wrap">
+          <div class="relative flex-1 max-w-md min-w-[200px]">
+            <i class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-surface-600 text-base pointer-events-none"></i>
+            <input type="text" id="searchInput" placeholder="Cari nama menu..." oninput="onSearch()" class="w-full pl-10 pr-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 placeholder:text-surface-600 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" />
+          </div>
+          <div class="flex gap-2">
+            <button class="filter-btn px-4 py-2.5 rounded-xl text-[13px] font-bold border bg-brand-50 border-brand-500 text-brand-500 transition-all" data-filter="all" onclick="setFilter('all',this)">Semua</button>
+            <button class="filter-btn px-4 py-2.5 rounded-xl text-[13px] font-semibold border border-surface-500 text-surface-900 bg-surface-100 hover:border-brand-500 hover:text-brand-500 transition-all flex items-center gap-1.5" data-filter="food" onclick="setFilter('food',this)"><i class="ti ti-tools-kitchen-2 text-sm"></i> Makanan</button>
+            <button class="filter-btn px-4 py-2.5 rounded-xl text-[13px] font-semibold border border-surface-500 text-surface-900 bg-surface-100 hover:border-brand-500 hover:text-brand-500 transition-all flex items-center gap-1.5" data-filter="drink" onclick="setFilter('drink',this)"><i class="ti ti-glass text-sm"></i> Minuman</button>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto min-h-0">
+          <table class="w-full border-collapse table-fixed"><colgroup><col style="width:38%" /><col style="width:14%" /><col style="width:16%" /><col style="width:16%" /><col style="width:16%" /></colgroup><thead><tr class="bg-surface-200/70 sticky top-0 z-10"><th class="text-left px-7 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Menu</th><th class="text-left px-7 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Kategori</th><th class="text-center px-7 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Harga</th><th class="text-center px-7 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Status</th><th class="text-center px-7 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Aksi</th></tr></thead><tbody id="menuTbody"></tbody></table>
+          <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center"><i class="ti ti-search text-5xl text-surface-500 mb-3"></i><div class="text-base font-bold text-surface-800">Menu tidak ditemukan</div><div class="text-[13px] text-surface-700 mt-1">Coba ubah kata kunci atau filter</div></div>
+        </div>
+        <div class="px-6 lg:px-7 py-3.5 border-t border-surface-400 flex items-center justify-between flex-shrink-0">
+          <span class="text-[12px] text-surface-700" id="footInfo">Menampilkan 0 dari 0 menu</span>
+          <div class="flex gap-2">
+            <button onclick="changePage(-1)" class="px-4 py-2 rounded-xl text-[13px] font-bold border border-surface-500 bg-surface-100 text-surface-900 hover:border-brand-500 hover:text-brand-500 transition-all font-sans">Sebelumnya</button>
+            <button onclick="changePage(1)" class="px-4 py-2 rounded-xl text-[13px] font-bold bg-brand-500 text-white border border-brand-500 hover:bg-brand-600 transition-all font-sans">Berikutnya</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: LAPORAN ═══════ -->
+    <div id="page-report" class="page flex-col flex-1 overflow-y-auto p-6 lg:p-8 gap-6">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-surface-50 rounded-2xl p-6 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-calendar-stats text-brand-500"></i> Pendapatan Bulan Ini</div><div class="text-3xl font-extrabold text-surface-1000 mt-3">Rp 48.750.000</div><div class="text-[11px] font-semibold text-success-500 mt-1 flex items-center gap-1"><i class="ti ti-trending-up text-xs"></i> +18.3%</div></div>
+        <div class="bg-surface-50 rounded-2xl p-6 border border-surface-400"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-shopping-cart text-brand-500"></i> Total Pesanan</div><div class="text-3xl font-extrabold text-surface-1000 mt-3">1.248</div><div class="text-[11px] font-semibold text-success-500 mt-1 flex items-center gap-1"><i class="ti ti-trending-up text-xs"></i> +9.7%</div></div>
+        <div class="bg-surface-50 rounded-2xl p-6 border border-surface-400 col-span-2 lg:col-span-1"><div class="text-[11px] font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5"><i class="ti ti-target text-brand-500"></i> Rata-rata per Hari</div><div class="text-3xl font-extrabold text-surface-1000 mt-3">Rp 1.625.000</div><div class="text-[11px] font-semibold text-danger-500 mt-1 flex items-center gap-1"><i class="ti ti-trending-down text-xs"></i> -2.1%</div></div>
+      </div>
+      <div class="bg-surface-50 rounded-2xl border border-surface-400 p-6"><div class="flex items-center justify-between mb-5"><div><h3 class="text-base font-bold text-surface-1000">Pendapatan Bulanan</h3><p class="text-[11px] text-surface-700 mt-0.5">Januari – Mei 2026</p></div></div><div class="relative h-56" id="monthlyChart"></div></div>
+      <div class="bg-surface-50 rounded-2xl border border-surface-400 overflow-hidden"><div class="px-6 py-4 border-b border-surface-300"><h3 class="text-base font-bold text-surface-1000">Top 5 Menu Terlaris</h3></div><table class="w-full text-sm"><thead><tr class="bg-surface-200/60"><th class="text-left px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">#</th><th class="text-left px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Menu</th><th class="text-center px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Pesanan</th><th class="text-center px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Pendapatan</th><th class="text-left px-6 py-3 text-[11px] font-bold text-surface-700 uppercase tracking-wider">Performa</th></tr></thead><tbody id="topMenuBody"></tbody></table></div>
+    </div>
+
+    <!-- ═══════ PAGE: PENGATURAN ═══════ -->
+    <div id="page-settings" class="page flex-col flex-1 overflow-y-auto p-6 lg:p-8 gap-6">
+      <div class="max-w-2xl space-y-6">
+        <div class="bg-surface-50 rounded-2xl border border-surface-400 p-6"><h3 class="text-base font-bold text-surface-1000 mb-4 flex items-center gap-2"><i class="ti ti-building text-brand-500"></i> Informasi Kantin</h3><div class="space-y-4"><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Nama Kantin</label><input type="text" value="Kantin NEO 2" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Shift Pagi</label><input type="text" value="07.00–16.00" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Shift Sore</label><input type="text" value="16.00–23.00" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div></div></div></div>
+        <div class="bg-surface-50 rounded-2xl border border-surface-400 p-6"><h3 class="text-base font-bold text-surface-1000 mb-4 flex items-center gap-2"><i class="ti ti-database text-brand-500"></i> Koneksi Database</h3><div class="space-y-4"><div class="grid grid-cols-2 gap-4"><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Host</label><input type="text" value="localhost" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-mono" /></div><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Port</label><input type="text" value="3306" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-mono" /></div></div><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Database Name</label><input type="text" value="telfood_db" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-mono" /></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Username</label><input type="text" value="root" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-mono" /></div><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Password</label><input type="password" value="password" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-mono" /></div></div><div class="flex items-center gap-3 pt-2"><button onclick="showToast('Koneksi database berhasil!','success')" class="bg-brand-500 hover:bg-brand-600 text-white rounded-xl px-5 py-2.5 text-[13px] font-bold transition-colors flex items-center gap-1.5"><i class="ti ti-plug text-base"></i> Test Koneksi</button><div class="flex items-center gap-2 text-[12px] font-semibold text-success-500"><span class="w-2 h-2 rounded-full bg-success-500"></span> Terhubung</div></div></div></div>
+        <div class="bg-surface-50 rounded-2xl border border-surface-400 p-6"><h3 class="text-base font-bold text-surface-1000 mb-4 flex items-center gap-2"><i class="ti ti-user-circle text-brand-500"></i> Akun Pengguna</h3><div class="space-y-4"><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Nama Lengkap</label><input type="text" value="Namimaw" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div><div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5">Email</label><input type="email" value="mimaw@gmail.com" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div><button onclick="showToast('Pengaturan berhasil disimpan!','success')" class="bg-brand-500 hover:bg-brand-600 text-white rounded-xl px-5 py-2.5 text-[13px] font-bold transition-colors flex items-center gap-1.5"><i class="ti ti-device-floppy text-base"></i> Simpan Pengaturan</button></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ ADD/EDIT MODAL ═══════ -->
+<div id="modalOverlay" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center" style="display:none;">
+  <div class="bg-surface-50 rounded-2xl w-full max-w-md mx-4 border border-surface-400 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+    <div class="p-7">
+      <div class="text-lg font-extrabold text-surface-1000 mb-5 flex items-center gap-2.5"><i class="ti ti-edit text-brand-500 text-xl"></i><span id="modalHeading">Tambah Menu Baru</span></div>
+      <div class="space-y-4">
+        <div>
+          <label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-2">Foto Menu</label>
+          <div class="flex items-start gap-4">
+            <div class="w-28 h-28 rounded-xl bg-surface-200 border-2 border-dashed border-surface-500 flex items-center justify-center overflow-hidden flex-shrink-0 relative upload-zone" id="uploadZone" onclick="document.getElementById('fImageFile').click()">
+              <img id="fImagePreview" src="" class="w-full h-full object-cover hidden" alt="Preview" />
+              <div id="fImagePlaceholder" class="flex flex-col items-center justify-center text-surface-600 pointer-events-none"><i class="ti ti-camera-plus text-3xl"></i><span class="text-[10px] font-semibold mt-1">Pilih Foto</span></div>
+            </div>
+            <div class="flex flex-col gap-2 pt-1">
+              <input type="file" id="fImageFile" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
+              <button type="button" onclick="document.getElementById('fImageFile').click()" class="px-4 py-2 border border-surface-500 rounded-xl text-[12px] font-semibold text-surface-900 hover:border-brand-500 hover:text-brand-500 transition-all flex items-center gap-1.5 bg-surface-100"><i class="ti ti-upload text-sm"></i> Unggah</button>
+              <button type="button" onclick="removeImage()" id="btnRemoveImg" class="px-4 py-2 rounded-xl text-[12px] font-semibold text-danger-500 hover:bg-red-50 transition-all hidden">Hapus Foto</button>
+              <p class="text-[10px] text-surface-700 leading-tight mt-1">Format: JPG, PNG<br>Maks: 2MB</p>
+            </div>
+          </div>
+        </div>
+        <div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5" for="fName">Nama Menu</label><input type="text" id="fName" placeholder="Contoh: Nasi Goreng Spesial" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 placeholder:text-surface-600 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div>
+        <div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5" for="fDesc">Deskripsi</label><input type="text" id="fDesc" placeholder="Bahan / varian" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 placeholder:text-surface-600 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5" for="fCat">Kategori</label><select id="fCat" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans"><option value="food">Makanan</option><option value="drink">Minuman</option></select></div>
+          <div><label class="text-[11px] font-bold text-surface-700 uppercase tracking-wider block mb-1.5" for="fPrice">Harga (Rp)</label><input type="number" id="fPrice" placeholder="25000" min="0" class="w-full px-4 py-2.5 border border-surface-500 rounded-xl text-[13px] bg-surface-100 text-surface-1000 placeholder:text-surface-600 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all font-sans" /></div>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end mt-6">
+        <button onclick="closeModal()" class="px-5 py-2.5 border border-surface-500 rounded-xl text-[13px] font-semibold text-surface-900 hover:bg-surface-200 transition-colors font-sans">Batal</button>
+        <button onclick="saveMenu()" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-[13px] font-bold transition-colors font-sans">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ DELETE CONFIRM ═══════ -->
+<div id="delOverlay" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center" style="display:none;">
+  <div class="bg-surface-50 rounded-2xl w-full max-w-sm mx-4 border border-surface-400 shadow-2xl p-7 text-center" onclick="event.stopPropagation()">
+    <div class="text-4xl text-danger-500 mb-4"><i class="ti ti-trash"></i></div>
+    <div class="text-lg font-extrabold text-surface-1000 mb-2">Hapus Menu?</div>
+    <div class="text-[13px] text-surface-700 mb-6" id="delSub">Tindakan ini tidak dapat dibatalkan.</div>
+    <div class="flex gap-3 justify-center">
+      <button onclick="closeDel()" class="px-5 py-2.5 border border-surface-500 rounded-xl text-[13px] font-semibold text-surface-900 hover:bg-surface-200 transition-colors font-sans">Batal</button>
+      <button onclick="confirmDel()" class="px-6 py-2.5 bg-danger-500 hover:bg-danger-600 text-white rounded-xl text-[13px] font-bold transition-colors font-sans">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-el" id="toast"></div>
+
+<!-- ═══════ SCRIPTS ═══════ -->
+<script src="js/app.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/dashboard.js"></script>
+
+<!-- Initial Render Script -->
+<script>
+  // Render halaman awal saat website diload
+  window.onload = function() {
+    renderMenu();
+  };
+</script>
+
+</body>
+</html>
