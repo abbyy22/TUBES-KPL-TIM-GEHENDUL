@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TelFood – Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { poppins: ['Poppins', 'sans-serif'], jakarta: ['Plus Jakarta Sans', 'sans-serif'] } } } }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f0e8d5;
+      font-family: 'Poppins', sans-serif;
+      min-width: 1280px;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .toggle-track {
+      width: 44px;
+      height: 24px;
+      border-radius: 999px;
+      background: #d79b6d;
+      transition: .2s;
+      position: relative;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      display: inline-block;
+    }
+
+    .toggle-track input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      transition: .2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    }
+
+    .toggle-track input:checked~.toggle-thumb {
+      left: 22px;
+    }
+
+    .toggle-track:has(input:checked) {
+      background: #c1500e;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      color: #574239;
+    }
+
+    .nav-item.active {
+      background: #c1500e;
+      color: #000;
+      font-weight: 700;
+    }
+
+    .nav-item.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    input[type=search]::-webkit-search-cancel-button {
+      display: none;
+    }
+
+    input {
+      outline: none;
+      background: transparent;
+      width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+      color: #574239;
+    }
+
+    input::placeholder {
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="min-width:1280px;min-height:100vh;background:#f0e8d5;padding:40px 40px 40px 40px;position:relative;">
+
+    <!-- SIDEBAR -->
+    <aside
+      style="position:fixed;top:42px;left:54px;width:280px;height:calc(100vh - 84px);background:rgba(255,255,255,0.3);border-radius:50px;display:flex;flex-direction:column;padding:43px 0 0 0;z-index:10;">
+      <div
+        style="padding:0 79px;font-family:'Poppins',sans-serif;font-weight:800;font-size:34px;color:#c1500e;margin-bottom:24px;">
+        telFood.</div>
+      <nav style="padding:0 38px;display:flex;flex-direction:column;gap:8px;">
+        <!-- TODO: aktifkan setelah merge dengan halaman Dashboard -->
+        <div class="nav-item disabled" title="Tersedia setelah merge">
+          <i class="ti ti-layout-dashboard" style="font-size:18px;"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item active" onclick="switchPage('menu',this)">
+          <i class="ti ti-tools-kitchen-2" style="font-size:18px;"></i>
+          <span>Edit Menu</span>
+        </div>
+      </nav>
+      <div style="margin-top:auto;padding:0 66px 43px;display:flex;flex-direction:column;gap:8px;">
+        <img src="../../assets/avatars/avatar.png" style="width:58px;height:58px;border-radius:50%;object-fit:cover;" />
+        <div style="font-weight:600;font-size:16px;color:#2f2f2f;">Namimaw</div>
+        <div style="font-size:16px;color:#2f2f2f;">mimaw@gmail.com</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div style="margin-left:316px;">
+
+      <!-- TOPBAR -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
+        <div>
+          <h1 style="font-weight:600;font-size:34px;line-height:1.2;margin:0;">Kantin NEO 2</h1>
+          <p style="font-size:16px;color:rgba(0,0,0,0.7);margin:4px 0 0;">Rabu, 7 Mei 2026 · Shift Pagi 07.00–16.00</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="text-align:right;">
+            <div style="font-weight:600;font-size:16px;">Namimaw</div>
+            <div style="font-size:14px;">mimaw@gmail.com</div>
+          </div>
+          <img src="../../assets/avatars/avatar.png"
+            style="width:58px;height:58px;border-radius:50%;object-fit:cover;" />
+        </div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+        <div style="background:rgba(255,255,255,0.3);border-radius:50px;padding:32px 40px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#574239;margin-bottom:8px;"><i
+              class="ti ti-border-all" style="color:#c1500e;"></i> TOTAL MENU</div>
+          <div style="font-size:38px;font-weight:600;" id="totalCount">0</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.3);border-radius:50px;padding:32px 40px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#574239;margin-bottom:8px;"><i
+              class="ti ti-tools-kitchen-2" style="color:#c1500e;"></i> MAKANAN</div>
+          <div style="font-size:38px;font-weight:600;" id="foodCount">0</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.3);border-radius:50px;padding:32px 40px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#574239;margin-bottom:8px;"><i
+              class="ti ti-glass" style="color:#c1500e;"></i> MINUMAN</div>
+          <div style="font-size:38px;font-weight:600;" id="drinkCount">0</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.3);border-radius:50px;padding:32px 40px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#c1500e;margin-bottom:8px;"><i
+              class="ti ti-alert-circle" style="color:#c1500e;"></i> MENU HABIS</div>
+          <div style="font-size:38px;font-weight:600;color:#c1500e;" id="emptyCount">0</div>
+        </div>
+      </div>
+
+      <!-- PAGE DASHBOARD: TODO setelah merge -->
+
+      <!-- PAGE MENU -->
+      <div id="page-menu" class="page active">
+        <div
+          style="background:rgba(255,255,255,0.3);border-radius:50px;overflow:hidden;border:1px solid rgba(255,255,255,0.3);">
+
+          <!-- Table Header Bar -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 32px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <i class="ti ti-menu-2" style="font-size:26px;color:#c1500e;"></i>
+              <h2
+                style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:32px;margin:0;color:#1d1b19;">
+                Manajemen Menu</h2>
+            </div>
+            <button onclick="openAdd()"
+              style="background:#c1500e;color:#eddbb3;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:14px;padding:12px 24px;cursor:pointer;display:flex;align-items:center;gap:8px;">
+              <i class="ti ti-plus"></i> Tambah Menu Baru
+            </button>
+          </div>
+
+          <!-- Search + Filter -->
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #dec0b5;">
+            <div style="position:relative;flex:1;max-width:420px;">
+              <i class="ti ti-search"
+                style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:18px;pointer-events:none;"></i>
+              <input type="search" id="searchInput" placeholder="Cari nama menu..." oninput="onSearch()"
+                style="width:100%;padding:10px 16px 10px 40px;background:#fff8f4;border:1px solid #dec0b5;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:#1d1b19;" />
+            </div>
+            <button
+              style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#1d1b19;background:transparent;border:1px solid #dec0b5;border-radius:8px;padding:8px 16px;cursor:pointer;">Filter</button>
+          </div>
+
+          <!-- Table -->
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-family:'Plus Jakarta Sans',sans-serif;">
+              <thead>
+                <tr style="background:#ede7e3;">
+                  <th style="text-align:left;padding:16px 24px;font-size:14px;font-weight:700;color:#574239;">MENU</th>
+                  <th style="text-align:center;padding:16px 24px;font-size:14px;font-weight:700;color:#574239;">KATEGORI
+                  </th>
+                  <th style="text-align:right;padding:16px 24px;font-size:14px;font-weight:700;color:#574239;">HARGA
+                  </th>
+                  <th style="text-align:center;padding:16px 24px;font-size:14px;font-weight:700;color:#574239;">STATUS
+                  </th>
+                  <th style="text-align:right;padding:16px 24px;font-size:14px;font-weight:700;color:#574239;">AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="menuTbody"></tbody>
+            </table>
+            <div id="emptyState" style="display:none;text-align:center;padding:60px 24px;">
+              <i class="ti ti-search" style="font-size:48px;color:#b0a090;"></i>
+              <div style="font-size:16px;font-weight:700;color:#574239;margin-top:12px;">Menu tidak ditemukan</div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;padding:12px 24px 24px;background:#ede7e3;border-top:1px solid #c1500e;">
+            <p id="footInfo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:#574239;margin:0;">
+            </p>
+            <div style="display:flex;gap:8px;">
+              <button onclick="changePage(-1)"
+                style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#574239;background:transparent;border:1px solid #dec0b5;border-radius:8px;padding:8px 16px;cursor:pointer;">Sebelumnya</button>
+              <button onclick="changePage(1)"
+                style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#eddbb3;background:#c1500e;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;">Berikutnya</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD/EDIT MODAL -->
+  <div id="modalOverlay"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;">
+    <div
+      style="background:#fff8f4;border-radius:24px;width:100%;max-width:460px;margin:0 16px;max-height:90vh;overflow-y:auto;padding:32px;"
+      onclick="event.stopPropagation()">
+      <div style="font-size:18px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:10px;"><i
+          class="ti ti-edit" style="color:#c1500e;font-size:22px;"></i><span id="modalHeading">Tambah Menu Baru</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <label
+            style="font-size:11px;font-weight:700;color:#574239;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px;">Foto
+            Menu</label>
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <div id="uploadZone" onclick="document.getElementById('fImageFile').click()"
+              style="width:112px;height:112px;border-radius:12px;background:#ede7e3;border:2px dashed #dec0b5;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;position:relative;">
+              <img id="fImagePreview" src="" style="width:100%;height:100%;object-fit:cover;display:none;"
+                alt="Preview" />
+              <div id="fImagePlaceholder" style="display:flex;flex-direction:column;align-items:center;color:#574239;">
+                <i class="ti ti-camera-plus" style="font-size:28px;"></i><span
+                  style="font-size:10px;font-weight:600;margin-top:4px;">Pilih Foto</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding-top:4px;">
+              <input type="file" id="fImageFile" accept="image/*" style="display:none;"
+                onchange="handleImageUpload(event)" />
+              <button type="button" onclick="document.getElementById('fImageFile').click()"
+                style="padding:8px 16px;border:1px solid #dec0b5;border-radius:12px;font-size:12px;font-weight:600;color:#574239;cursor:pointer;display:flex;align-items:center;gap:6px;background:#fff8f4;"><i
+                  class="ti ti-upload" style="font-size:14px;"></i>Unggah</button>
+              <button type="button" id="btnRemoveImg" onclick="removeImage()"
+                style="padding:8px 16px;border-radius:12px;font-size:12px;font-weight:600;color:#e24b4a;cursor:pointer;display:none;background:transparent;border:none;">Hapus
+                Foto</button>
+            </div>
+          </div>
+        </div>
+        <div><label
+            style="font-size:11px;font-weight:700;color:#574239;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Nama
+            Menu</label><input type="text" id="fName" placeholder="Contoh: Nasi Goreng Spesial"
+            style="width:100%;padding:10px 16px;border:1px solid #dec0b5;border-radius:12px;font-size:14px;background:#fff8f4;color:#1d1b19;" />
+        </div>
+        <div><label
+            style="font-size:11px;font-weight:700;color:#574239;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Deskripsi</label><input
+            type="text" id="fDesc" placeholder="Bahan / varian"
+            style="width:100%;padding:10px 16px;border:1px solid #dec0b5;border-radius:12px;font-size:14px;background:#fff8f4;color:#1d1b19;" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label
+              style="font-size:11px;font-weight:700;color:#574239;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Kategori</label><select
+              id="fCat"
+              style="width:100%;padding:10px 16px;border:1px solid #dec0b5;border-radius:12px;font-size:14px;background:#fff8f4;color:#1d1b19;">
+              <option value="food">Makanan</option>
+              <option value="drink">Minuman</option>
+            </select></div>
+          <div><label
+              style="font-size:11px;font-weight:700;color:#574239;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Harga
+              (Rp)</label><input type="number" id="fPrice" placeholder="25000" min="0"
+              style="width:100%;padding:10px 16px;border:1px solid #dec0b5;border-radius:12px;font-size:14px;background:#fff8f4;color:#1d1b19;" />
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button onclick="closeModal()"
+          style="padding:10px 20px;border:1px solid #dec0b5;border-radius:12px;font-size:14px;font-weight:600;color:#574239;cursor:pointer;background:#fff8f4;">Batal</button>
+        <button onclick="saveMenu()"
+          style="padding:10px 24px;background:#c1500e;color:#eddbb3;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE MODAL -->
+  <div id="delOverlay"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;">
+    <div
+      style="background:#fff8f4;border-radius:24px;width:100%;max-width:360px;margin:0 16px;padding:32px;text-align:center;"
+      onclick="event.stopPropagation()">
+      <div style="font-size:40px;color:#e24b4a;margin-bottom:16px;"><i class="ti ti-trash"></i></div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;">Hapus Menu?</div>
+      <div id="delSub" style="font-size:13px;color:#574239;margin-bottom:24px;">Tindakan ini tidak dapat dibatalkan.
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button onclick="closeDel()"
+          style="padding:10px 20px;border:1px solid #dec0b5;border-radius:12px;font-size:14px;font-weight:600;color:#574239;cursor:pointer;background:#fff8f4;">Batal</button>
+        <button onclick="confirmDel()"
+          style="padding:10px 24px;background:#e24b4a;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Ya,
+          Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" style="position:fixed;bottom:24px;right:24px;z-index:9999;opacity:0;transition:opacity .3s;"></div>
+
+  <script>
+    function switchPage(pageId, el) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const t = document.getElementById('page-' + pageId);
+      if (t) t.classList.add('active');
+      if (el) el.classList.add('active');
+    }
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      const bg = type === 'error' ? '#e24b4a' : type === 'success' ? '#0f6e56' : '#185fa5';
+      t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:${bg};box-shadow:0 4px 24px rgba(0,0,0,.15);opacity:1;transition:opacity .3s;font-family:'Plus Jakarta Sans',sans-serif;`;
+      setTimeout(() => { t.style.opacity = '0'; }, 2500);
+    }
+  </script>
+  <script src="../../js/edit-menu.js"></script>
+  <script>
+    // Panggil renderMenu pertama kali jika tidak dipanggil dari edit-menu.js
+    window.addEventListener('DOMContentLoaded', () => {
+      if (typeof renderMenu === 'function') renderMenu();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,13 +1,13 @@
 // Data Layer (Nanti ganti dengan fetch ke API Node.js)
 let menus = [
-  { id:1,  name:'Nasi Goreng Spesial',   desc:'Pedas Sedang, Telur Ceplok',     cat:'food',  price:25000, active:true,  image:'https://picsum.photos/seed/nasgor/200/200' },
-  { id:2,  name:'Ayam Goreng Kremes',    desc:'Paha/Dada, Sambal Bawang',       cat:'food',  price:22000, active:true,  image:'https://picsum.photos/seed/ayamkr/200/200' },
+  { id:1,  name:'Nasi Goreng Spesial',   desc:'Pedas Sedang, Telur Ceplok',     cat:'food',  price:25000, active:true,  image:'assets/nasi_goreng.png' },
+  { id:2,  name:'Ayam Goreng Kremes',    desc:'Paha/Dada, Sambal Bawang',       cat:'food',  price:22000, active:true,  image:'assets/ayam_goreng.png' },
   { id:3,  name:'Mie Goreng Seafood',    desc:'Udang, Cumi, Bakso Ikan',        cat:'food',  price:28000, active:true,  image:'https://picsum.photos/seed/miegoreng/200/200' },
   { id:4,  name:'Soto Ayam Lamongan',    desc:'Kuah Bening, Koya Gurih',        cat:'food',  price:18000, active:true,  image:'https://picsum.photos/seed/sotoayam/200/200' },
   { id:5,  name:'Rendang Sapi',          desc:'Daging Sapi Empuk, Bumbu Padang',cat:'food',  price:32000, active:false, image:'https://picsum.photos/seed/rendang/200/200' },
   { id:6,  name:'Gado-gado Jakarta',     desc:'Sayuran Segar, Bumbu Kacang',    cat:'food',  price:15000, active:true,  image:'https://picsum.photos/seed/gadogado/200/200' },
-  { id:7,  name:'Es Teh Manis',          desc:'Gula Murni, Es Kristal',         cat:'drink', price:5000,  active:true,  image:'https://picsum.photos/seed/esteh/200/200' },
-  { id:8,  name:'Jus Jeruk Peras',       desc:'Jeruk Medan Asli, Tanpa Gula',   cat:'drink', price:15000, active:false, image:'https://picsum.photos/seed/jusjeruk/200/200' },
+  { id:7,  name:'Es Teh Manis',          desc:'Gula Murni, Es Kristal',         cat:'drink', price:5000,  active:true,  image:'assets/es_teh_manis.png' },
+  { id:8,  name:'Jus Jeruk Peras',       desc:'Jeruk Medan Asli, Tanpa Gula',   cat:'drink', price:15000, active:false, image:'assets/jus_jeruk.png' },
   { id:9,  name:'Es Kopi Susu',          desc:'Kopi Robusta, Susu Segar',       cat:'drink', price:18000, active:true,  image:'https://picsum.photos/seed/eskopi/200/200' },
   { id:10, name:'Teh Tarik',             desc:'Teh Ceylon, Susu Kental Manis',  cat:'drink', price:12000, active:true,  image:'https://picsum.photos/seed/tehtarik/200/200' },
 ];
