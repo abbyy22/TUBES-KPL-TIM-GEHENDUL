@@ -7,12 +7,12 @@
   <title>TelFood – Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { theme: { extend: { fontFamily: { poppins: ['Poppins', 'sans-serif'], jakarta: ['Plus Jakarta Sans', 'sans-serif'] } } } }
+    tailwind.config = { theme: { extend: { fontFamily: { poppins: ['Poppins', 'sans-serif'], jakarta: ['Poppins', 'sans-serif'] } } } }
   </script>
   <style>
     * {
@@ -108,7 +108,7 @@
       outline: none;
       background: transparent;
       width: 100%;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 16px;
       color: #574239;
     }
@@ -201,11 +201,11 @@
             <div style="display:flex;align-items:center;gap:12px;">
               <i class="ti ti-menu-2" style="font-size:26px;color:#c1500e;"></i>
               <h2
-                style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:32px;margin:0;color:#1d1b19;">
+                style="font-family:'Poppins',sans-serif;font-weight:700;font-size:32px;margin:0;color:#1d1b19;">
                 Manajemen Menu</h2>
             </div>
             <button onclick="openAdd()"
-              style="background:#c1500e;color:#eddbb3;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:14px;padding:12px 24px;cursor:pointer;display:flex;align-items:center;gap:8px;">
+              style="background:#c1500e;color:#eddbb3;font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:14px;padding:12px 24px;cursor:pointer;display:flex;align-items:center;gap:8px;">
               <i class="ti ti-plus"></i> Tambah Menu Baru
             </button>
           </div>
@@ -217,15 +217,15 @@
               <i class="ti ti-search"
                 style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:18px;pointer-events:none;"></i>
               <input type="search" id="searchInput" placeholder="Cari nama menu..." oninput="onSearch()"
-                style="width:100%;padding:10px 16px 10px 40px;background:#fff8f4;border:1px solid #dec0b5;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:#1d1b19;" />
+                style="width:100%;padding:10px 16px 10px 40px;background:#fff8f4;border:1px solid #dec0b5;border-radius:12px;font-family:'Poppins',sans-serif;font-size:15px;color:#1d1b19;" />
             </div>
             <button
-              style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#1d1b19;background:transparent;border:1px solid #dec0b5;border-radius:8px;padding:8px 16px;cursor:pointer;">Filter</button>
+              style="font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;color:#1d1b19;background:transparent;border:1px solid #dec0b5;border-radius:8px;padding:8px 16px;cursor:pointer;">Filter</button>
           </div>
 
           <!-- Table -->
           <div style="overflow-x:auto;">
-            <table style="width:100%;border-collapse:collapse;font-family:'Plus Jakarta Sans',sans-serif;">
+            <table style="width:100%;border-collapse:collapse;font-family:'Poppins',sans-serif;">
               <thead>
                 <tr style="background:#ede7e3;">
                   <th style="text-align:left;padding:16px 24px;font-size:14px;font-weight:700;color:#574239;">MENU</th>
@@ -249,13 +249,13 @@
           <!-- Footer -->
           <div
             style="display:flex;align-items:center;justify-content:space-between;padding:12px 24px 24px;background:#ede7e3;border-top:1px solid #c1500e;">
-            <p id="footInfo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:#574239;margin:0;">
+            <p id="footInfo" style="font-family:'Poppins',sans-serif;font-size:15px;color:#574239;margin:0;">
             </p>
             <div style="display:flex;gap:8px;">
               <button onclick="changePage(-1)"
-                style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#574239;background:transparent;border:1px solid #dec0b5;border-radius:8px;padding:8px 16px;cursor:pointer;">Sebelumnya</button>
+                style="font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;color:#574239;background:transparent;border:1px solid #dec0b5;border-radius:8px;padding:8px 16px;cursor:pointer;">Sebelumnya</button>
               <button onclick="changePage(1)"
-                style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#eddbb3;background:#c1500e;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;">Berikutnya</button>
+                style="font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;color:#eddbb3;background:#c1500e;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;">Berikutnya</button>
             </div>
           </div>
         </div>
@@ -367,7 +367,7 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       const bg = type === 'error' ? '#e24b4a' : type === 'success' ? '#0f6e56' : '#185fa5';
-      t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:${bg};box-shadow:0 4px 24px rgba(0,0,0,.15);opacity:1;transition:opacity .3s;font-family:'Plus Jakarta Sans',sans-serif;`;
+      t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:${bg};box-shadow:0 4px 24px rgba(0,0,0,.15);opacity:1;transition:opacity .3s;font-family:'Poppins',sans-serif;`;
       setTimeout(() => { t.style.opacity = '0'; }, 2500);
     }
   </script>
