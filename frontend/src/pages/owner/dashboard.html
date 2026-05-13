@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Kantin NEO 2 – telFood</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #EDE5D8;
+      --sidebar-bg: #F7F2EA;
+      --card-bg: #F7F2EA;
+      --panel-bg: #F7F2EA;
+      --primary: #C05A1F;
+      --primary-light: #E8784A;
+      --text-dark: #1C1410;
+      --text-mid: #6B5E54;
+      --text-muted: #9E8E84;
+      --border: rgba(0,0,0,0.07);
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --shadow-hover: 0 6px 24px rgba(0,0,0,0.10);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      --radius-pill: 100px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      padding: 20px;
+      gap: 16px;
+      color: var(--text-dark);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 230px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-radius: var(--radius-lg);
+      padding: 36px 28px 28px;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 40px);
+      animation: fadeSlideIn 0.4s ease both;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 44px;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--primary); }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-mid);
+      text-decoration: none;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .nav-item:hover { color: var(--primary); background: rgba(192,90,31,0.07); }
+    .nav-item.active { color: var(--text-dark); font-weight: 600; }
+
+    .sidebar-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d4956a, #b85c20);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-fallback {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .user-info { overflow: hidden; }
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-email {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: calc(100vh - 40px);
+      animation: fadeSlideIn 0.4s ease 0.05s both;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: var(--panel-bg);
+      border-radius: var(--radius-lg);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .topbar-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+      flex: 1;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      border: 1.5px solid #DDD0C4;
+      border-radius: var(--radius-pill);
+      padding: 10px 20px;
+      width: 320px;
+      transition: border-color 0.15s;
+    }
+    .search-bar:focus-within { border-color: var(--primary); }
+    .search-bar svg { color: var(--text-muted); flex-shrink: 0; }
+    .search-bar input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      color: var(--text-dark);
+      width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--text-muted); }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid #DDD0C4;
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .icon-btn:hover { border-color: var(--primary); background: #fff; }
+
+    .notif-dot {
+      width: 9px;
+      height: 9px;
+      background: var(--primary);
+      border-radius: 50%;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      border: 2px solid var(--panel-bg);
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+    }
+
+    /* ── STAT CARDS ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 26px 28px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: fadeUp 0.4s ease both;
+    }
+    .stat-card:nth-child(2) { animation-delay: 0.07s; }
+    .stat-card:nth-child(3) { animation-delay: 0.14s; }
+
+    .stat-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .stat-up { color: var(--primary); font-weight: 600; }
+
+    /* ── ORDERS SECTION ── */
+    .orders-section {
+      background: var(--panel-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px 28px 24px;
+      flex: 1;
+      animation: fadeUp 0.4s ease 0.18s both;
+    }
+
+    .orders-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .orders-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .order-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 24px;
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.15s;
+      animation: fadeUp 0.35s ease both;
+    }
+    .order-row:nth-child(1) { animation-delay: 0.22s; }
+    .order-row:nth-child(2) { animation-delay: 0.28s; }
+    .order-row:nth-child(3) { animation-delay: 0.34s; }
+    .order-row:nth-child(4) { animation-delay: 0.40s; }
+    .order-row:nth-child(5) { animation-delay: 0.46s; }
+    .order-row:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    .order-num {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-muted);
+      width: 36px;
+      flex-shrink: 0;
+    }
+
+    .order-info { flex: 1; min-width: 0; }
+    .order-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+    .order-items {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .order-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-dark);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      padding: 7px 20px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 90px;
+      text-align: center;
+    }
+    .badge-baru    { background: var(--primary); color: #fff; }
+    .badge-proses  { background: var(--primary); color: #fff; }
+    .badge-selesai { background: var(--primary); color: #fff; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── DARK MODE toggle state ── */
+    body.dark {
+      --bg: #1A1410;
+      --sidebar-bg: #221C17;
+      --card-bg: #221C17;
+      --panel-bg: #221C17;
+      --text-dark: #F0E8D8;
+      --text-mid: #B09888;
+      --text-muted: #7A6A60;
+      --border: rgba(255,255,255,0.07);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="logo"><span>tel</span>Food.</div>
+
+    <nav class="nav">
+      <a class="nav-item active" href="#">Dashboard</a>
+      <a class="nav-item" href="#">Edit Menu</a>
+      <a class="nav-item" href="#">Status Pesanan</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="avatar">
+        <span class="avatar-fallback">N</span>
+      </div>
+      <div class="user-info">
+        <div class="user-name">Namimaw</div>
+        <div class="user-email">mimaw@gmail.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="panel">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <h1 class="topbar-title">Kantin NEO 2</h1>
+
+      <div class="search-bar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Search">
+      </div>
+
+      <div class="topbar-actions">
+        <button class="icon-btn" id="darkToggle" title="Toggle dark mode">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7a6555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- Stat Cards -->
+      <div class="stat-grid">
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M9 9h6M9 12h6M9 15h4"/><path d="M9 9v6"/>
+            </svg>
+            Omzet hari ini
+          </div>
+          <div class="stat-value">Rp 847k</div>
+          <div class="stat-sub"><span class="stat-up">↑ 12% vs kemarin</span></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2"/>
+              <line x1="8" y1="8" x2="16" y2="8"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+              <line x1="8" y1="16" x2="13" y2="16"/>
+            </svg>
+            Total Transaksi
+          </div>
+          <div class="stat-value">64</div>
+          <div class="stat-sub">Rata-rata Rp 12k/transaksi</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Antrian aktif
+          </div>
+          <div class="stat-value">7</div>
+          <div class="stat-sub">Estimasi selesai ~18 mnt</div>
+        </div>
+
+      </div>
+
+      <!-- Orders Section -->
+      <section class="orders-section">
+        <div class="orders-header">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="15" y2="18"/>
+          </svg>
+          <h2>Pesanan masuk</h2>
+        </div>
+
+        <div class="orders-list">
+
+          <div class="order-row">
+            <span class="order-num">#41</span>
+            <div class="order-info">
+              <div class="order-name">Meja 3 – Sukma</div>
+              <div class="order-items">Nasi goreng, Es teh x1</div>
+            </div>
+            <span class="order-price">Rp 23k</span>
+            <span class="badge badge-baru">Baru</span>
+          </div>
+
+          <div class="order-row">
+            <span class="order-num">#40</span>
+            <div class="order-info">
+              <div class="order-name">Bawa Pulang – Nadia</div>
+              <div class="order-items">Serbu 1 x1</div>
+            </div>
+            <span class="order-price">Rp 11k</span>
+            <span class="badge badge-proses">Diproses</span>
+          </div>
+
+          <div class="order-row">
+            <span class="order-num">#39</span>
+            <div class="order-info">
+              <div class="order-name">Meja 1 – Abidah</div>
+              <div class="order-items">Soto Ayam, Es teh x1</div>
+            </div>
+            <span class="order-price">Rp 19k</span>
+            <span class="badge badge-selesai">Selesai</span>
+          </div>
+
+          <div class="order-row">
+            <span class="order-num">#38</span>
+            <div class="order-info">
+              <div class="order-name">Meja 5 – Najwa</div>
+              <div class="order-items">Nasi rames x4, Jus jeruk x3</div>
+            </div>
+            <span class="order-price">Rp 67k</span>
+            <span class="badge badge-selesai">Selesai</span>
+          </div>
+
+          <div class="order-row">
+            <span class="order-num">#37</span>
+            <div class="order-info">
+              <div class="order-name">Bawa Pulang – Ryvanda</div>
+              <div class="order-items">Tongseng pedas lvl 3 x1</div>
+            </div>
+            <span class="order-price">Rp 14k</span>
+            <span class="badge badge-selesai">Selesai</span>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Nav active state
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+
+    // Dark mode toggle
+    document.getElementById('darkToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+
+    // Search focus
+    const bar = document.querySelector('.search-bar');
+    bar.querySelector('input').addEventListener('focus', () => bar.style.borderColor = 'var(--primary)');
+    bar.querySelector('input').addEventListener('blur',  () => bar.style.borderColor = '');
+  </script>
+</body>
+</html>
