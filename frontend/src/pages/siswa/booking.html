@@ -1,0 +1,93 @@
+<div class="ml-[30px] mr-20 min-h-screen flex-1 px-7 py-6">
+
+    <!-- TOPBAR -->
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-2 bg-[#F4EFE2] rounded-[10px] px-4 py-[9px] flex-1 max-w-[480px] shadow-md">
+            <span class="text-gray-400 text-sm">&#128269;</span>
+            <input type="text" placeholder="Search"
+                class="bg-transparent outline-none border-none text-[12px] text-[#2D2D2D] w-full" />
+        </div>
+        <div class="flex items-center gap-3">
+            <button
+                class="relative w-9 h-9 rounded-full bg-[#F4EFE2] flex items-center justify-center shadow-md hover:shadow-lg transition">
+                <span class="text-gray-500 text-base">&#128276;</span>
+                <span
+                    class="absolute -top-1 -right-1 w-[14px] h-[14px] rounded-full bg-[#D4622A] text-white text-[8px] font-bold flex items-center justify-center">1</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- BOOKING LAYOUT -->
+    <div class="grid grid-cols-2 gap-6">
+
+        <!-- KIRI: FORM -->
+        <div class="bg-[#F4EFE2] rounded-[22px] p-6 shadow-md flex flex-col">
+
+            <h2 class="text-[22px] font-bold text-[#2D2D2D] mb-1">Form Pemesanan</h2>
+            <p class="text-[12px] text-gray-400 mb-5">
+                Estimasi pesanan kamu akan jadi dalam
+                <span class="text-[#D4622A] font-semibold">29 menit</span>
+                setelah kamu memesan.
+            </p>
+
+            <!-- Nama -->
+            <div class="mb-4">
+                <input type="text" id="namaInput" placeholder="Nama" autocomplete="off"
+                    class="w-full bg-[#F4EFE2] border border-gray-200 rounded-xl px-4 py-3 text-[12px] outline-none focus:border-[#D4622A] transition" />
+            </div>
+
+            <!-- Pilih Kantin -->
+            <div class="mb-5 relative">
+                <select id="kantinSelect"
+                    class="w-full bg-[#F4EFE2] border border-gray-200 rounded-xl px-4 py-3 text-[12px] outline-none focus:border-[#D4622A] appearance-none transition cursor-pointer">
+                    <option value="">Pilih Kantin</option>
+                </select>
+                <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Item List -->
+            <div class="mb-4">
+                <div class="text-[12px] font-semibold text-[#2D2D2D] mb-3">Item</div>
+                <div id="orderItemsList" class="min-h-[80px] space-y-1">
+                    <div class="text-xs text-gray-400 italic">Belum ada item dipilih</div>
+                </div>
+            </div>
+
+            <!-- Separator -->
+            <div class="border-t border-gray-200 my-3"></div>
+
+            <!-- Total -->
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-[13px] font-semibold text-[#2D2D2D]">total</span>
+                <span id="orderTotal" class="text-[15px] font-bold text-[#D4622A]">Rp 0</span>
+            </div>
+            <p class="text-[11px] text-gray-400 mb-5">*bayar makanan langsung di Kantin</p>
+
+            <button id="pesanBtn"
+                class="mt-auto w-full bg-[#D4622A] hover:bg-[#bb5422] text-white py-[13px] rounded-xl text-[12px] font-semibold transition active:scale-[0.98]">
+                Pesan Sekarang
+            </button>
+        </div>
+
+        <!-- KANAN: MENU GRID -->
+        <div class="bg-[#F4EFE2] rounded-[22px] p-6 shadow-md">
+            <div class="flex justify-center items-center gap-3 mb-5">
+                <div id="menuPanelHeader" class="text-[18px] font-bold text-[#2D2D2D] tracking-wide">MENU KANTIN</div>
+            </div>
+
+            <div id="menuGrid" class="grid grid-cols-2 gap-4">
+                <div class="col-span-2 text-center py-10 text-gray-400 text-xs italic">Pilih kantin untuk melihat menu
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="orderStatusOverlay" class="flex fixed inset-0 z-200 items-center justify-end p-6 pointer-events-none">
+</div>
