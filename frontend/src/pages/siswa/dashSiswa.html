@@ -1,0 +1,59 @@
+<div class="ml-[30px] mr-20 px-7 py-6">
+
+  <!-- TOPBAR -->
+  <div class="flex items-center justify-between mb-5">
+
+    <div class="flex items-center gap-2 bg-[#F4EFE2] rounded-[10px] px-4 py-[9px] flex-1 max-w-[480px] shadow-md">
+      <span class="text-gray-400 text-sm">&#128269;</span>
+      <input type="text" id="searchInput" placeholder="Search"
+        class="bg-transparent outline-none border-none text-[12px] text-[#2D2D2D] w-full" />
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button class="relative w-9 h-9 rounded-full bg-[#F4EFE2] flex items-center justify-center shadow-md hover:shadow-lg transition">
+        <span class="text-gray-500 text-base">&#128276;</span>
+        <span class="absolute -top-1 -right-1 w-[14px] h-[14px] rounded-full bg-[#D4622A] text-white text-[8px] font-bold flex items-center justify-center">1</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE HOME -->
+  <div>
+
+    <!-- Hero -->
+    <div class="bg-[#F4EFE2] rounded-[22px] overflow-hidden relative flex items-center shadow-md mb-7">
+
+      <div class="w-[200px] min-w-[200px] h-[170px] flex items-center justify-center p-3 bg-gradient-to-br from-[#F4EFE2] to-[#FEF2E4]">
+        <div class="text-[90px] leading-none drop-shadow-[0_8px_20px_rgba(212,98,42,0.25)]">🍜</div>
+      </div>
+
+      <div class="px-7 py-6 flex-1">
+
+        <div class="inline-flex items-center gap-[5px] bg-[#FAF7F2] rounded-full px-3 py-1 text-[10px] font-medium text-gray-500 mb-[10px]">
+          <span class="w-[6px] h-[6px] rounded-full bg-[#D4622A] inline-block"></span>
+          Akses Cepat
+        </div>
+
+        <h1 class="text-[26px] font-extrabold text-[#2D2D2D] leading-[1.1] mb-2">Gas pesen!!!</h1>
+
+        <p class="text-[11.5px] text-gray-400 leading-[1.5] max-w-[340px] mb-[18px]">
+          Datang ke kantin pas makanan kamu udah siap? Pesan makanan favoritmu
+          tanpa ribet, langsung dari kantin kampus.
+        </p>
+
+        <button id="heroCta" onclick="loadPage('booking')"
+          class="bg-[#D4622A] hover:bg-[#bb5422] text-[#F4EFE2] text-[12px] font-semibold px-[22px] py-[10px] rounded-lg transition hover:-translate-y-[1px]">
+          Pesan Sekarang
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Section -->
+    <h2 class="text-[18px] font-bold text-[#2D2D2D] mb-[18px]">Top Menu Minggu Ini</h2>
+
+    <!-- Grid - JS yang render isinya -->
+    <div id="topMenuGrid" class="grid grid-cols-3 gap-4 mb-8"></div>
+
+  </div>
+</div>

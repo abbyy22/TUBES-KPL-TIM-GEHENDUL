@@ -1,139 +1,244 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>telFood - Smart Canteen</title>
-    <link href="./output.css" rel="stylesheet" />
-  </head>
-  <body class="bg-[#F0E8D5] dark:bg-gray-900 transition-colors">
-    <div id="sidebar-placeholder"></div>
 
-    <main id="main-content" class="ml-72 p-8 min-h-screen">
-      <div id="page-loader" class="flex justify-center items-center h-full">
-        <p>Memuat halaman...</p>
-      </div>
-    </main>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>telFood - Smart Canteen</title>
+  <link href="./output.css" rel="stylesheet" />
+</head>
 
-    <script>
-      // 1. Fungsi Load Sidebar
-      async function initApp() {
-        try {
-          // Load Sidebar dari folder partials
-          const resSidebar = await fetch("./partials/sidebar.html");
-          const sidebarHtml = await resSidebar.text();
-          document.getElementById("sidebar-placeholder").innerHTML =
-            sidebarHtml;
+<body class="bg-[#F0E8D5] dark:bg-gray-900 transition-colors">
+  <div id="sidebar-placeholder"></div>
 
-          // Inisialisasi Navigasi setelah sidebar muncul
-          setupNavigation();
+  <main id="main-content" class="ml-72 p-8 min-h-screen">
+    <div id="page-loader" class="flex justify-center items-center h-full">
+      <p>Memuat halaman...</p>
+    </div>
+  </main>
 
-          // Load halaman pertama kali (Home)
-          loadPage("home");
-        } catch (err) {
-          console.error("Gagal inisialisasi:", err);
-        }
+  <script src="./js/siswa/utils.js"></script>
+  <script src="./js/siswa/menuTable.js"></script>
+  <script src="./js/siswa/orderStateMachine.js"></script>
+  <script src="./js/siswa/cart.js"></script>
+  <script src="./js/siswa/ui.js"></script>
+
+
+  <script src="./js/siswa/dashSiswa.js"></script>
+  <script src="./js/siswa/booking.js"></script>
+
+  <script>
+    // 1. Fungsi Load Sidebar
+    async function initApp() {
+      try {
+        // Load Sidebar dari folder partials
+        const resSidebar = await fetch("./partials/sidebar.html");
+        const sidebarHtml = await resSidebar.text();
+        document.getElementById("sidebar-placeholder").innerHTML =
+          sidebarHtml;
+
+        // Inisialisasi Navigasi setelah sidebar muncul
+        setupNavigation();
+
+        // Load halaman pertama kali (Home)
+        loadPage("home");
+      } catch (err) {
+        console.error("Gagal inisialisasi:", err);
       }
+    }
 
-      // 2. Fungsi Load Halaman Dinamis
-      async function loadPage(pageName) {
-        const contentArea = document.getElementById("main-content");
+    // 2. Fungsi Load Halaman Dinamis
+    async function loadPage(pageName) {
+      const contentArea = document.getElementById('main-content');
 
-        let filePath = "";
-        if (pageName === "home") filePath = "./pages/index.html";
-        else if (pageName === "booking") filePath = "./pages/booking.html";
-        else if (pageName === "account")
-          filePath = "./pages/account/index.html";
+      let filePath = '';
+      if (pageName === 'home') filePath = './pages/siswa/dashSiswa.html';
+      else if (pageName === 'booking') filePath = './pages/siswa/booking.html';
+      else if (pageName === 'account') filePath = './pages/account/index.html';
 
-        try {
-          const response = await fetch(filePath);
-          if (!response.ok) throw new Error("Page not found");
-          const html = await response.text();
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) throw new Error('Page not found');
+        const html = await response.text();
 
-          // ← Tambah ini, cek apakah <script> ada di HTML yang di-fetch
-          console.log("HTML yang difetch:", html.substring(0, 200));
-          console.log("Ada script tag?", html.includes("<script>"));
+        contentArea.innerHTML = html; // inject sekali
 
-          contentArea.innerHTML = html;
+        updateSidebarActive(pageName);
 
-          console.log(
-            "Scripts di DOM setelah inject:",
-            contentArea.querySelectorAll("script").length,
-          );
-
-          updateSidebarActive(pageName);
-
-          if (pageName === 'account') initAccountPage();
-        } catch (err) {
-          contentArea.innerHTML = `<h2 class="text-red-500">Halaman tidak ditemukan: ${pageName}</h2>`;
+        // Tunggu DOM selesai render baru panggil fungsi JS
+        if (pageName === 'home') {
+          dashSiswa.renderTopMenu();
         }
-      }
+        if (pageName === 'booking') {
+          booking.renderKantinSelect();
+          booking.renderMenuGrid('');
+          booking.renderOrderItems();
 
-      // 3. Setup klik menu di sidebar
-      function setupNavigation() {
-        document.body.addEventListener("click", (e) => {
-          const link = e.target.closest("a[data-page]");
-          if (link) {
-            e.preventDefault();
-            const page = link.getAttribute("data-page").replace("page-", "");
-            loadPage(page);
+          const pesanBtn = document.getElementById('pesanBtn');
+
+          if (pesanBtn) {
+
+            // biar ga double event tiap reload page
+            pesanBtn.replaceWith(pesanBtn.cloneNode(true));
+
+            const newPesanBtn = document.getElementById('pesanBtn');
+
+            newPesanBtn.addEventListener('click', () => {
+
+              const nama = document.getElementById('namaInput')?.value?.trim();
+              const kantin = document.getElementById('kantinSelect')?.value;
+
+              // VALIDASI
+              const valid = Utils.validateNama(nama);
+
+              if (!valid.valid) {
+                alert(valid.message);
+                return;
+              }
+
+              if (!kantin) {
+                alert('Pilih kantin dulu anjir');
+                return;
+              }
+
+              if (Cart.isEmpty()) {
+                alert('Pilih menu terlebih dahulu!');
+                return;
+              }
+
+              // STATE MACHINE
+              OrderStateMachine.reset();
+              OrderStateMachine.transition(
+                OrderStateMachine.STATES.ORDERED
+              );
+
+              // ORDER DATA
+              const orderId = Utils.generateOrderId();
+
+              const items = Cart.getItems();
+
+              const summary =
+                items[0].menuItem.name +
+                (items.length > 1
+                  ? ` + ${items.length - 1} lainnya`
+                  : '');
+
+              // RENDER POPUP
+              const total = Cart.getTotal();
+
+              UI.renderOrderStatus(
+                orderId,
+                summary,
+                total
+              );
+
+              // SIMULASI STATUS
+              setTimeout(() => {
+                OrderStateMachine.transition(
+                  OrderStateMachine.STATES.COOKING
+                );
+
+                UI.renderOrderStatus(orderId, summary, total);
+              }, 3000);
+
+              setTimeout(() => {
+                OrderStateMachine.transition(
+                  OrderStateMachine.STATES.READY
+                );
+
+                UI.renderOrderStatus(orderId, summary, total);
+              }, 6000);
+
+              setTimeout(() => {
+                OrderStateMachine.transition(
+                  OrderStateMachine.STATES.DONE
+                );
+
+                UI.renderOrderStatus(orderId, summary, total);
+              }, 9000);
+
+              // RESET CART
+              Cart.clearCart();
+              booking.renderOrderItems();
+            });
           }
-        });
-      }
-
-      // 4. Update UI Menu Aktif
-      function updateSidebarActive(pageName) {
-        document.querySelectorAll(".sidebar-nav a").forEach((nav) => {
-          if (nav.getAttribute("data-page") === `page-${pageName}`) {
-            nav.classList.add("text-[#D2691E]", "font-bold");
-            nav.classList.remove("text-gray-400");
-          } else {
-            nav.classList.remove("text-[#D2691E]", "font-bold");
-            nav.classList.add("text-gray-400");
-          }
-        });
-      }
-
-      function initAccountPage() {
-        const orders = [
-          {
-            id: "#78093",
-            date: "Rabu, 25 April 2026",
-            pesan: [
-              { menu: "Nasi Goreng Mozarella", qty: 1 },
-              { menu: "Es Teh Manis", qty: 1 },
-            ],
-            canteen: "Kantin NEO 1",
-            total: "Rp 15.000",
-          },
-          {
-            id: "#78094",
-            date: "Selasa, 24 April 2026",
-            pesan: [
-              { menu: "Mie Ayam Spesial", qty: 2 },
-              { menu: "Jus Alpukat", qty: 1 },
-            ],
-            canteen: "Kantin NEO 2",
-            total: "Rp 28.000",
-          },
-          {
-            id: "#78095",
-            date: "Senin, 23 April 2026",
-            pesan: [{ menu: "Soto Ayam", qty: 1 }],
-            canteen: "Kantin NEO 1",
-            total: "Rp 12.000",
-          },
-        ];
-
-        const container = document.getElementById("history-container");
-        if (!container) {
-          console.log("container masih null!");
-          return;
         }
 
-        container.innerHTML = orders
-          .map(
-            (order) => `
+        if (pageName === 'account') {
+          initAccountPage();
+        }
+
+      } catch (err) {
+        console.error('Gagal load halaman:', err);
+        contentArea.innerHTML = `<h2 class="text-red-500">Halaman tidak ditemukan: ${pageName}</h2>`;
+      }
+    }
+
+    // 3. Setup klik menu di sidebar
+    function setupNavigation() {
+      document.body.addEventListener("click", (e) => {
+        const link = e.target.closest("a[data-page]");
+        if (link) {
+          e.preventDefault();
+          const page = link.getAttribute("data-page").replace("page-", "");
+          loadPage(page);
+        }
+      });
+    }
+
+    // 4. Update UI Menu Aktif
+    function updateSidebarActive(pageName) {
+      document.querySelectorAll(".sidebar-nav a").forEach((nav) => {
+        if (nav.getAttribute("data-page") === `page-${pageName}`) {
+          nav.classList.add("text-[#D2691E]", "font-bold");
+          nav.classList.remove("text-gray-400");
+        } else {
+          nav.classList.remove("text-[#D2691E]", "font-bold");
+          nav.classList.add("text-gray-400");
+        }
+      });
+    }
+
+    function initAccountPage() {
+      const orders = [
+        {
+          id: "#78093",
+          date: "Rabu, 25 April 2026",
+          pesan: [
+            { menu: "Nasi Goreng Mozarella", qty: 1 },
+            { menu: "Es Teh Manis", qty: 1 },
+          ],
+          canteen: "Kantin NEO 1",
+          total: "Rp 15.000",
+        },
+        {
+          id: "#78094",
+          date: "Selasa, 24 April 2026",
+          pesan: [
+            { menu: "Mie Ayam Spesial", qty: 2 },
+            { menu: "Jus Alpukat", qty: 1 },
+          ],
+          canteen: "Kantin NEO 2",
+          total: "Rp 28.000",
+        },
+        {
+          id: "#78095",
+          date: "Senin, 23 April 2026",
+          pesan: [{ menu: "Soto Ayam", qty: 1 }],
+          canteen: "Kantin NEO 1",
+          total: "Rp 12.000",
+        },
+      ];
+
+      const container = document.getElementById("history-container");
+      if (!container) {
+        console.log("container history masih null!");
+        return;
+      }
+
+      container.innerHTML = orders
+        .map(
+          (order) => `
     <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[#C1500E] transition-colors">
       <div class="flex items-start justify-between gap-4">
         <div>${order.pesan.map((item) => `<p class="text-sm text-gray-700">${item.qty}x <span class="font-medium">${item.menu}</span></p>`).join("")}</div>
@@ -148,23 +253,23 @@
       </div>
     </div>
   `,
-          )
-          .join("");
+        )
+        .join("");
 
-        // Search filter
-        const searchInput = document.getElementById("search");
-        if (searchInput) {
-          searchInput.addEventListener("input", (e) => {
-            const keyword = e.target.value.toLowerCase();
-            const filtered = orders.filter(
-              (order) =>
-                order.pesan.some((item) =>
-                  item.menu.toLowerCase().includes(keyword),
-                ) || order.canteen.toLowerCase().includes(keyword),
-            );
-            container.innerHTML = filtered
-              .map(
-                (order) => `
+      // Search filter
+      const searchInput = document.getElementById("search");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          const keyword = e.target.value.toLowerCase();
+          const filtered = orders.filter(
+            (order) =>
+              order.pesan.some((item) =>
+                item.menu.toLowerCase().includes(keyword),
+              ) || order.canteen.toLowerCase().includes(keyword),
+          );
+          container.innerHTML = filtered
+            .map(
+              (order) => `
         <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[#C1500E] transition-colors">
           <div class="flex items-start justify-between gap-4">
             <div>${order.pesan.map((item) => `<p class="text-sm text-gray-700">${item.qty}x <span class="font-medium">${item.menu}</span></p>`).join("")}</div>
@@ -179,14 +284,15 @@
           </div>
         </div>
       `,
-              )
-              .join("");
-          });
-        }
+            )
+            .join("");
+        });
       }
+    }
 
-      // Jalankan aplikasi
-      window.onload = initApp;
-    </script>
-  </body>
+    // Jalankan aplikasi
+    window.onload = initApp;
+  </script>
+</body>
+
 </html>
