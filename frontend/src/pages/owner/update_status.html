@@ -1,0 +1,205 @@
+<div class="flex flex-col gap-3.5 min-h-[calc(100vh-40px)] animate-fadeSlideIn">
+
+  <header class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center gap-6">
+    <h1 class="text-2xl font-bold text-brand-mid tracking-tight flex-1">Kantin NEO 2</h1>
+    <div class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80">
+      <span class="text-brand-muted text-sm shrink-0 select-none">&#128269;</span>
+      <input class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
+        type="text" placeholder="Search" id="searchInput" oninput="filterOrders()">
+    </div>
+  </header>
+
+  <main class="flex flex-col gap-3.5 flex-1">
+
+    <div class="grid grid-cols-4 gap-3.5">
+      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+        <div class="text-2xl font-bold text-brand-mid" id="stat-pesanan">0</div>
+        <div class="text-xs text-brand-muted font-medium">Pesanan</div>
+      </div>
+      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+        <div class="text-2xl font-bold text-brand-mid" id="stat-dimasak">0</div>
+        <div class="text-xs text-brand-muted font-medium">Dimasak</div>
+      </div>
+      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+        <div class="text-2xl font-bold text-brand-mid" id="stat-siap">0</div>
+        <div class="text-xs text-brand-muted font-medium">Siap Diambil</div>
+      </div>
+      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+        <div class="text-2xl font-bold text-brand-mid" id="stat-selesai">0</div>
+        <div class="text-xs text-brand-muted font-medium">Selesai</div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2.5 bg-brand-card p-3 px-4 border border-[#DDD0C4]/40 rounded-full shadow-sm">
+      <input type="text" id="inp-menu" placeholder="Nama menu (cth: Nasi Goreng)"
+        class="flex-1 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted">
+      <input type="text" id="inp-jml" placeholder="Jml"
+        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center border-l border-[#DDD0C4]/40">
+      <input type="text" id="inp-meja" placeholder="Meja"
+        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center border-l border-[#DDD0C4]/40">
+      <button
+        class="bg-brand-primary hover:bg-brand-light text-white font-bold text-xs px-5 py-2 rounded-full flex items-center gap-1.5 shrink-0"
+        onclick="openModal()">
+        <span>&#65291;</span> Tambah Pesanan
+      </button>
+    </div>
+
+    <div class="grid grid-cols-4 gap-3.5 items-start flex-1" id="kanban"></div>
+  </main>
+</div>
+
+<div class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" id="modal">
+  <div class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-sm border border-black/10 shadow-xl">
+    <h2 class="text-base font-bold text-brand-mid mb-4">Tambah Pesanan</h2>
+    <div class="space-y-3">
+      <div>
+        <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Nama Menu</label>
+        <input type="text" id="m-menu" placeholder="cth: Nasi Goreng, Es Teh"
+          class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Jumlah</label>
+          <input type="number" id="m-jml" placeholder="1" min="1"
+            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Nomor Meja</label>
+          <input type="text" id="m-meja" placeholder="cth: 3"
+            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid">
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-6">
+      <button class="px-4 py-2 border border-[#DDD0C4] bg-white rounded-xl text-xs font-bold text-brand-mid"
+        onclick="closeModal()">Batal</button>
+      <button class="px-5 py-2 bg-brand-primary rounded-xl text-xs font-bold text-white"
+        onclick="addOrder()">Tambah</button>
+    </div>
+  </div>
+</div>
+
+<div
+  class="fixed bottom-6 right-6 z-50 bg-brand-mid text-white font-bold text-xs p-3 px-5 rounded-xl border border-black/10 shadow-lg hidden opacity-0 transition-all duration-300"
+  id="toast"></div>
+
+<script>
+  (() => {
+    const STATUSES = ['Pesanan', 'Dimasak', 'Siap Diambil', 'Selesai'];
+    const NEXT_BTN = ['Mulai Masak', 'Siap Diambil', 'Selesai', 'Selesai'];
+    const IS_FINAL = [false, false, false, true];
+
+    window.orders = window.orders || [
+      { id: '001', time: '18.07', items: 'Nasi goreng, Es teh x 1', status: 0, meja: '' },
+      { id: '001b', time: '18.07', items: 'Nasi goreng, Es teh x 1', status: 0, meja: '' },
+      { id: '002', time: '18.11', items: 'Serbu 1 x 1', status: 1, meja: '' },
+      { id: '003', time: '18.15', items: 'Soto Ayam, Es teh x 1', status: 2, meja: '' },
+      { id: '004', time: '18.59', items: 'Nasi rames x4, Jus jeruk x3', status: 3, meja: '' },
+    ];
+    window.counter = window.counter || 5;
+
+    window.render = function (filter = '') {
+      updateStats();
+      const kanban = document.getElementById('kanban');
+      if (!kanban) return;
+      kanban.innerHTML = '';
+
+      STATUSES.forEach((status, si) => {
+        const col = document.createElement('div');
+        col.className = "flex flex-col gap-3 bg-brand-card p-4 border border-[#DDD0C4]/20 rounded-lg-custom min-h-[400px]";
+
+        const filtered = orders.filter(o => o.status === si && (
+          filter === '' || o.items.toLowerCase().includes(filter.toLowerCase()) || o.id.includes(filter)
+        ));
+
+        col.innerHTML = `
+          <div class="flex items-center justify-between bg-brand-primary text-white p-3 px-4 rounded-xl text-sm font-bold shadow-sm">
+            <span>${status}</span>
+            <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs">${filtered.length}</span>
+          </div>
+        `;
+
+        if (filtered.length === 0) {
+          col.innerHTML += `<p class="text-center py-10 text-xs text-brand-muted italic">Tidak ada pesanan</p>`;
+        }
+
+        filtered.forEach(o => {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-4 rounded-xl border border-[#DDD0C4]/30 shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-0.5 duration-150';
+          const isFinal = IS_FINAL[si];
+
+          card.innerHTML = `
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-brand-primary font-mono">#${o.id}</span>
+              <span class="text-brand-muted">${o.time}</span>
+            </div>
+            <p class="text-sm font-semibold text-brand-mid leading-snug">${o.items}</p>
+            <button class="w-full text-xs font-bold py-2 mt-1 rounded-lg transition-colors ${isFinal ? 'bg-brand-bg text-brand-muted cursor-not-allowed' : 'bg-brand-primary hover:bg-brand-light text-white'}" ${isFinal ? '' : `onclick="advance('${o.id}')"`}>${NEXT_BTN[si]}</button>
+          `;
+          col.appendChild(card);
+        });
+        kanban.appendChild(col);
+      });
+    };
+
+    window.updateStats = function () {
+      if (!document.getElementById('stat-pesanan')) return;
+      document.getElementById('stat-pesanan').textContent = orders.filter(o => o.status === 0).length;
+      document.getElementById('stat-dimasak').textContent = orders.filter(o => o.status === 1).length;
+      document.getElementById('stat-siap').textContent = orders.filter(o => o.status === 2).length;
+      document.getElementById('stat-selesai').textContent = orders.filter(o => o.status === 3).length;
+    };
+
+    window.advance = function (id) {
+      const o = orders.find(o => o.id === id);
+      if (o && o.status < 3) { o.status++; }
+      render();
+      showToast('Status pesanan diperbarui ✓');
+    };
+
+    window.filterOrders = function () {
+      render(document.getElementById('searchInput').value);
+    };
+
+    window.openModal = function () {
+      const menu = document.getElementById('inp-menu').value.trim();
+      const jml = document.getElementById('inp-jml').value.trim();
+      const meja = document.getElementById('inp-meja').value.trim();
+      if (menu) document.getElementById('m-menu').value = menu;
+      if (jml) document.getElementById('m-jml').value = jml;
+      if (meja) document.getElementById('m-meja').value = meja;
+      document.getElementById('modal').classList.remove('hidden');
+    };
+
+    window.closeModal = function () {
+      document.getElementById('modal').classList.add('hidden');
+    };
+
+    window.addOrder = function () {
+      const menu = document.getElementById('m-menu').value.trim();
+      const jml = document.getElementById('m-jml').value.trim();
+      const meja = document.getElementById('m-meja').value.trim();
+      if (!menu) { document.getElementById('m-menu').focus(); return; }
+
+      const itemStr = jml ? `${menu} x ${jml}` : menu;
+      function pad(n) { return String(n).padStart(3, '0'); }
+      function getTime() { const d = new Date(); return d.getHours() + '.' + String(d.getMinutes()).padStart(2, '0'); }
+
+      orders.push({ id: pad(counter++), time: getTime(), items: itemStr, status: 0, meja });
+      ['inp-menu', 'inp-jml', 'inp-meja', 'm-menu', 'm-jml', 'm-meja'].forEach(id => { document.getElementById(id).value = ''; });
+      closeModal();
+      render();
+      showToast('Pesanan #' + pad(counter - 1) + ' ditambahkan ✓');
+    };
+
+    window.showToast = function (msg) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.innerText = msg;
+      t.classList.remove('hidden', 'opacity-0');
+      setTimeout(() => { t.classList.add('opacity-0'); }, 2200);
+    };
+
+    render();
+  })();
+</script>
