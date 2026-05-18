@@ -1,1 +1,94 @@
 @import "tailwindcss";
+
+@theme {
+    --font-sans: 'Poppins', sans-serif;
+
+    /* Variabel Warna Terang */
+    --color-brand-bg: #EDE5D8;
+    --color-brand-sidebar: #F7F2EA;
+    --color-brand-card: #F7F2EA;
+    --color-brand-panel: #F7F2EA;
+    --color-brand-primary: #C05A1F;
+    --color-brand-light: #E8784A;
+    --color-brand-mid: #6B5E54;
+    --color-brand-muted: #9E8E84;
+    --color-brand-border: rgba(0, 0, 0, 0.07);
+
+    /* Variabel Warna Gelap (Dark Mode) */
+    --color-brand-darkBg: #1A1410;
+    --color-brand-darkPanel: #221C17;
+    --color-brand-darkMid: #B09888;
+    --color-brand-darkMuted: #7A6A60;
+
+    /* Radius Kelengkungan Kustom */
+    --radius-lg-custom: 22px;
+    --radius-md-custom: 16px;
+    --radius-sm-custom: 10px;
+
+    /* Efek Bayangan Kustom */
+    --shadow-custom: 0 2px 12px rgba(0, 0, 0, 0.06);
+    --shadow-custom-hover: 0 6px 24px rgba(0, 0, 0, 0.10);
+
+    /* Animasi Kustom (agar efek fade saat ganti halaman jalan) */
+    --animate-fadeSlideIn: fadeSlideIn 0.4s ease both;
+    --animate-fadeUp: fadeUp 0.4s ease both;
+
+    @keyframes fadeSlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* Class utilitas manual untuk delay animasi berurutan */
+@layer utilities {
+    .animation-delay-70 {
+        animation-delay: 0.07s;
+    }
+
+    .animation-delay-140 {
+        animation-delay: 0.14s;
+    }
+
+    .animation-delay-180 {
+        animation-delay: 0.18s;
+    }
+
+    .animation-delay-220 {
+        animation-delay: 0.22s;
+    }
+
+    .animation-delay-280 {
+        animation-delay: 0.28s;
+    }
+
+    .animation-delay-340 {
+        animation-delay: 0.34s;
+    }
+
+    .animation-delay-400 {
+        animation-delay: 0.40s;
+    }
+
+    .animation-delay-460 {
+        animation-delay: 0.46s;
+    }
+}
