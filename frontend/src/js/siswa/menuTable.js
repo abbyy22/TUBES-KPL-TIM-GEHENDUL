@@ -1,13 +1,13 @@
 const MenuTable = (() => {
 
-  const KANTIN_LIST = [
+  const DEFAULT_KANTIN_LIST = [
     { id: 'neo1', name: 'Kantin NEO 1' },
     { id: 'neo2', name: 'Kantin NEO 2' },
     { id: 'tpb', name: 'Kantin TPB' },
     { id: 'gkm', name: 'Kantin GKM' },
   ];
 
-  const MENU_DATA = {
+  const DEFAULT_MENU_DATA = {
     neo1: [
       { id: 'm1', name: 'Nasi Goreng Maza', price: 15000, emoji: '🍳', kantin: 'Kantin NEO 1' },
       { id: 'm2', name: 'Es Teh Manis', price: 3000, emoji: '🍹', kantin: 'Kantin NEO 1' },
@@ -26,6 +26,10 @@ const MenuTable = (() => {
       { id: 'm6', name: 'Mie Ayam', price: 12000, emoji: '🍜', kantin: 'Kantin GKM' },
     ],
   };
+
+  let kantinList = [...DEFAULT_KANTIN_LIST];
+  let menuData = cloneMenuData(DEFAULT_MENU_DATA);
+  let apiBacked = false;
 
   const TOP_MENU = [
     {
@@ -50,16 +54,16 @@ const MenuTable = (() => {
   }
 
   function getKantinList() {
-    return [...KANTIN_LIST];
+    return [...kantinList];
   }
 
   function getMenuByKantin(kantinId) {
-    return MENU_DATA[kantinId] || [];
+    return menuData[String(kantinId)] || [];
   }
 
   function findMenuItemById(itemId) {
-    for (const kantin of Object.values(MENU_DATA)) {
-      const found = kantin.find(item => item.id === itemId);
+    for (const kantin of Object.values(menuData)) {
+      const found = kantin.find(item => String(item.id) === String(itemId));
 
       if (found) return found;
     }
@@ -67,7 +71,61 @@ const MenuTable = (() => {
     return null;
   }
 
+  function cloneMenuData(source) {
+    return Object.fromEntries(
+      Object.entries(source).map(([key, items]) => [key, items.map(item => ({ ...item }))])
+    );
+  }
+
+  function setApiData(kantins, menus) {
+    kantinList = kantins.map(kantin => ({
+      id: kantin.id,
+      name: kantin.name,
+    }));
+
+    menuData = {};
+    menus.forEach(menu => {
+      const key = String(menu.kantin_id);
+      if (!menuData[key]) menuData[key] = [];
+      menuData[key].push({
+        id: menu.id,
+        kantin_id: menu.kantin_id,
+        name: menu.name,
+        price: Number(menu.price),
+        emoji: menu.emoji || '🍽️',
+        description: menu.description || '',
+        available: menu.available !== false,
+        kantin: menu.kantin_name,
+      });
+    });
+
+    apiBacked = true;
+  }
+
+  async function loadFromApi() {
+    if (!window.ApiClient || !ApiClient.isAuthenticated()) return false;
+
+    try {
+      const [kantins, menus] = await Promise.all([
+        ApiClient.getKantins(),
+        ApiClient.getMenus({ available: true }),
+      ]);
+      setApiData(kantins, menus);
+      return true;
+    } catch (err) {
+      console.warn('[MenuTable] Gagal ambil menu dari API, pakai data lokal:', err.message);
+      apiBacked = false;
+      return false;
+    }
+  }
+
+  function isApiBacked() {
+    return apiBacked;
+  }
+
   return {
+    isApiBacked,
+    loadFromApi,
     getTopMenu,
     getKantinList,
     getMenuByKantin,

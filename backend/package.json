@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
+    "test": "node test/validators.test.js",
     "dev": "nodemon src/index.js",
     "db:init": "node scripts/initDb.js",
     "db:seed": "node scripts/seedDb.js"

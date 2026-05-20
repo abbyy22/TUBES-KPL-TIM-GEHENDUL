@@ -145,7 +145,48 @@
       ></div>
     </div>
 
+    <script src="../../js/api.js"></script>
     <script>
+      const registerForm = document.getElementById("registerForm");
+      const registerMessage = document.createElement("p");
+      registerMessage.className = "text-sm mt-3 text-center font-medium";
+      registerForm.insertAdjacentElement("afterend", registerMessage);
+
+      function setRegisterMessage(message, isError = true) {
+        registerMessage.textContent = message;
+        registerMessage.className = `text-sm mt-3 text-center font-medium ${isError ? "text-red-600" : "text-green-700"}`;
+      }
+
+      registerForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const submitButton = registerForm.querySelector('button[type="submit"]');
+        const name = document.getElementById("nameLengkap").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("konfirmasi-password").value;
+
+        if (password !== confirmPassword) {
+          setRegisterMessage("Konfirmasi kata sandi tidak sama");
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Memproses...";
+        setRegisterMessage("");
+
+        try {
+          await ApiClient.register(name, email, password);
+          setRegisterMessage("Registrasi berhasil, mengalihkan...", false);
+          window.location.href = "../../index.html";
+        } catch (err) {
+          setRegisterMessage(err.message || "Registrasi gagal");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Daftar";
+        }
+      });
+
       function togglePassword() {
         const passwordInput = document.getElementById("password");
         const btnEyePassword = document.getElementById("btn-eye-password");

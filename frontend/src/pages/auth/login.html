@@ -106,7 +106,41 @@
       ></div>
     </div>
 
+    <script src="../../js/api.js"></script>
     <script>
+      const loginForm = document.getElementById("loginForm");
+      const loginMessage = document.createElement("p");
+      loginMessage.className = "text-sm mt-3 text-center font-medium";
+      loginForm.insertAdjacentElement("afterend", loginMessage);
+
+      function setLoginMessage(message, isError = true) {
+        loginMessage.textContent = message;
+        loginMessage.className = `text-sm mt-3 text-center font-medium ${isError ? "text-red-600" : "text-green-700"}`;
+      }
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Memproses...";
+        setLoginMessage("");
+
+        try {
+          await ApiClient.login(email, password);
+          setLoginMessage("Login berhasil, mengalihkan...", false);
+          window.location.href = "../../index.html";
+        } catch (err) {
+          setLoginMessage(err.message || "Login gagal");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Masuk";
+        }
+      });
+
       function togglePassword() {
         const passwordInput = document.getElementById("password");
         const btnSubmit = document.getElementById("btn-submit");

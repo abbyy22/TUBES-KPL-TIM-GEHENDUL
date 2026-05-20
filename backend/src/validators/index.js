@@ -26,13 +26,13 @@ function validateRegister(body) {
   assert(isNonEmptyString(email) && EMAIL_RE.test(email), 'email tidak valid');
   assert(isNonEmptyString(password) && password.length >= 6, 'password minimal 6 karakter');
   if (role !== undefined) {
-    assert(role === 'pelanggan' || role === 'admin', "role harus 'pelanggan' atau 'admin'");
+    assert(role === 'pelanggan', "register publik hanya boleh role 'pelanggan'");
   }
   return {
     name: name.trim(),
     email: email.trim().toLowerCase(),
     password,
-    role: role || 'pelanggan',
+    role: 'pelanggan',
   };
 }
 

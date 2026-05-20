@@ -86,6 +86,7 @@
 <script>
   (() => {
     const STATUSES = ['Pesanan', 'Dimasak', 'Siap Diambil', 'Selesai'];
+    const API_STATUSES = ['ORDERED', 'COOKING', 'READY', 'DONE'];
     const NEXT_BTN = ['Mulai Masak', 'Siap Diambil', 'Selesai', 'Selesai'];
     const IS_FINAL = [false, false, false, true];
 
@@ -150,11 +151,20 @@
       document.getElementById('stat-selesai').textContent = orders.filter(o => o.status === 3).length;
     };
 
-    window.advance = function (id) {
+    window.advance = async function (id) {
       const o = orders.find(o => o.id === id);
-      if (o && o.status < 3) { o.status++; }
-      render();
-      showToast('Status pesanan diperbarui ✓');
+      if (!o || o.status >= 3) return;
+
+      try {
+        if (window.ApiClient && ApiClient.isAuthenticated() && o.backendId) {
+          await ApiClient.updateOrderStatus(o.backendId, API_STATUSES[o.status + 1]);
+        }
+        o.status++;
+        render();
+        showToast('Status pesanan diperbarui ✓');
+      } catch (err) {
+        showToast(err.message || 'Gagal memperbarui status');
+      }
     };
 
     window.filterOrders = function () {
@@ -200,6 +210,56 @@
       setTimeout(() => { t.classList.add('opacity-0'); }, 2200);
     };
 
-    render();
+    function formatOrderTime(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }).replace(':', '.');
+    }
+
+    function formatOrderItems(order) {
+      if (Array.isArray(order.items) && order.items.length > 0) {
+        return order.items
+          .map(item => `${item.menu_name} x ${item.quantity}`)
+          .join(', ');
+      }
+      return order.customer_name ? `Pesanan ${order.customer_name}` : `Order #${order.id}`;
+    }
+
+    function mapBackendOrder(order) {
+      const statusIndex = API_STATUSES.indexOf(order.status);
+      return {
+        id: String(order.id),
+        backendId: order.id,
+        time: formatOrderTime(order.created_at),
+        items: formatOrderItems(order),
+        status: statusIndex >= 0 ? statusIndex : 0,
+        meja: '',
+      };
+    }
+
+    async function loadBackendOrders() {
+      if (!window.ApiClient || !ApiClient.isAuthenticated()) return false;
+      if (ApiClient.normalizeRole(ApiClient.getUser()?.role) !== 'owner') return false;
+
+      const summaries = await ApiClient.listAllOrders();
+      const details = await Promise.all(
+        summaries.map(order => ApiClient.getOrder(order.id).catch(() => order))
+      );
+      orders = details.map(mapBackendOrder);
+      return true;
+    }
+
+    window.initKanban = async function () {
+      try {
+        await loadBackendOrders();
+      } catch (err) {
+        console.warn('[update_status] Gagal ambil order dari API, pakai data lokal:', err.message);
+      }
+      render();
+    };
   })();
 </script>

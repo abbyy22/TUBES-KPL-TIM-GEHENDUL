@@ -6,6 +6,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>telFood - Smart Canteen</title>
   <link href="./output.css" rel="stylesheet" />
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#EDE5D8',
+              sidebar: '#F7F2EA',
+              card: '#F7F2EA',
+              panel: '#F7F2EA',
+              primary: '#C05A1F',
+              light: '#E8784A',
+              mid: '#6B5E54',
+              muted: '#9E8E84',
+            },
+          },
+          borderRadius: {
+            'lg-custom': '22px',
+            'md-custom': '16px',
+            'sm-custom': '10px',
+          },
+          boxShadow: {
+            custom: '0 2px 12px rgba(0, 0, 0, 0.06)',
+            'custom-hover': '0 6px 24px rgba(0, 0, 0, 0.10)',
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .sidebar-nav a.active-menu {
       color: #C1500E !important;
@@ -23,6 +54,7 @@
     </div>
   </main>
 
+  <script src="./js/api.js"></script>
   <script src="./js/siswa/utils.js"></script>
   <script src="./js/siswa/menuTable.js"></script>
   <script src="./js/siswa/orderStateMachine.js"></script>
@@ -35,7 +67,8 @@
 
   <script>
 
-    const CURRENT_ROLE = 'owner';
+    const CURRENT_USER = ApiClient.getUser();
+    const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
     async function initApp() {
       try {
         const resSidebar = await fetch("./partials/sidebar.html");
@@ -44,6 +77,10 @@
 
         const avatar = document.getElementById("sidebar-avatar");
         if (avatar) avatar.src = "./assets/profile.png";
+        const sidebarName = document.getElementById("sidebar-user-name");
+        const sidebarEmail = document.getElementById("sidebar-user-email");
+        if (CURRENT_USER && sidebarName) sidebarName.textContent = CURRENT_USER.name;
+        if (CURRENT_USER && sidebarEmail) sidebarEmail.textContent = CURRENT_USER.email;
 
         const navContainer = document.querySelector(".sidebar-nav");
 
@@ -114,6 +151,7 @@
           dashSiswa.renderTopMenu();
         }
         if (pageName === 'siswa-booking') {
+          await MenuTable.loadFromApi();
           booking.renderKantinSelect();
           booking.renderMenuGrid('');
           booking.renderOrderItems();
@@ -169,31 +207,62 @@
       pesanBtn.replaceWith(pesanBtn.cloneNode(true));
       const newPesanBtn = document.getElementById('pesanBtn');
 
-      newPesanBtn.addEventListener('click', () => {
+      newPesanBtn.addEventListener('click', async () => {
         const nama = document.getElementById('namaInput')?.value?.trim();
         const kantin = document.getElementById('kantinSelect')?.value;
 
         const valid = Utils.validateNama(nama);
         if (!valid.valid) { alert(valid.message); return; }
-        if (!kantin) { alert('Pilih kantin dulu anjir'); return; }
+        if (!kantin) { alert('Pilih kantin terlebih dahulu'); return; }
         if (Cart.isEmpty()) { alert('Pilih menu terlebih dahulu!'); return; }
 
-        OrderStateMachine.reset();
-        OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
+        newPesanBtn.disabled = true;
+        newPesanBtn.textContent = 'Memproses...';
 
-        const orderId = Utils.generateOrderId();
         const items = Cart.getItems();
         const summary = items[0].menuItem.name + (items.length > 1 ? ` + ${items.length - 1} lainnya` : '');
-        const total = Cart.getTotal();
+        let total = Cart.getTotal();
 
-        UI.renderOrderStatus(orderId, summary, total);
+        OrderStateMachine.reset();
 
-        setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.COOKING); UI.renderOrderStatus(orderId, summary, total); }, 3000);
-        setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.READY); UI.renderOrderStatus(orderId, summary, total); }, 6000);
-        setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.DONE); UI.renderOrderStatus(orderId, summary, total); }, 9000);
+        try {
+          if (ApiClient.isAuthenticated() && MenuTable.isApiBacked()) {
+            const payload = {
+              kantin_id: Number(kantin),
+              customer_name: nama,
+              items: items.map(item => ({
+                menu_id: Number(item.menuItem.id),
+                quantity: item.quantity,
+              })),
+            };
 
-        Cart.clearCart();
-        booking.renderOrderItems();
+            if (!Number.isInteger(payload.kantin_id) ||
+              payload.items.some(item => !Number.isInteger(item.menu_id))) {
+              throw new Error('Data menu belum sinkron dengan backend');
+            }
+
+            const order = await ApiClient.createOrder(payload);
+            total = Number(order.total_price);
+            OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
+            UI.renderOrderStatus(String(order.id), summary, total);
+          } else {
+            const orderId = Utils.generateOrderId();
+            OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
+            UI.renderOrderStatus(orderId, summary, total);
+
+            setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.COOKING); UI.renderOrderStatus(orderId, summary, total); }, 3000);
+            setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.READY); UI.renderOrderStatus(orderId, summary, total); }, 6000);
+            setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.DONE); UI.renderOrderStatus(orderId, summary, total); }, 9000);
+          }
+
+          Cart.clearCart();
+          booking.renderOrderItems();
+        } catch (err) {
+          alert(err.message || 'Gagal membuat pesanan');
+        } finally {
+          newPesanBtn.disabled = false;
+          newPesanBtn.textContent = 'Pesan Sekarang';
+        }
       });
     }
 

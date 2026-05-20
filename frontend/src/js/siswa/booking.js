@@ -34,7 +34,7 @@ const booking = (() => {
 
         const menus = MenuTable.getMenuByKantin(kantinId);
         const kantins = MenuTable.getKantinList();
-        const kantin = kantins.find(k => k.id === kantinId);
+        const kantin = kantins.find(k => String(k.id) === String(kantinId));
 
         if (header && kantin) header.textContent = `MENU ${kantin.name.toUpperCase()}`;
 

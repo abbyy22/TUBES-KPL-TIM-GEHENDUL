@@ -31,7 +31,7 @@ const UI = (function () {
           <div class="menu-food-img" style="background:linear-gradient(135deg,#f5e6c8,#e8c97a);display:flex;align-items:center;justify-content:center;font-size:46px;border-radius:50%;">
             ${foodEmojis[i]}
           </div>
-          <div class="rank-crown">${item.crown}</div>
+          <div class="rank-crown">${item.crown || ''}</div>
         </div>
         <div class="menu-card-name">${Utils.sanitize(item.name)}</div>
         <div class="menu-card-kantin">by ${Utils.sanitize(item.kantin)}</div>
@@ -69,7 +69,7 @@ const UI = (function () {
 
     const menus = MenuTable.getMenuByKantin(kantinId);
     const kantins = MenuTable.getKantinList();
-    const kantin = kantins.find(k => k.id === kantinId);
+    const kantin = kantins.find(k => String(k.id) === String(kantinId));
 
     if (header && kantin) header.textContent = `MENU ${kantin.name.toUpperCase()}`;
 
