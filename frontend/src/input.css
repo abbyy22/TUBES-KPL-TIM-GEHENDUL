@@ -91,4 +91,67 @@
     .animation-delay-460 {
         animation-delay: 0.46s;
     }
+
+    /* Safelist: class-class brand yang dipakai di JS template strings */
+    .bg-brand-primary { background-color: var(--color-brand-primary); }
+    .bg-brand-light   { background-color: var(--color-brand-light); }
+    .bg-brand-card    { background-color: var(--color-brand-card); }
+    .bg-brand-panel   { background-color: var(--color-brand-panel); }
+    .bg-brand-sidebar { background-color: var(--color-brand-sidebar); }
+    .bg-brand-bg      { background-color: var(--color-brand-bg); }
+    .bg-brand-mid     { background-color: var(--color-brand-mid); }
+
+    .text-brand-primary { color: var(--color-brand-primary); }
+    .text-brand-light   { color: var(--color-brand-light); }
+    .text-brand-mid     { color: var(--color-brand-mid); }
+    .text-brand-muted   { color: var(--color-brand-muted); }
+
+    .border-brand-primary { border-color: var(--color-brand-primary); }
+    .border-brand-panel   { border-color: var(--color-brand-panel); }
+
+    .rounded-lg-custom  { border-radius: var(--radius-lg-custom); }
+    .rounded-md-custom  { border-radius: var(--radius-md-custom); }
+    .shadow-custom      { box-shadow: var(--shadow-custom); }
+    .shadow-custom-hover { box-shadow: var(--shadow-custom-hover); }
+}
+
+/* Hover states — harus di luar @layer agar Tailwind v4 tidak strip */
+.hover\:bg-brand-primary:hover { background-color: var(--color-brand-primary) !important; }
+.hover\:bg-brand-light:hover   { background-color: var(--color-brand-light) !important; }
+.hover\:bg-brand-mid:hover     { background-color: var(--color-brand-mid) !important; }
+.hover\:text-brand-primary:hover { color: var(--color-brand-primary) !important; }
+.hover\:text-red-700:hover     { color: #b91c1c !important; }
+.hover\:border-brand-primary:hover { border-color: var(--color-brand-primary) !important; }
+.hover\:border-red-500:hover   { border-color: #ef4444 !important; }
+.hover\:bg-white:hover         { background-color: #ffffff !important; }
+.hover\:shadow-lg:hover        { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1) !important; }
+.hover\:shadow-custom-hover:hover { box-shadow: var(--shadow-custom-hover) !important; }
+.hover\:-translate-y-\[1px\]:hover { transform: translateY(-1px) !important; }
+.focus-within\:border-brand-primary:focus-within { border-color: var(--color-brand-primary) !important; }
+
+/* Active/pressed states — mencegah button flash transparan saat diklik */
+.bg-brand-primary:active,
+.hover\:bg-brand-light:active { background-color: var(--color-brand-primary) !important; }
+
+.bg-red-500:active             { background-color: #dc2626 !important; }
+
+/* Hapus browser default tap highlight (flash transparan saat klik di Chrome) */
+button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* Jaga background button saat focus (setelah diklik, browser kadang strip bg) */
+button:focus { outline: none; }
+button.bg-brand-primary:focus,
+button.bg-brand-primary:focus-visible {
+    background-color: var(--color-brand-primary) !important;
+    outline: 2px solid var(--color-brand-light);
+    outline-offset: 2px;
+}
+button.bg-red-500:focus,
+button.bg-red-500:focus-visible {
+    background-color: #dc2626 !important;
+    outline: 2px solid #f87171;
+    outline-offset: 2px;
 }
