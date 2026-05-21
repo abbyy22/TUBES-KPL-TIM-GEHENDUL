@@ -3,7 +3,7 @@
   <header class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center gap-6">
     <h1 class="text-2xl font-bold text-brand-mid tracking-tight flex-1">Kantin NEO 2</h1>
     <div class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80">
-      <svg class="text-brand-muted shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <svg class="w-4 h-4 text-brand-muted shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
         type="text" placeholder="Search" id="searchInput" oninput="filterOrders()">
     </div>
@@ -39,9 +39,11 @@
         class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center border-l border-[#DDD0C4]/40">
       <button
         class="bg-brand-primary hover:bg-brand-light text-white font-bold text-xs px-5 py-2 rounded-full flex items-center gap-1.5 shrink-0"
+        style="background-color:#C05A1F;color:#fff;"
+        onmouseover="this.style.backgroundColor='#E8784A'"
+        onmouseout="this.style.backgroundColor='#C05A1F'"
         onclick="openModal()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Tambah Pesanan
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Tambah Pesanan
       </button>
     </div>
 
@@ -72,9 +74,9 @@
       </div>
     </div>
     <div class="flex justify-end gap-2 mt-6">
-      <button class="px-4 py-2 border border-[#DDD0C4] bg-white rounded-xl text-xs font-bold text-brand-mid"
+      <button class="px-4 py-2 border border-[#DDD0C4] bg-white hover:bg-gray-50 rounded-xl text-xs font-bold text-brand-mid transition-colors"
         onclick="closeModal()">Batal</button>
-      <button class="px-5 py-2 bg-brand-primary rounded-xl text-xs font-bold text-white"
+      <button class="px-5 py-2 bg-brand-primary hover:bg-brand-light rounded-xl text-xs font-bold text-white transition-colors"
         onclick="addOrder()">Tambah</button>
     </div>
   </div>
@@ -87,6 +89,7 @@
 <script>
   (() => {
     const STATUSES = ['Pesanan', 'Dimasak', 'Siap Diambil', 'Selesai'];
+    const API_STATUSES = ['ORDERED', 'COOKING', 'READY', 'DONE'];
     const NEXT_BTN = ['Mulai Masak', 'Siap Diambil', 'Selesai', 'Selesai'];
     const IS_FINAL = [false, false, false, true];
 
@@ -107,35 +110,46 @@
 
       STATUSES.forEach((status, si) => {
         const col = document.createElement('div');
-        col.className = "flex flex-col gap-3 bg-brand-card p-4 border border-[#DDD0C4]/20 rounded-lg-custom min-h-[400px]";
+        col.className = "flex flex-col gap-3 p-4 rounded-lg-custom min-h-[400px]";
+        col.style.cssText = "background:#F7F2EA;border:1px solid rgba(221,208,196,0.2);";
 
         const filtered = orders.filter(o => o.status === si && (
           filter === '' || o.items.toLowerCase().includes(filter.toLowerCase()) || o.id.includes(filter)
         ));
 
         col.innerHTML = `
-          <div class="flex items-center justify-between bg-brand-primary text-white p-3 px-4 rounded-xl text-sm font-bold shadow-sm">
+          <div class="flex items-center justify-between p-3 px-4 rounded-xl text-sm font-bold shadow-sm"
+               style="background-color:#C05A1F;color:#ffffff;">
             <span>${status}</span>
-            <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs">${filtered.length}</span>
+            <span style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;font-size:11px;">${filtered.length}</span>
           </div>
         `;
 
         if (filtered.length === 0) {
-          col.innerHTML += `<p class="text-center py-10 text-xs text-brand-muted italic">Tidak ada pesanan</p>`;
+          col.innerHTML += `<p style="text-align:center;padding:40px 0;font-size:12px;color:#9E8E84;font-style:italic;">Tidak ada pesanan</p>`;
         }
 
         filtered.forEach(o => {
           const card = document.createElement('div');
-          card.className = 'bg-white p-4 rounded-xl border border-[#DDD0C4]/30 shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-0.5 duration-150';
+          card.className = 'p-4 rounded-xl shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-0.5 duration-150';
+          card.style.cssText = 'background:#ffffff;border:1px solid #DDD0C4;';
           const isFinal = IS_FINAL[si];
 
           card.innerHTML = `
             <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-brand-primary font-mono">#${o.id}</span>
-              <span class="text-brand-muted">${o.time}</span>
+              <span class="font-bold font-mono" style="color:#C05A1F">#${o.id}</span>
+              <span style="color:#9E8E84">${o.time}</span>
             </div>
-            <p class="text-sm font-semibold text-brand-mid leading-snug">${o.items}</p>
-            <button class="w-full text-xs font-bold py-2 mt-1 rounded-lg transition-colors ${isFinal ? 'bg-brand-bg text-brand-muted cursor-not-allowed' : 'bg-brand-primary hover:bg-brand-light text-white'}" ${isFinal ? '' : `onclick="advance('${o.id}')"`}>${NEXT_BTN[si]}</button>
+            <p class="text-sm font-semibold leading-snug" style="color:#6B5E54">${o.items}</p>
+            <button
+              class="w-full text-xs font-bold py-2 mt-1 rounded-lg transition-all"
+              style="
+                background-color: ${isFinal ? '#EDE5D8' : '#C05A1F'};
+                color: ${isFinal ? '#9E8E84' : '#ffffff'};
+                cursor: ${isFinal ? 'not-allowed' : 'pointer'};
+              "
+              ${isFinal ? 'disabled' : `onclick="advance('${o.id}')" onmouseover="this.style.backgroundColor='#E8784A'" onmouseout="this.style.backgroundColor='#C05A1F'"`}
+            >${NEXT_BTN[si]}</button>
           `;
           col.appendChild(card);
         });
@@ -151,11 +165,20 @@
       document.getElementById('stat-selesai').textContent = orders.filter(o => o.status === 3).length;
     };
 
-    window.advance = function (id) {
+    window.advance = async function (id) {
       const o = orders.find(o => o.id === id);
-      if (o && o.status < 3) { o.status++; }
-      render();
-      showToast('Status pesanan diperbarui ✓');
+      if (!o || o.status >= 3) return;
+
+      try {
+        if (window.ApiClient && ApiClient.isAuthenticated() && o.backendId) {
+          await ApiClient.updateOrderStatus(o.backendId, API_STATUSES[o.status + 1]);
+        }
+        o.status++;
+        render();
+        showToast('Status pesanan diperbarui ✓');
+      } catch (err) {
+        showToast(err.message || 'Gagal memperbarui status');
+      }
     };
 
     window.filterOrders = function () {
@@ -201,6 +224,77 @@
       setTimeout(() => { t.classList.add('opacity-0'); }, 2200);
     };
 
-    render();
+    function formatOrderTime(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }).replace(':', '.');
+    }
+
+    function formatOrderItems(order) {
+      if (Array.isArray(order.items) && order.items.length > 0) {
+        return order.items
+          .map(item => `${item.menu_name} x ${item.quantity}`)
+          .join(', ');
+      }
+      return order.customer_name ? `Pesanan ${order.customer_name}` : `Order #${order.id}`;
+    }
+
+    function mapBackendOrder(order) {
+      const statusIndex = API_STATUSES.indexOf(order.status);
+      return {
+        id: String(order.id),
+        backendId: order.id,
+        time: formatOrderTime(order.created_at),
+        items: formatOrderItems(order),
+        status: statusIndex >= 0 ? statusIndex : 0,
+        meja: '',
+      };
+    }
+
+    async function loadBackendOrders() {
+      if (!window.ApiClient || !ApiClient.isAuthenticated()) return false;
+      if (ApiClient.normalizeRole(ApiClient.getUser()?.role) !== 'owner') return false;
+
+      const summaries = await ApiClient.listAllOrders();
+      const details = await Promise.all(
+        summaries.map(order => ApiClient.getOrder(order.id).catch(() => order))
+      );
+      orders = details.map(mapBackendOrder);
+      return true;
+    }
+
+    window.initKanban = async function () {
+      try {
+        await loadBackendOrders();
+      } catch (err) {
+        console.warn('[update_status] Gagal ambil order dari API, pakai data lokal:', err.message);
+      }
+      render();
+
+      // Real-time: listen to socket order:status events
+      // socket is set up in index.html parent scope
+      if (window.socket) {
+        window.socket.off('order:status'); // prevent duplicate listeners
+        window.socket.on('order:status', async (payload) => {
+          console.log('[update_status] socket order:status →', payload.orderId, payload.status);
+          try {
+            await loadBackendOrders();
+          } catch (e) {
+            // fallback: update local array if backend fails
+            const o = orders.find(x => x.backendId === payload.orderId || String(x.id) === String(payload.orderId));
+            if (o) {
+              const idx = API_STATUSES.indexOf(payload.status);
+              if (idx >= 0) o.status = idx;
+            }
+          }
+          render();
+          showToast(`Pesanan #${payload.orderId} → ${payload.status}`);
+        });
+      }
+    };
   })();
 </script>

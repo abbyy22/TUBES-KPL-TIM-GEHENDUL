@@ -34,7 +34,7 @@ const booking = (() => {
 
         const menus = MenuTable.getMenuByKantin(kantinId);
         const kantins = MenuTable.getKantinList();
-        const kantin = kantins.find(k => k.id === kantinId);
+        const kantin = kantins.find(k => String(k.id) === String(kantinId));
 
         if (header && kantin) header.textContent = `MENU ${kantin.name.toUpperCase()}`;
 
@@ -47,8 +47,8 @@ const booking = (() => {
     <div class="bg-[#F0E8D5] rounded-xl overflow-hidden cursor-pointer transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
 
         <div class="w-full h-20 bg-[linear-gradient(135deg,#e8dfd0,#d4c5a9)]
-            flex items-center justify-center text-[28px]">
-            ${m.emoji}
+            flex items-center justify-center">
+            <svg class="w-7 h-7 text-[#9E8E84]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
         </div>
 
         <div class="px-[10px] py-2 flex items-center justify-between gap-2">
@@ -93,6 +93,9 @@ const booking = (() => {
 
     </div>
     `).join('');
+
+        // Render Lucide icons in the newly created menu cards
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         bindAddButtons();
         bindMinButtons();

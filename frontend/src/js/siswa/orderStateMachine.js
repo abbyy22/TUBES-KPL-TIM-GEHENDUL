@@ -22,10 +22,20 @@ const OrderStateMachine = (() => {
         DONE: 'Selesai',
     };
 
+    const TRANSITIONS = {
+        IDLE: [STATES.ORDERED],
+        ORDERED: [STATES.COOKING],
+        COOKING: [STATES.READY],
+        READY: [STATES.DONE],
+        DONE: [],
+    };
+
     let currentState = STATES.IDLE;
 
     function transition(toState) {
+        if (!canTransition(toState)) return false;
         currentState = toState;
+        return true;
     }
 
     function getState() {
@@ -45,7 +55,7 @@ const OrderStateMachine = (() => {
     }
 
     function canTransition(toState) {
-        return Object.values(STATES).includes(toState);
+        return (TRANSITIONS[currentState] || []).includes(toState);
     }
 
     function getStepStatus(step) {

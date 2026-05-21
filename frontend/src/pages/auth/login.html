@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="../../output.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script></head>
   <body class="bg-[#F0E8D5] h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
@@ -106,7 +105,54 @@
       ></div>
     </div>
 
+    <script src="../../js/api.js"></script>
     <script>
+      if (ApiClient.isAuthenticated()) {
+        window.location.href = '../../index.html';
+      }
+
+      const loginForm = document.getElementById("loginForm");
+      const loginMessage = document.createElement("p");
+      loginMessage.className = "text-sm mt-3 text-center font-medium";
+      loginForm.insertAdjacentElement("afterend", loginMessage);
+
+      function setLoginMessage(message, isError = true) {
+        loginMessage.textContent = message;
+        loginMessage.className = `text-sm mt-3 text-center font-medium ${isError ? "text-red-600" : "text-green-700"}`;
+      }
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Memproses...";
+        setLoginMessage("");
+
+        try {
+          const data = await ApiClient.login(email, password);
+          const role = data?.user?.role || '';
+          const normalizedRole = ApiClient.normalizeRole(role);
+
+          setLoginMessage("Login berhasil, mengalihkan...", false);
+
+          // Both roles go to index.html; index.html will load correct page based on role
+          setTimeout(() => {
+            window.location.href = "../../index.html";
+          }, 500);
+        } catch (err) {
+          setLoginMessage(err.message || "Login gagal");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Masuk";
+        }
+      });
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+
       function togglePassword() {
         const passwordInput = document.getElementById("password");
         const btnSubmit = document.getElementById("btn-submit");
