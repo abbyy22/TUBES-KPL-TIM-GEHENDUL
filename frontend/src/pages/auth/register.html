@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="../../output.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   </head>
   <body class="bg-[#F0E8D5] h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
@@ -145,7 +145,58 @@
       ></div>
     </div>
 
+    <script src="../../js/api.js"></script>
     <script>
+      if (ApiClient.isAuthenticated()) {
+        window.location.href = '../../index.html';
+      }
+
+      const registerForm = document.getElementById("registerForm");
+      const registerMessage = document.createElement("p");
+      registerMessage.className = "text-sm mt-3 text-center font-medium";
+      registerForm.insertAdjacentElement("afterend", registerMessage);
+
+      function setRegisterMessage(message, isError = true) {
+        registerMessage.textContent = message;
+        registerMessage.className = `text-sm mt-3 text-center font-medium ${isError ? "text-red-600" : "text-green-700"}`;
+      }
+
+      registerForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const submitButton = registerForm.querySelector('button[type="submit"]');
+        const full_name = document.getElementById("nameLengkap").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("konfirmasi-password").value;
+
+        if (password !== confirmPassword) {
+          setRegisterMessage("Konfirmasi kata sandi tidak sama");
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Memproses...";
+        setRegisterMessage("");
+
+        try {
+          // send full_name to match backend Joi authValidator
+          await ApiClient.register(full_name, email, password);
+          setRegisterMessage("Registrasi berhasil! Silakan login...", false);
+          // redirect to login so user can login with new account
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1200);
+        } catch (err) {
+          setRegisterMessage(err.message || "Registrasi gagal");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Daftar";
+        }
+      });
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+
       function togglePassword() {
         const passwordInput = document.getElementById("password");
         const btnEyePassword = document.getElementById("btn-eye-password");

@@ -1,0 +1,39 @@
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] code 404, message File not found
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /output.css HTTP/1.1" 404 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/api.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/siswa/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/siswa/orderStateMachine.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/siswa/menuTable.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/siswa/ui.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/siswa/cart.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/siswa/dashSiswa.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:05] "GET /js/siswa/booking.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:06] "GET /pages/auth/login.html HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:06] code 404, message File not found
+127.0.0.1 - - [20/May/2026 02:26:06] "GET /output.css HTTP/1.1" 404 -
+127.0.0.1 - - [20/May/2026 02:26:06] "GET /assets/auth-bg.png HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:26:07] code 404, message File not found
+127.0.0.1 - - [20/May/2026 02:26:07] "GET /output.css HTTP/1.1" 404 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] code 404, message File not found
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /output.css HTTP/1.1" 404 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/api.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/siswa/menuTable.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/siswa/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/siswa/orderStateMachine.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/siswa/cart.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/siswa/ui.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/siswa/dashSiswa.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /js/siswa/booking.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /pages/auth/login.html HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:19] code 404, message File not found
+127.0.0.1 - - [20/May/2026 02:27:19] "GET /output.css HTTP/1.1" 404 -
+127.0.0.1 - - [20/May/2026 02:27:20] "GET /assets/auth-bg.png HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:20] code 404, message File not found
+127.0.0.1 - - [20/May/2026 02:27:20] "GET /output.css HTTP/1.1" 404 -
+127.0.0.1 - - [20/May/2026 02:27:20] code 404, message File not found
+127.0.0.1 - - [20/May/2026 02:27:20] "GET /output.css HTTP/1.1" 404 -
+127.0.0.1 - - [20/May/2026 02:27:20] "GET /partials/sidebar.html HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:20] "GET /assets/profile.png HTTP/1.1" 200 -
+127.0.0.1 - - [20/May/2026 02:27:20] "GET /pages/siswa/dashSiswa.html HTTP/1.1" 200 -

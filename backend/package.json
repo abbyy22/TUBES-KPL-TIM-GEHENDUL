@@ -1,7 +1,35 @@
 {
+  "name": "smart-canteen-backend",
+  "version": "1.0.0",
+  "description": "Backend Smart Canteen Ordering System (telFood) - Node.js + Express.js + MySQL",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/validators.test.js",
+    "dev": "nodemon src/index.js",
+    "db:init": "node scripts/initDb.js",
+    "db:seed": "node scripts/seedDb.js"
+  },
+  "keywords": [
+    "express",
+    "mysql",
+    "canteen",
+    "ordering"
+  ],
+  "author": "Team Gehendul",
+  "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "joi": "^18.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.11.3",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }

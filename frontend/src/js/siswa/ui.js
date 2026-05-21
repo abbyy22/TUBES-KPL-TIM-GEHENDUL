@@ -23,15 +23,15 @@ const UI = (function () {
     if (!container) return;
 
     const topMenus = MenuTable.getTopMenu();
-    const foodEmojis = ['🍳', '🍜', '🍱'];
+    const foodIcons = ['cooking-pot', 'soup', 'beef'];
 
     container.innerHTML = topMenus.map((item, i) => `
       <div class="menu-card">
         <div class="menu-food-wrap">
-          <div class="menu-food-img" style="background:linear-gradient(135deg,#f5e6c8,#e8c97a);display:flex;align-items:center;justify-content:center;font-size:46px;border-radius:50%;">
-            ${foodEmojis[i]}
+          <div class="menu-food-img" style="background:linear-gradient(135deg,#f5e6c8,#e8c97a);display:flex;align-items:center;justify-content:center;border-radius:50%;width:80px;height:80px;">
+            <svg style="width:40px;height:40px;color:#D4622A" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
           </div>
-          <div class="rank-crown">${item.crown}</div>
+          <div class="rank-crown">${item.crown || ''}</div>
         </div>
         <div class="menu-card-name">${Utils.sanitize(item.name)}</div>
         <div class="menu-card-kantin">by ${Utils.sanitize(item.kantin)}</div>
@@ -43,6 +43,8 @@ const UI = (function () {
         
       </div>
     `).join('');
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ---- Render Kantin Options in Select ----
@@ -69,7 +71,7 @@ const UI = (function () {
 
     const menus = MenuTable.getMenuByKantin(kantinId);
     const kantins = MenuTable.getKantinList();
-    const kantin = kantins.find(k => k.id === kantinId);
+    const kantin = kantins.find(k => String(k.id) === String(kantinId));
 
     if (header && kantin) header.textContent = `MENU ${kantin.name.toUpperCase()}`;
 
@@ -80,7 +82,7 @@ const UI = (function () {
 
     container.innerHTML = menus.map(m => `
       <div class="menu-item-card">
-        <div class="menu-item-img-placeholder">${m.emoji}</div>
+        <div class="menu-item-img-placeholder"><svg class="w-6 h-6 text-[#9E8E84]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg></div>
         <div class="menu-item-info">
           <div>
             <div class="menu-item-name">${Utils.sanitize(m.name)}</div>
