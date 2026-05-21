@@ -6,6 +6,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>telFood - Smart Canteen</title>
   <link href="./output.css" rel="stylesheet" />
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#EDE5D8',
+              sidebar: '#F7F2EA',
+              card: '#F7F2EA',
+              panel: '#F7F2EA',
+              primary: '#C05A1F',
+              light: '#E8784A',
+              mid: '#6B5E54',
+              muted: '#9E8E84',
+            },
+          },
+          borderRadius: {
+            'lg-custom': '22px',
+            'md-custom': '16px',
+            'sm-custom': '10px',
+          },
+          boxShadow: {
+            custom: '0 2px 12px rgba(0, 0, 0, 0.06)',
+            'custom-hover': '0 6px 24px rgba(0, 0, 0, 0.10)',
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <style>
     .sidebar-nav a.active-menu {
       color: #C1500E !important;
@@ -23,52 +55,94 @@
     </div>
   </main>
 
+  <script src="./js/api.js"></script>
   <script src="./js/siswa/utils.js"></script>
   <script src="./js/siswa/menuTable.js"></script>
   <script src="./js/siswa/orderStateMachine.js"></script>
   <script src="./js/siswa/cart.js"></script>
   <script src="./js/siswa/ui.js"></script>
 
+  <!-- Owner scripts -->
+  <script src="./js/owner/edit-menu.js"></script>
 
   <script src="./js/siswa/dashSiswa.js"></script>
   <script src="./js/siswa/booking.js"></script>
 
   <script>
 
-    const CURRENT_ROLE = 'siswa';
+    if (!ApiClient.isAuthenticated()) {
+      window.location.href = './pages/auth/login.html';
+    }
+
+    const CURRENT_USER = ApiClient.getUser();
+    const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
+
+    // ─── Socket.io connection for real-time order updates ────────────────────
+    window.socket = null;
+    try {
+      // Derive socket URL from API base (strip /api suffix)
+      const socketUrl = ApiClient.getBaseUrl().replace(/\/api$/, '');
+      window.socket = io(socketUrl);
+      window.socket.on('connect', () => console.log('[socket.io] connected to', socketUrl, ':', window.socket.id));
+      window.socket.on('disconnect', () => console.log('[socket.io] disconnected'));
+      window.socket.on('connect_error', (err) => console.warn('[socket.io] connection error:', err.message));
+
+      // Real-time order status – notify pelanggan
+      window.socket.on('order:status', (payload) => {
+        console.log('[socket.io] order:status received:', payload);
+        // If kanban (owner status page) is rendered, refresh it
+        if (typeof window.render === 'function' && typeof window.orders !== 'undefined') {
+          // reload from backend to get fresh data
+          if (typeof window.initKanban === 'function') {
+            window.initKanban();
+          } else {
+            window.render();
+          }
+        }
+        // If siswa is watching an order status overlay, update it
+        if (typeof OrderStateMachine !== 'undefined' && typeof UI !== 'undefined') {
+          const stateMap = { ORDERED: 'ORDERED', COOKING: 'COOKING', READY: 'READY', DONE: 'DONE' };
+          const newState = stateMap[payload.status];
+          if (newState && OrderStateMachine.getState() !== OrderStateMachine.STATES.IDLE) {
+            try { OrderStateMachine.forceState(newState); } catch(e) { /* ignore */ }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('[socket.io] Failed to connect:', e.message);
+    }
     async function initApp() {
       try {
         const resSidebar = await fetch("./partials/sidebar.html");
         const sidebarHtml = await resSidebar.text();
         document.getElementById("sidebar-placeholder").innerHTML = sidebarHtml;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         const avatar = document.getElementById("sidebar-avatar");
         if (avatar) avatar.src = "./assets/profile.png";
+        const sidebarName = document.getElementById("sidebar-user-name");
+        const sidebarEmail = document.getElementById("sidebar-user-email");
+        if (CURRENT_USER && sidebarName) sidebarName.textContent = CURRENT_USER.name;
+        if (CURRENT_USER && sidebarEmail) sidebarEmail.textContent = CURRENT_USER.email;
 
         const navContainer = document.querySelector(".sidebar-nav");
 
         if (CURRENT_ROLE === 'siswa') {
           navContainer.innerHTML = `
-            <a data-page="siswa-home" href="#" class="block text-gray-400 hover:text-[#D2691E] p-2.5 rounded-xl transition-all">Home</a>
-            <a data-page="siswa-booking" href="#" class="block text-gray-400 hover:text-[#D2691E] p-2.5 rounded-xl transition-all">Pesan</a>
+            <a data-page="siswa-home" href="#" class="flex items-center gap-3 text-gray-400 hover:text-[#D2691E] p-2.5 rounded-xl transition-all">Home</a>
+            <a data-page="siswa-booking" href="#" class="flex items-center gap-3 text-gray-400 hover:text-[#D2691E] p-2.5 rounded-xl transition-all">Pesan</a>
           `;
           setupNavigation();
-          loadPage("siswa-home");
+          loadPage("siswa-home"); 
 
         } else if (CURRENT_ROLE === 'owner') {
           navContainer.innerHTML = `
-            <a data-page="owner-dashboard" href="#" class="nav-item flex items-center gap-3 p-3 rounded-xl text-sm text-gray-400 hover:text-[#C1500E] transition-all">
-                <i class="ti ti-layout-dashboard text-lg"></i> Dashboard
-            </a>
-            <a data-page="owner-menu" href="#" class="nav-item flex items-center gap-3 p-3 rounded-xl text-sm text-gray-400 hover:text-[#C1500E] transition-all">
-                <i class="ti ti-tools-kitchen-2 text-lg"></i> Edit Menu
-            </a>
-            <a data-page="owner-status" href="#" class="nav-item flex items-center gap-3 p-3 rounded-xl text-sm text-gray-400 hover:text-[#C1500E] transition-all">
-                <i class="ti ti-receipt text-lg"></i> Status Pesanan
-            </a>
+            <a data-page="owner-dashboard" href="#" class="nav-item flex items-center gap-3 p-3 rounded-xl text-sm text-gray-400 hover:text-[#C1500E] transition-all">Dashboard</a>
+            <a data-page="owner-menu" href="#" class="nav-item flex items-center gap-3 p-3 rounded-xl text-sm text-gray-400 hover:text-[#C1500E] transition-all">Edit Menu</a>
+            <a data-page="owner-status" href="#" class="nav-item flex items-center gap-3 p-3 rounded-xl text-sm text-gray-400 hover:text-[#C1500E] transition-all">Status Pesanan</a>
           `;
           setupNavigation();
-          loadPage("owner-dashboard");
+          loadPage("owner-dashboard"); 
         }
 
       } catch (err) {
@@ -80,12 +154,21 @@
       const contentArea = document.getElementById('main-content');
       let filePath = '';
 
+      // ── Admin page guard ───────────────────────────────────────────────────
+      const ownerPages = ['owner-dashboard', 'owner-menu', 'owner-status'];
+      if (ownerPages.includes(pageName) && CURRENT_ROLE !== 'owner') {
+        console.warn(`[auth] siswa mencoba akses halaman owner: ${pageName} → redirect ke siswa-home`);
+        loadPage('siswa-home');
+        return;
+      }
+
       if (pageName === 'siswa-home') filePath = './pages/siswa/dashSiswa.html';
       else if (pageName === 'siswa-booking') filePath = './pages/siswa/booking.html';
       else if (pageName === 'owner-dashboard') filePath = './pages/owner/dashboard.html';
       else if (pageName === 'owner-menu') filePath = './pages/owner/edit-menu.html';
       else if (pageName === 'owner-status') filePath = './pages/owner/update_status.html';
       else if (pageName === 'page-account') filePath = './pages/account/index.html';
+
 
       try {
         const response = await fetch(filePath);
@@ -114,6 +197,7 @@
           dashSiswa.renderTopMenu();
         }
         if (pageName === 'siswa-booking') {
+          await MenuTable.loadFromApi();
           booking.renderKantinSelect();
           booking.renderMenuGrid('');
           booking.renderOrderItems();
@@ -132,6 +216,9 @@
         if (pageName === 'owner-status' && typeof initKanban === 'function') {
           initKanban();
         }
+
+        // Render Lucide icons in the newly loaded page content
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
       } catch (err) {
         console.error('Gagal load halaman:', err);
@@ -169,31 +256,62 @@
       pesanBtn.replaceWith(pesanBtn.cloneNode(true));
       const newPesanBtn = document.getElementById('pesanBtn');
 
-      newPesanBtn.addEventListener('click', () => {
+      newPesanBtn.addEventListener('click', async () => {
         const nama = document.getElementById('namaInput')?.value?.trim();
         const kantin = document.getElementById('kantinSelect')?.value;
 
         const valid = Utils.validateNama(nama);
         if (!valid.valid) { alert(valid.message); return; }
-        if (!kantin) { alert('Pilih kantin dulu anjir'); return; }
+        if (!kantin) { alert('Pilih kantin terlebih dahulu'); return; }
         if (Cart.isEmpty()) { alert('Pilih menu terlebih dahulu!'); return; }
 
-        OrderStateMachine.reset();
-        OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
+        newPesanBtn.disabled = true;
+        newPesanBtn.textContent = 'Memproses...';
 
-        const orderId = Utils.generateOrderId();
         const items = Cart.getItems();
         const summary = items[0].menuItem.name + (items.length > 1 ? ` + ${items.length - 1} lainnya` : '');
-        const total = Cart.getTotal();
+        let total = Cart.getTotal();
 
-        UI.renderOrderStatus(orderId, summary, total);
+        OrderStateMachine.reset();
 
-        setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.COOKING); UI.renderOrderStatus(orderId, summary, total); }, 3000);
-        setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.READY); UI.renderOrderStatus(orderId, summary, total); }, 6000);
-        setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.DONE); UI.renderOrderStatus(orderId, summary, total); }, 9000);
+        try {
+          if (ApiClient.isAuthenticated() && MenuTable.isApiBacked()) {
+            const payload = {
+              kantin_id: Number(kantin),
+              customer_name: nama,
+              items: items.map(item => ({
+                menu_id: Number(item.menuItem.id),
+                quantity: item.quantity,
+              })),
+            };
 
-        Cart.clearCart();
-        booking.renderOrderItems();
+            if (!Number.isInteger(payload.kantin_id) ||
+              payload.items.some(item => !Number.isInteger(item.menu_id))) {
+              throw new Error('Data menu belum sinkron dengan backend');
+            }
+
+            const order = await ApiClient.createOrder(payload);
+            total = Number(order.total_price);
+            OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
+            UI.renderOrderStatus(String(order.id), summary, total);
+          } else {
+            const orderId = Utils.generateOrderId();
+            OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
+            UI.renderOrderStatus(orderId, summary, total);
+
+            setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.COOKING); UI.renderOrderStatus(orderId, summary, total); }, 3000);
+            setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.READY); UI.renderOrderStatus(orderId, summary, total); }, 6000);
+            setTimeout(() => { OrderStateMachine.transition(OrderStateMachine.STATES.DONE); UI.renderOrderStatus(orderId, summary, total); }, 9000);
+          }
+
+          Cart.clearCart();
+          booking.renderOrderItems();
+        } catch (err) {
+          alert(err.message || 'Gagal membuat pesanan');
+        } finally {
+          newPesanBtn.disabled = false;
+          newPesanBtn.textContent = 'Pesan Sekarang';
+        }
       });
     }
 
