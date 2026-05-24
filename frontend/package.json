@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node test/syntax.test.js",
-    "dev": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch"
+    "dev": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch",
+    "serve": "npx serve ./serve -p 8080"
   },
   "keywords": [],
   "author": "",
