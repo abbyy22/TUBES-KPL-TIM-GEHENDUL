@@ -1,15 +1,15 @@
 // Data Layer (Nanti ganti dengan fetch ke API Node.js)
 let menus = [
-  { id:1,  name:'Nasi Goreng Spesial',   desc:'Pedas Sedang, Telur Ceplok',     cat:'food',  price:25000, active:true,  image:'./assets/images/nasi_goreng.png' },
-  { id:2,  name:'Ayam Goreng Kremes',    desc:'Paha/Dada, Sambal Bawang',       cat:'food',  price:22000, active:true,  image:'./assets/images/ayam_goreng.png' },
-  { id:3,  name:'Mie Goreng Seafood',    desc:'Udang, Cumi, Bakso Ikan',        cat:'food',  price:28000, active:true,  image:'https://picsum.photos/seed/miegoreng/200/200' },
-  { id:4,  name:'Soto Ayam Lamongan',    desc:'Kuah Bening, Koya Gurih',        cat:'food',  price:18000, active:true,  image:'https://picsum.photos/seed/sotoayam/200/200' },
-  { id:5,  name:'Rendang Sapi',          desc:'Daging Sapi Empuk, Bumbu Padang',cat:'food',  price:32000, active:false, image:'https://picsum.photos/seed/rendang/200/200' },
-  { id:6,  name:'Gado-gado Jakarta',     desc:'Sayuran Segar, Bumbu Kacang',    cat:'food',  price:15000, active:true,  image:'https://picsum.photos/seed/gadogado/200/200' },
-  { id:7,  name:'Es Teh Manis',          desc:'Gula Murni, Es Kristal',         cat:'drink', price:5000,  active:true,  image:'./assets/images/es_teh_manis.png' },
-  { id:8,  name:'Jus Jeruk Peras',       desc:'Jeruk Medan Asli, Tanpa Gula',   cat:'drink', price:15000, active:false, image:'./assets/images/jus_jeruk.png' },
-  { id:9,  name:'Es Kopi Susu',          desc:'Kopi Robusta, Susu Segar',       cat:'drink', price:18000, active:true,  image:'https://picsum.photos/seed/eskopi/200/200' },
-  { id:10, name:'Teh Tarik',             desc:'Teh Ceylon, Susu Kental Manis',  cat:'drink', price:12000, active:true,  image:'https://picsum.photos/seed/tehtarik/200/200' },
+  { id: 1, name: 'Nasi Goreng Spesial', desc: 'Pedas Sedang, Telur Ceplok', cat: 'food', price: 25000, active: true, image: './assets/images/nasi_goreng.png' },
+  { id: 2, name: 'Ayam Goreng Kremes', desc: 'Paha/Dada, Sambal Bawang', cat: 'food', price: 22000, active: true, image: './assets/images/ayam_goreng.png' },
+  { id: 3, name: 'Mie Goreng Seafood', desc: 'Udang, Cumi, Bakso Ikan', cat: 'food', price: 28000, active: true, image: 'https://picsum.photos/seed/miegoreng/200/200' },
+  { id: 4, name: 'Soto Ayam Lamongan', desc: 'Kuah Bening, Koya Gurih', cat: 'food', price: 18000, active: true, image: 'https://picsum.photos/seed/sotoayam/200/200' },
+  { id: 5, name: 'Rendang Sapi', desc: 'Daging Sapi Empuk, Bumbu Padang', cat: 'food', price: 32000, active: false, image: 'https://picsum.photos/seed/rendang/200/200' },
+  { id: 6, name: 'Gado-gado Jakarta', desc: 'Sayuran Segar, Bumbu Kacang', cat: 'food', price: 15000, active: true, image: 'https://picsum.photos/seed/gadogado/200/200' },
+  { id: 7, name: 'Es Teh Manis', desc: 'Gula Murni, Es Kristal', cat: 'drink', price: 5000, active: true, image: './assets/images/es_teh_manis.png' },
+  { id: 8, name: 'Jus Jeruk Peras', desc: 'Jeruk Medan Asli, Tanpa Gula', cat: 'drink', price: 15000, active: false, image: './assets/images/jus_jeruk.png' },
+  { id: 9, name: 'Es Kopi Susu', desc: 'Kopi Robusta, Susu Segar', cat: 'drink', price: 18000, active: true, image: 'https://picsum.photos/seed/eskopi/200/200' },
+  { id: 10, name: 'Teh Tarik', desc: 'Teh Ceylon, Susu Kental Manis', cat: 'drink', price: 12000, active: true, image: 'https://picsum.photos/seed/tehtarik/200/200' },
 ];
 
 let nextId = 11;
@@ -18,7 +18,7 @@ let editingId = null;
 let deletingId = null;
 let page = 0;
 const PER = 6;
-let currentImageData = null; 
+let currentImageData = null;
 
 function fmt(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
 
@@ -174,8 +174,8 @@ function openAdd() {
   document.getElementById('fDesc').value = '';
   document.getElementById('fCat').value = 'food';
   document.getElementById('fPrice').value = '';
-  removeImage(); 
-  document.getElementById('modalOverlay').classList.remove('hidden');
+  removeImage();
+  document.getElementById('modalOverlay').style.display = 'flex';
   setTimeout(() => document.getElementById('fName').focus(), 50);
 }
 
@@ -187,7 +187,7 @@ function openEdit(id) {
   document.getElementById('fDesc').value = m.desc;
   document.getElementById('fCat').value = m.cat;
   document.getElementById('fPrice').value = m.price;
-  
+
   currentImageData = m.image;
   const preview = document.getElementById('fImagePreview');
   preview.src = m.image;
@@ -198,22 +198,25 @@ function openEdit(id) {
   document.getElementById('uploadZone').style.borderColor = '#C05A1F';
   document.getElementById('uploadZone').style.borderStyle = 'solid';
 
-  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.getElementById('modalOverlay').style.display = 'flex';
   setTimeout(() => document.getElementById('fName').focus(), 50);
 }
 
-function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
+function closeModal() {
+  const el = document.getElementById('modalOverlay');
+  if (el) el.style.display = 'none';
+}
 
 function saveMenu() {
   const name = document.getElementById('fName').value.trim();
   const desc = document.getElementById('fDesc').value.trim();
   const cat = document.getElementById('fCat').value;
   const price = parseInt(document.getElementById('fPrice').value) || 0;
-  
+
   if (!name) { document.getElementById('fName').focus(); return; }
   if (price <= 0) { document.getElementById('fPrice').focus(); return; }
 
-  const imgToSave = currentImageData || `https://picsum.photos/seed/${name.replace(/\s/g,'')}/200/200`;
+  const imgToSave = currentImageData || `https://picsum.photos/seed/${name.replace(/\s/g, '')}/200/200`;
 
   if (editingId) {
     const m = menus.find(x => x.id === editingId);
@@ -230,10 +233,13 @@ function openDel(id) {
   deletingId = id;
   const m = menus.find(x => x.id === id);
   document.getElementById('delSub').textContent = `"${m.name}" akan dihapus secara permanen.`;
-  document.getElementById('delOverlay').classList.remove('hidden');
+  document.getElementById('delOverlay').style.display = 'flex';
 }
 
-function closeDel() { document.getElementById('delOverlay').classList.add('hidden'); }
+function closeDel() {
+  const el = document.getElementById('delOverlay');
+  if (el) el.style.display = 'none';
+}
 
 function confirmDel() {
   menus = menus.filter(x => x.id !== deletingId);

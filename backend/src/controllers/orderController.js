@@ -10,7 +10,6 @@ function mapOrderRow(r) {
     id: r.id,
     user_id: r.user_id,
     kantin_id: r.kantin_id,
-    kantin_name: r.kantin_name,
     customer_name: r.customer_name,
     total_price: r.total_price,
     status: r.status,
@@ -20,10 +19,9 @@ function mapOrderRow(r) {
 }
 
 const SELECT_ORDER = `
-  SELECT o.id, o.user_id, o.kantin_id, k.name AS kantin_name, o.customer_name,
+  SELECT o.id, o.user_id, o.kantin_id, o.customer_name,
          o.total_price, o.status, o.created_at, o.updated_at
   FROM orders o
-  JOIN kantins k ON k.id = o.kantin_id
 `;
 
 async function fetchOrderItems(orderId) {
@@ -45,10 +43,6 @@ async function createOrder(req, res) {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-
-    // Validasi kantin
-    const [k] = await conn.query('SELECT id FROM kantins WHERE id = ?', [input.kantin_id]);
-    if (k.length === 0) throw ApiError.badRequest('Kantin tidak ditemukan');
 
     // Ambil semua menu yang dipesan, validasi kantin & ketersediaan
     const menuIds = input.items.map((i) => i.menu_id);

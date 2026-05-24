@@ -47,7 +47,10 @@
         <h2 class="text-xl font-bold text-brand-mid">Manajemen Menu</h2>
       </div>
       <button onclick="openAdd()"
-        class="bg-brand-primary hover:bg-brand-light text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2">
+        class="text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2"
+        style="background-color:#C05A1F;color:#fff;"
+        onmouseover="this.style.backgroundColor='#E8784A'"
+        onmouseout="this.style.backgroundColor='#C05A1F'">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
         Tambah Menu Baru
       </button>
@@ -87,15 +90,21 @@
       <p id="footInfo" class="text-xs text-brand-muted"></p>
       <div class="flex gap-2">
         <button onclick="changePage(-1)"
-          class="text-xs font-bold border border-[#DDD0C4] bg-white text-brand-mid px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors">Sebelumnya</button>
+          class="text-xs font-bold border border-[#DDD0C4] bg-white text-brand-mid px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+          style="border:1px solid #DDD0C4;background:#fff;color:#6B5E54;"
+          onmouseover="this.style.background='#f9f9f9'"
+          onmouseout="this.style.background='#fff'">Sebelumnya</button>
         <button onclick="changePage(1)"
-          class="text-xs font-bold bg-brand-primary text-white px-4 py-2 rounded-xl hover:bg-brand-light transition-colors">Berikutnya</button>
+          class="text-xs font-bold text-white px-4 py-2 rounded-xl transition-colors"
+          style="background-color:#C05A1F;color:#fff;"
+          onmouseover="this.style.backgroundColor='#E8784A'"
+          onmouseout="this.style.backgroundColor='#C05A1F'">Berikutnya</button>
       </div>
     </div>
   </section>
 </div>
 
-<div id="modalOverlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+<div id="modalOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" style="display:none;">
   <div class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-sm border border-black/10 shadow-xl"
     style="background:#F7F2EA;"
     onclick="event.stopPropagation()">
@@ -166,7 +175,7 @@
   </div>
 </div>
 
-<div id="delOverlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+<div id="delOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" style="display:none;">
   <div class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-xs text-center border border-black/10 shadow-xl"
     onclick="event.stopPropagation()">
     <svg class="w-8 h-8 text-red-500 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
