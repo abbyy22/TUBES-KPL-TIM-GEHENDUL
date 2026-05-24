@@ -1,104 +1,244 @@
-<div class="flex flex-col gap-3.5 min-h-[calc(100vh-40px)] animate-fadeSlideIn animation-delay-70">
-
-  <header class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center gap-6">
-    <h1 class="text-2xl font-bold text-brand-mid tracking-tight flex-1">Kantin NEO 2</h1>
+<div
+  class="flex flex-col gap-3.5 min-h-[calc(100vh-40px)] animate-fadeSlideIn animation-delay-70"
+>
+  <header
+    class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center gap-6"
+  >
+    <h1
+      id="kantin-title"
+      class="text-2xl font-bold text-brand-mid tracking-tight flex-1"
+    >
+      Kantin NEO 2
+    </h1>
 
     <div
-      class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80 transition-colors focus-within:border-brand-primary">
-      <svg class="w-4 h-4 text-brand-muted shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
-        type="text" placeholder="Search">
+      class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80 transition-colors focus-within:border-brand-primary"
+    >
+      <svg
+        class="w-4 h-4 text-brand-muted shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
+        type="text"
+        placeholder="Search"
+      />
     </div>
 
     <div class="flex items-center gap-2">
       <button
         class="w-10 h-10 rounded-full border border-[#DDD0C4] bg-brand-bg cursor-default flex items-center justify-center relative transition-all hover:border-brand-primary hover:bg-white"
-        title="Notifications">
-        <svg class="w-4 h-4 text-[#7a6555]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="w-2 h-2 bg-brand-primary rounded-full absolute top-1 right-1 border-2 border-brand-panel"></span>
+        title="Notifications"
+      >
+        <svg
+          class="w-4 h-4 text-[#7a6555]"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span
+          class="w-2 h-2 bg-brand-primary rounded-full absolute top-1 right-1 border-2 border-brand-panel"
+        ></span>
       </button>
     </div>
   </header>
 
   <main class="flex flex-col gap-3.5 flex-1">
-
     <div class="grid grid-cols-3 gap-3.5">
-
-      <div class="bg-brand-card rounded-lg-custom p-7 pb-5 flex flex-col gap-2 animate-fadeUp">
-        <div class="flex items-center gap-1.5 text-xs font-medium text-brand-muted">
-          <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <div
+        class="bg-brand-card rounded-lg-custom p-7 pb-5 flex flex-col gap-2 animate-fadeUp"
+      >
+        <div
+          class="flex items-center gap-1.5 text-xs font-medium text-brand-muted"
+        >
+          <svg
+            class="w-4 h-4 text-brand-primary shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
           Omzet hari ini
         </div>
-        <div class="text-4xl font-bold text-brand-mid tracking-tighter leading-[1.1]">Rp 847k
+        <div
+          class="text-4xl font-bold text-brand-mid tracking-tighter leading-[1.1]"
+        >
+          Rp 847k
         </div>
-        <div class="text-xs text-brand-muted"><span class="text-brand-primary font-semibold">↑
-            12% vs kemarin</span></div>
+        <div class="text-xs text-brand-muted">
+          <span class="text-brand-primary font-semibold">↑ 12% vs kemarin</span>
+        </div>
       </div>
 
-      <div class="bg-brand-card rounded-lg-custom p-7 pb-5 flex flex-col gap-2 animate-fadeUp animation-delay-70">
-        <div class="flex items-center gap-1.5 text-xs font-medium text-brand-muted">
-          <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <div
+        class="bg-brand-card rounded-lg-custom p-7 pb-5 flex flex-col gap-2 animate-fadeUp animation-delay-70"
+      >
+        <div
+          class="flex items-center gap-1.5 text-xs font-medium text-brand-muted"
+        >
+          <svg
+            class="w-4 h-4 text-brand-primary shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
           Total Transaksi
         </div>
-        <div class="text-4xl font-bold text-brand-mid tracking-tighter leading-[1.1]">64</div>
+        <div
+          class="text-4xl font-bold text-brand-mid tracking-tighter leading-[1.1]"
+        >
+          64
+        </div>
         <div class="text-xs text-brand-muted">Rata-rata Rp 12k/transaksi</div>
       </div>
 
-      <div class="bg-brand-card rounded-lg-custom p-7 pb-5 flex flex-col gap-2 animate-fadeUp animation-delay-140">
-        <div class="flex items-center gap-1.5 text-xs font-medium text-brand-muted">
-          <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div
+        class="bg-brand-card rounded-lg-custom p-7 pb-5 flex flex-col gap-2 animate-fadeUp animation-delay-140"
+      >
+        <div
+          class="flex items-center gap-1.5 text-xs font-medium text-brand-muted"
+        >
+          <svg
+            class="w-4 h-4 text-brand-primary shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
           Antrian aktif
         </div>
-        <div class="text-4xl font-bold text-brand-mid tracking-tighter leading-[1.1]">7</div>
+        <div
+          class="text-4xl font-bold text-brand-mid tracking-tighter leading-[1.1]"
+        >
+          7
+        </div>
         <div class="text-xs text-brand-muted">Estimasi selesai ~18 mnt</div>
       </div>
-
     </div>
 
-    <section class="bg-brand-panel rounded-lg-custom p-7 pb-6 flex-1 animate-fadeUp animation-delay-180">
+    <section
+      class="bg-brand-panel rounded-lg-custom p-7 pb-6 flex-1 animate-fadeUp animation-delay-180"
+    >
       <div class="flex items-center gap-3.5 mb-5">
-        <svg class="w-5 h-5 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        <h2 class="text-2xl font-bold text-brand-mid tracking-tight">Pesanan masuk</h2>
+        <svg
+          class="w-5 h-5 text-brand-primary shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <circle cx="3" cy="6" r="1"></circle>
+          <circle cx="3" cy="12" r="1"></circle>
+          <circle cx="3" cy="18" r="1"></circle>
+        </svg>
+        <h2 class="text-2xl font-bold text-brand-mid tracking-tight">
+          Pesanan masuk
+        </h2>
       </div>
 
       <div class="flex flex-col gap-2.5">
         <div
-          class="flex items-center gap-[18px] p-4 px-6 bg-brand-bg rounded-md-custom cursor-pointer transition-all hover:shadow-custom-hover hover:-translate-y-[1px] animate-fadeUp animation-delay-220">
-          <span class="text-sm font-bold text-brand-muted w-9 shrink-0">#41</span>
+          class="flex items-center gap-[18px] p-4 px-6 bg-brand-bg rounded-md-custom cursor-pointer transition-all hover:shadow-custom-hover hover:-translate-y-[1px] animate-fadeUp animation-delay-220"
+        >
+          <span class="text-sm font-bold text-brand-muted w-9 shrink-0"
+            >#41</span
+          >
           <div class="flex-1 min-w-0">
-            <div class="text-sm font-bold text-brand-mid mb-0.5">Meja 3 – Sukma</div>
+            <div class="text-sm font-bold text-brand-mid mb-0.5">
+              Meja 3 – Sukma
+            </div>
             <div class="text-xs text-brand-muted">Nasi goreng, Es teh x1</div>
           </div>
-          <span class="text-sm font-bold text-brand-mid shrink-0 whitespace-nowrap">Rp 23k</span>
           <span
-            class="bg-brand-primary text-white py-1.5 px-5 rounded-full text-xs font-semibold shrink-0 min-w-[90px] text-center">Baru</span>
+            class="text-sm font-bold text-brand-mid shrink-0 whitespace-nowrap"
+            >Rp 23k</span
+          >
+          <span
+            class="bg-brand-primary text-white py-1.5 px-5 rounded-full text-xs font-semibold shrink-0 min-w-[90px] text-center"
+            >Baru</span
+          >
         </div>
 
         <div
-          class="flex items-center gap-[18px] p-4 px-6 bg-brand-bg rounded-md-custom cursor-pointer transition-all hover:shadow-custom-hover hover:-translate-y-[1px] animate-fadeUp animation-delay-280">
-          <span class="text-sm font-bold text-brand-muted w-9 shrink-0">#40</span>
+          class="flex items-center gap-[18px] p-4 px-6 bg-brand-bg rounded-md-custom cursor-pointer transition-all hover:shadow-custom-hover hover:-translate-y-[1px] animate-fadeUp animation-delay-280"
+        >
+          <span class="text-sm font-bold text-brand-muted w-9 shrink-0"
+            >#40</span
+          >
           <div class="flex-1 min-w-0">
-            <div class="text-sm font-bold text-brand-mid mb-0.5">Bawa Pulang – Nadia</div>
+            <div class="text-sm font-bold text-brand-mid mb-0.5">
+              Bawa Pulang – Nadia
+            </div>
             <div class="text-xs text-brand-muted">Serbu 1 x1</div>
           </div>
-          <span class="text-sm font-bold text-brand-mid shrink-0 whitespace-nowrap">Rp 11k</span>
           <span
-            class="bg-brand-primary text-white py-1.5 px-5 rounded-full text-xs font-semibold shrink-0 min-w-[90px] text-center">Diproses</span>
+            class="text-sm font-bold text-brand-mid shrink-0 whitespace-nowrap"
+            >Rp 11k</span
+          >
+          <span
+            class="bg-brand-primary text-white py-1.5 px-5 rounded-full text-xs font-semibold shrink-0 min-w-[90px] text-center"
+            >Diproses</span
+          >
         </div>
 
         <div
-          class="flex items-center gap-[18px] p-4 px-6 bg-brand-bg rounded-md-custom cursor-pointer transition-all hover:shadow-custom-hover hover:-translate-y-[1px] animate-fadeUp animation-delay-340">
-          <span class="text-sm font-bold text-brand-muted w-9 shrink-0">#39</span>
+          class="flex items-center gap-[18px] p-4 px-6 bg-brand-bg rounded-md-custom cursor-pointer transition-all hover:shadow-custom-hover hover:-translate-y-[1px] animate-fadeUp animation-delay-340"
+        >
+          <span class="text-sm font-bold text-brand-muted w-9 shrink-0"
+            >#39</span
+          >
           <div class="flex-1 min-w-0">
-            <div class="text-sm font-bold text-brand-mid mb-0.5">Meja 1 – Abidah</div>
+            <div class="text-sm font-bold text-brand-mid mb-0.5">
+              Meja 1 – Abidah
+            </div>
             <div class="text-xs text-brand-muted">Soto Ayam, Es teh x1</div>
           </div>
-          <span class="text-sm font-bold text-brand-mid shrink-0 whitespace-nowrap">Rp 19k</span>
           <span
-            class="bg-brand-primary text-white py-1.5 px-5 rounded-full text-xs font-semibold shrink-0 min-w-[90px] text-center">Selesai</span>
+            class="text-sm font-bold text-brand-mid shrink-0 whitespace-nowrap"
+            >Rp 19k</span
+          >
+          <span
+            class="bg-brand-primary text-white py-1.5 px-5 rounded-full text-xs font-semibold shrink-0 min-w-[90px] text-center"
+            >Selesai</span
+          >
         </div>
       </div>
     </section>
-
   </main>
 </div>
