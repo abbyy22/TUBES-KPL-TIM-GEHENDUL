@@ -1,37 +1,68 @@
 <div class="flex flex-col gap-3.5 min-h-[calc(100vh-40px)] animate-fadeSlideIn">
-
-  <header class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center justify-between gap-6">
-    <div>
-      <h1 class="text-2xl font-bold text-brand-mid tracking-tight">Kantin NEO 2</h1>
-      <p class="text-xs text-brand-muted mt-0.5">Rabu, 7 Mei 2026 · Shift Pagi 07.00–16.00</p>
+  <header
+    class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center justify-between gap-6"
+  >
+    <div class="flex-1">
+      <h1
+        id="kantin-title"
+        class="text-2xl font-bold text-brand-mid tracking-tight"
+      >
+        Dashboard Kantin
+      </h1>
+      <p id="dashboard-date" class="text-xs text-brand-muted mt-0.5"></p>
     </div>
   </header>
 
   <div class="grid grid-cols-4 gap-3.5">
-    <div class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm">
-      <div class="flex items-center gap-1.5 text-xs font-medium text-brand-muted">
-        <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <div
+      class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm"
+    >
+      <div
+        class="flex items-center gap-1.5 text-xs font-medium text-brand-muted"
+      >
+        <i
+          data-lucide="file-text"
+          class="w-4 h-4 text-brand-primary shrink-0"
+        ></i>
         TOTAL MENU
       </div>
       <div class="text-3xl font-bold text-brand-mid" id="totalCount">0</div>
     </div>
-    <div class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm">
-      <div class="flex items-center gap-1.5 text-xs font-medium text-brand-muted">
-        <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+    <div
+      class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm"
+    >
+      <div
+        class="flex items-center gap-1.5 text-xs font-medium text-brand-muted"
+      >
+        <i
+          data-lucide="utensils-crossed"
+          class="w-4 h-4 text-brand-primary shrink-0"
+        ></i>
         MAKANAN
       </div>
       <div class="text-3xl font-bold text-brand-mid" id="foodCount">0</div>
     </div>
-    <div class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm">
-      <div class="flex items-center gap-1.5 text-xs font-medium text-brand-muted">
-        <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+    <div
+      class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm"
+    >
+      <div
+        class="flex items-center gap-1.5 text-xs font-medium text-brand-muted"
+      >
+        <i data-lucide="coffee" class="w-4 h-4 text-brand-primary shrink-0"></i>
         MINUMAN
       </div>
       <div class="text-3xl font-bold text-brand-mid" id="drinkCount">0</div>
     </div>
-    <div class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm">
-      <div class="flex items-center gap-1.5 text-xs font-medium text-brand-muted">
-        <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div
+      class="bg-brand-card rounded-lg-custom p-6 flex flex-col gap-1 shadow-sm"
+    >
+      <div
+        class="flex items-center gap-1.5 text-xs font-medium text-brand-muted"
+      >
+        <i
+          data-lucide="alert-circle"
+          class="w-4 h-4 text-brand-primary shrink-0"
+        ></i>
         MENU HABIS
       </div>
       <div class="text-3xl font-bold text-brand-primary" id="emptyCount">0</div>
@@ -39,28 +70,41 @@
   </div>
 
   <section
-    class="bg-brand-card rounded-lg-custom overflow-hidden border border-[#DDD0C4]/40 shadow-sm flex flex-col flex-1">
-
-    <div class="flex items-center justify-between p-6 px-8 border-b border-[#DDD0C4]/30">
+    class="bg-brand-card rounded-lg-custom overflow-hidden border border-[#DDD0C4]/40 shadow-sm flex flex-col flex-1"
+  >
+    <div
+      class="flex items-center justify-between p-6 px-8 border-b border-[#DDD0C4]/30"
+    >
       <div class="flex items-center gap-2.5">
-        <svg class="w-5 h-5 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <i data-lucide="list" class="w-4 h-4 text-brand-primary shrink-0"></i>
         <h2 class="text-xl font-bold text-brand-mid">Manajemen Menu</h2>
       </div>
-      <button onclick="openAdd()"
+      <button
+        onclick="openAdd()"
         class="text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2"
-        style="background-color:#C05A1F;color:#fff;"
-        onmouseover="this.style.backgroundColor='#E8784A'"
-        onmouseout="this.style.backgroundColor='#C05A1F'">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        style="background-color: #c05a1f; color: #fff"
+        onmouseover="this.style.backgroundColor = '#E8784A'"
+        onmouseout="this.style.backgroundColor = '#C05A1F'"
+      >
+        <i data-lucide="plus" class="w-4 h-4 text-white shrink-0"></i>
         Tambah Menu Baru
       </button>
     </div>
 
-    <div class="flex items-center justify-between p-4 px-6 bg-brand-bg/20 border-b border-[#DDD0C4]/30">
-      <div class="relative flex-1 max-w-sm flex items-center bg-white border border-[#DDD0C4] rounded-xl px-3 py-2">
-        <svg class="w-4 h-4 text-brand-muted mr-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="search" id="searchInput" placeholder="Cari nama menu..." oninput="onSearch()"
-          class="bg-transparent border-none outline-none text-sm text-brand-mid w-full">
+    <div
+      class="flex items-center justify-between p-4 px-6 bg-brand-bg/20 border-b border-[#DDD0C4]/30"
+    >
+      <div
+        class="relative flex-1 max-w-sm flex items-center bg-white border border-[#DDD0C4] rounded-xl px-3 py-2"
+      >
+        <i data-lucide="search" class="w-4 h-4 text-brand-primary shrink-0"></i>
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Cari nama menu..."
+          oninput="onSearch()"
+          class="bg-transparent border-none outline-none text-sm text-brand-mid w-full"
+        />
       </div>
     </div>
 
@@ -68,7 +112,8 @@
       <table class="w-full text-left border-collapse">
         <thead>
           <tr
-            class="bg-brand-bg/40 text-brand-mid text-xs font-bold uppercase tracking-wider border-b border-[#DDD0C4]/20">
+            class="bg-brand-bg/40 text-brand-mid text-xs font-bold uppercase tracking-wider border-b border-[#DDD0C4]/20"
+          >
             <th class="p-4 px-6">Menu</th>
             <th class="p-4 px-6 text-center">Kategori</th>
             <th class="p-4 px-6 text-right">Harga</th>
@@ -76,130 +121,251 @@
             <th class="p-4 px-6 text-right">Aksi</th>
           </tr>
         </thead>
-        <tbody id="menuTbody" class="divide-y divide-[#DDD0C4]/10 text-sm text-brand-mid"></tbody>
+        <tbody
+          id="menuTbody"
+          class="divide-y divide-[#DDD0C4]/10 text-sm text-brand-mid"
+        ></tbody>
       </table>
       <div id="emptyState" class="hidden text-center py-12 text-brand-muted">
-        <svg class="w-8 h-8 mx-auto mb-2 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <i
+          data-lucide="file-text"
+          class="w-4 h-4 text-brand-primary shrink-0"
+        ></i>
         <p class="text-sm font-bold mt-2">Menu tidak ditemukan</p>
       </div>
     </div>
 
-    <div class="flex items-center justify-between p-4 px-6 bg-brand-bg/30 border-t border-[#DDD0C4]/30">
+    <div
+      class="flex items-center justify-between p-4 px-6 bg-brand-bg/30 border-t border-[#DDD0C4]/30"
+    >
       <p id="footInfo" class="text-xs text-brand-muted"></p>
       <div class="flex gap-2">
-        <button onclick="changePage(-1)"
+        <button
+          onclick="changePage(-1)"
           class="text-xs font-bold border border-[#DDD0C4] bg-white text-brand-mid px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors"
-          style="border:1px solid #DDD0C4;background:#fff;color:#6B5E54;"
-          onmouseover="this.style.background='#f9f9f9'"
-          onmouseout="this.style.background='#fff'">Sebelumnya</button>
-        <button onclick="changePage(1)"
+          style="border: 1px solid #ddd0c4; background: #fff; color: #6b5e54"
+          onmouseover="this.style.background = '#f9f9f9'"
+          onmouseout="this.style.background = '#fff'"
+        >
+          Sebelumnya
+        </button>
+        <button
+          onclick="changePage(1)"
           class="text-xs font-bold text-white px-4 py-2 rounded-xl transition-colors"
-          style="background-color:#C05A1F;color:#fff;"
-          onmouseover="this.style.backgroundColor='#E8784A'"
-          onmouseout="this.style.backgroundColor='#C05A1F'">Berikutnya</button>
+          style="background-color: #c05a1f; color: #fff"
+          onmouseover="this.style.backgroundColor = '#E8784A'"
+          onmouseout="this.style.backgroundColor = '#C05A1F'"
+        >
+          Berikutnya
+        </button>
       </div>
     </div>
   </section>
 </div>
 
-<div id="modalOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" style="display:none;">
-  <div class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-sm border border-black/10 shadow-xl"
-    style="background:#F7F2EA;"
-    onclick="event.stopPropagation()">
-    <div class="text-base font-bold text-brand-mid mb-4 flex items-center gap-2">
-      <svg class="w-4 h-4 text-brand-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+<div
+  id="modalOverlay"
+  class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center"
+  style="display: none"
+>
+  <div
+    class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-sm border border-black/10 shadow-xl"
+    style="background: #f7f2ea"
+    onclick="event.stopPropagation()"
+  >
+    <div
+      class="text-base font-bold text-brand-mid mb-4 flex items-center gap-2"
+    >
+      <i
+        data-lucide="file-text"
+        class="w-4 h-4 text-brand-primary shrink-0"
+      ></i>
       <span id="modalHeading">Tambah Menu Baru</span>
     </div>
     <div class="space-y-4">
       <div>
-        <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-2">Foto Menu</label>
+        <label
+          class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-2"
+          >Foto Menu</label
+        >
         <div class="flex gap-4 items-start">
-          <div id="uploadZone" onclick="document.getElementById('fImageFile').click()"
-            class="w-24 h-24 bg-white border-2 border-dashed border-[#DDD0C4] rounded-xl flex items-center justify-center overflow-hidden cursor-pointer shrink-0 relative">
-            <img id="fImagePreview" src="" class="w-full h-full object-fit-cover hidden" alt="Preview" />
-            <div id="fImagePlaceholder" class="text-center text-brand-muted flex flex-col items-center">
-              <svg class="w-6 h-6 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <div
+            id="uploadZone"
+            onclick="document.getElementById('fImageFile').click()"
+            class="w-24 h-24 bg-white border-2 border-dashed border-[#DDD0C4] rounded-xl flex items-center justify-center overflow-hidden cursor-pointer shrink-0 relative"
+          >
+            <img
+              id="fImagePreview"
+              src=""
+              class="w-full h-full object-fit-cover hidden"
+              alt="Preview"
+            />
+            <div
+              id="fImagePlaceholder"
+              class="text-center text-brand-muted flex flex-col items-center"
+            >
+              <i
+                data-lucide="upload"
+                class="w-4 h-4 text-brand-primary shrink-0"
+              ></i>
               <span class="text-[9px] font-semibold">Pilih Foto</span>
             </div>
           </div>
-          <input type="file" id="fImageFile" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
+          <input
+            type="file"
+            id="fImageFile"
+            accept="image/*"
+            class="hidden"
+            onchange="handleImageUpload(event)"
+          />
           <div class="flex flex-col gap-1.5 pt-2">
-            <button type="button" onclick="document.getElementById('fImageFile').click()"
-              class="border border-[#DDD0C4] bg-white px-3 py-1.5 text-xs font-semibold rounded-lg text-brand-mid hover:bg-gray-50 transition-colors">Unggah</button>
-            <button type="button" id="btnRemoveImg" onclick="removeImage()"
-              class="text-xs font-semibold text-red-500 hidden">Hapus Foto</button>
+            <button
+              type="button"
+              onclick="document.getElementById('fImageFile').click()"
+              class="border border-[#DDD0C4] bg-white px-3 py-1.5 text-xs font-semibold rounded-lg text-brand-mid hover:bg-gray-50 transition-colors"
+            >
+              Unggah
+            </button>
+            <button
+              type="button"
+              id="btnRemoveImg"
+              onclick="removeImage()"
+              class="text-xs font-semibold text-red-500 hidden"
+            >
+              Hapus Foto
+            </button>
           </div>
         </div>
       </div>
       <div>
-        <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Nama Menu</label>
-        <input type="text" id="fName" placeholder="Contoh: Nasi Goreng"
+        <label
+          class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+          >Nama Menu</label
+        >
+        <input
+          type="text"
+          id="fName"
+          placeholder="Contoh: Nasi Goreng"
           class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
-          style="border:1px solid #DDD0C4;border-radius:12px;color:#6B5E54;">
+          style="border: 1px solid #ddd0c4; border-radius: 12px; color: #6b5e54"
+        />
       </div>
       <div>
-        <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Deskripsi</label>
-        <input type="text" id="fDesc" placeholder="Varian rasa"
+        <label
+          class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+          >Deskripsi</label
+        >
+        <input
+          type="text"
+          id="fDesc"
+          placeholder="Varian rasa"
           class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
-          style="border:1px solid #DDD0C4;border-radius:12px;color:#6B5E54;">
+          style="border: 1px solid #ddd0c4; border-radius: 12px; color: #6b5e54"
+        />
+      </div>
+      <div>
+        <label
+          class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+          >Emoji (opsional)</label
+        >
+        <input
+          type="text"
+          id="fEmoji"
+          placeholder="🍛 atau 🥤"
+          class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
+          style="border: 1px solid #ddd0c4; border-radius: 12px; color: #6b5e54"
+        />
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Kategori</label>
-          <select id="fCat"
+          <label
+            class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+            >Kategori</label
+          >
+          <select
+            id="fCat"
             class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-3 py-2 outline-none text-brand-mid"
-            style="border:1px solid #DDD0C4;border-radius:12px;color:#6B5E54;">
+            style="
+              border: 1px solid #ddd0c4;
+              border-radius: 12px;
+              color: #6b5e54;
+            "
+          >
             <option value="food">Makanan</option>
             <option value="drink">Minuman</option>
           </select>
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Harga (Rp)</label>
-          <input type="number" id="fPrice" placeholder="15000"
+          <label
+            class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+            >Harga (Rp)</label
+          >
+          <input
+            type="number"
+            id="fPrice"
+            placeholder="15000"
             class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
-            style="border:1px solid #DDD0C4;border-radius:12px;color:#6B5E54;">
+            style="
+              border: 1px solid #ddd0c4;
+              border-radius: 12px;
+              color: #6b5e54;
+            "
+          />
         </div>
       </div>
     </div>
     <div class="flex justify-end gap-2 mt-6">
-      <button onclick="closeModal()"
-        class="px-4 py-2 rounded-xl text-xs font-bold border border-[#DDD0C4] bg-white text-brand-mid hover:bg-gray-50 transition-colors">Batal</button>
-      <button onclick="saveMenu()"
+      <button
+        onclick="closeModal()"
+        class="px-4 py-2 rounded-xl text-xs font-bold border border-[#DDD0C4] bg-white text-brand-mid hover:bg-gray-50 transition-colors"
+      >
+        Batal
+      </button>
+      <button
+        onclick="saveMenu()"
         class="px-5 py-2 rounded-xl text-xs font-bold bg-brand-primary text-white hover:bg-brand-light transition-colors"
-        style="background-color:#C05A1F;color:#fff;"
-        onmouseover="this.style.backgroundColor='#E8784A'"
-        onmouseout="this.style.backgroundColor='#C05A1F'">Simpan</button>
+        style="background-color: #c05a1f; color: #fff"
+        onmouseover="this.style.backgroundColor = '#E8784A'"
+        onmouseout="this.style.backgroundColor = '#C05A1F'"
+      >
+        Simpan
+      </button>
     </div>
   </div>
 </div>
 
-<div id="delOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" style="display:none;">
-  <div class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-xs text-center border border-black/10 shadow-xl"
-    onclick="event.stopPropagation()">
-    <svg class="w-8 h-8 text-red-500 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+<div
+  id="delOverlay"
+  class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center"
+  style="display: none"
+>
+  <div
+    class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-xs text-center border border-black/10 shadow-xl"
+    onclick="event.stopPropagation()"
+  >
+    <i data-lucide="trash" class="w-4 h-4 text-brand-primary shrink-0"></i>
     <h3 class="text-base font-bold text-brand-mid mb-1">Hapus Menu?</h3>
-    <p id="delSub" class="text-xs text-brand-muted mb-5">Tindakan ini tidak dapat dibatalkan.</p>
+    <p id="delSub" class="text-xs text-brand-muted mb-5">
+      Tindakan ini tidak dapat dibatalkan.
+    </p>
     <div class="flex justify-center gap-2">
-      <button onclick="closeDel()"
-        class="px-4 py-2 border border-[#DDD0C4] bg-white rounded-xl text-xs font-bold text-brand-mid hover:bg-gray-50 transition-colors">Batal</button>
-      <button onclick="confirmDel()" class="px-5 py-2 bg-red-500 hover:bg-red-600 rounded-xl text-xs font-bold text-white transition-colors">Ya,
-        Hapus</button>
+      <button
+        onclick="closeDel()"
+        class="px-4 py-2 border border-[#DDD0C4] bg-white rounded-xl text-xs font-bold text-brand-mid hover:bg-gray-50 transition-colors"
+      >
+        Batal
+      </button>
+      <button
+        onclick="confirmDel()"
+        class="px-5 py-2 bg-red-500 hover:bg-red-600 rounded-xl text-xs font-bold text-white transition-colors"
+      >
+        Ya, Hapus
+      </button>
     </div>
   </div>
 </div>
 
-<div id="toast" class="fixed bottom-6 right-6 z-50 opacity-0 pointer-events-none transition-all duration-300"></div>
-
-<script>
-  (() => {
-    if (typeof renderMenu === 'function') {
-      renderMenu();
-    } else {
-      // Fallback: load the script with correct path relative to SPA root (src/)
-      const script = document.createElement('script');
-      script.src = "./js/owner/edit-menu.js";
-      script.onload = () => { if (typeof renderMenu === 'function') renderMenu(); };
-      document.body.appendChild(script);
-    }
-  })();
-</script>
+<div
+  id="toast"
+  class="fixed bottom-6 right-6 z-50 opacity-0 pointer-events-none transition-all duration-300"
+></div>
