@@ -114,8 +114,8 @@ Smart Canteen adalah aplikasi web yang memungkinkan pelanggan memesan makanan da
 │
 └── frontend/
 ├── src/
-│   ├── index.html              # Entry point utama (SPA shell)
-│   ├── assets/                 # Gambar & static files
+│   ├── index.html              
+│   ├── assets/                 
 │   ├── partials/
 │   │   └── sidebar.html
 │   ├── pages/
