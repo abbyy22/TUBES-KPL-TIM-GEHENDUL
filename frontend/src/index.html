@@ -35,8 +35,10 @@
         },
       };
     </script>
-    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
       .sidebar-nav a.active-menu {
@@ -54,6 +56,11 @@
         <p>Memuat halaman...</p>
       </div>
     </main>
+
+    <div
+      id="orderStatusOverlay"
+      class="hidden fixed inset-0 z-[200] items-center justify-end p-6 pointer-events-none"
+    ></div>
 
     <script src="./js/api.js"></script>
     <script src="./js/siswa/utils.js"></script>
@@ -73,6 +80,7 @@
       }
 
       const CURRENT_USER = ApiClient.getUser();
+      // const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
       const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
 
       // ─── Socket.io connection for real-time order updates ────────────────────
@@ -96,6 +104,23 @@
           console.warn("[socket.io] connection error:", err.message),
         );
 
+        // Real-time menu update – penjual ubah menu → pelanggan refresh otomatis
+        window.socket.on("menu:updated", async (payload) => {
+          console.log("[socket.io] menu:updated received:", payload);
+          // Reload menu table agar perubahan penjual langsung terlihat pelanggan
+          try {
+            await MenuTable.loadFromApi();
+          } catch (e) {
+            console.warn("[socket.io] Gagal reload MenuTable:", e.message);
+          }
+          // Re-render booking page jika sedang ditampilkan
+          const kantinSelect = document.getElementById("kantinSelect");
+          if (kantinSelect) {
+            booking.renderKantinSelect();
+            booking.renderMenuGrid(kantinSelect.value || "");
+          }
+        });
+
         // Real-time order status – notify pelanggan
         window.socket.on("order:status", (payload) => {
           console.log("[socket.io] order:status received:", payload);
@@ -116,21 +141,56 @@
             typeof OrderStateMachine !== "undefined" &&
             typeof UI !== "undefined"
           ) {
-            const stateMap = {
-              ORDERED: "ORDERED",
-              COOKING: "COOKING",
-              READY: "READY",
-              DONE: "DONE",
-            };
-            const newState = stateMap[payload.status];
+            // Hanya update jika ini adalah pesanan aktif milik pelanggan ini
+            const activeId = OrderStateMachine.getActiveOrderId
+              ? OrderStateMachine.getActiveOrderId()
+              : null;
+            const isMyOrder =
+              activeId && String(activeId) === String(payload.orderId);
+
             if (
-              newState &&
+              isMyOrder ||
               OrderStateMachine.getState() !== OrderStateMachine.STATES.IDLE
             ) {
+              const newState = payload.status;
               try {
                 OrderStateMachine.forceState(newState);
+                // Re-render status card
+                if (
+                  typeof UI !== "undefined" &&
+                  typeof UI.renderOrderStatus === "function"
+                ) {
+                  const ordData = payload.order || {};
+                  const itemSummary =
+                    Array.isArray(ordData.items) && ordData.items.length > 0
+                      ? ordData.items[0].menu_name +
+                        (ordData.items.length > 1
+                          ? ` + ${ordData.items.length - 1} lainnya`
+                          : "")
+                      : `Pesanan #${payload.orderId}`;
+                  UI.renderOrderStatus(
+                    String(payload.orderId),
+                    itemSummary,
+                    ordData.total_price || 0,
+                  );
+                }
+                if (newState === "READY") {
+                  // Notifikasi visual bahwa pesanan siap diambil
+                  if (document.title)
+                    document.title = "🔔 Pesanan Siap! - telFood";
+                  setTimeout(() => {
+                    document.title = "telFood - Smart Canteen";
+                  }, 5000);
+                }
+                // Refresh estimasi waktu di booking page jika sedang dibuka
+                if (
+                  typeof UI !== "undefined" &&
+                  typeof UI.updateEstimasiWaktu === "function"
+                ) {
+                  UI.updateEstimasiWaktu();
+                }
               } catch (e) {
-                /* ignore */
+                console.warn("[socket.io] forceState error:", e);
               }
             }
           }
@@ -207,28 +267,35 @@
 
         try {
           const response = await fetch(filePath);
-          if (!response.ok) throw new Error("Halaman tidak ditemukan");
+          if (!response.ok) throw new Error("Gagal ambil file");
           const htmlText = await response.text();
 
           contentArea.innerHTML = "";
           updateSidebarActive(pageName);
 
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(htmlText, "text/html");
+          // 1. Tempel langsung ke DOM pakai innerHTML (Cara native ini jauh lebih aman buat membaca SVG)
+          contentArea.innerHTML = htmlText;
 
-          const bodyNodes = Array.from(doc.body.childNodes);
-          bodyNodes.forEach((node) => {
-            if (node.tagName === "SCRIPT") {
-              // Buat ulang elemen script secara manual agar browser mau mengeksekusinya
-              const scriptEl = document.createElement("script");
-              scriptEl.textContent = node.textContent;
-              document.body
-                .appendChild(scriptEl)
-                .parentNode.removeChild(scriptEl);
+          // 2. Cari semua tag <script> yang ikut masuk, lalu eksekusi ulang
+          const scripts = contentArea.querySelectorAll("script");
+
+          for (const oldScript of scripts) {
+            const newScript = document.createElement("script");
+
+            // Jika script punya 'src', cukup salin atributnya
+            if (oldScript.src) {
+              newScript.src = oldScript.src;
             } else {
-              contentArea.appendChild(node);
+              // Jika script berupa inline code, gunakan textContent yang aman
+              newScript.textContent = oldScript.textContent;
             }
-          });
+
+            // Masukkan script ke body agar dieksekusi oleh browser
+            document.body.appendChild(newScript);
+
+            // Hapus tag script lama dari dalam contentArea agar tidak double
+            oldScript.remove();
+          }
 
           if (pageName === "siswa-home") {
             dashSiswa.renderTopMenu();
@@ -238,6 +305,7 @@
             booking.renderKantinSelect();
             booking.renderMenuGrid("");
             booking.renderOrderItems();
+            UI.updateEstimasiWaktu(); // Update estimasi dari pesanan COOKING
             initBookingEvents(); // Pindahkan setup klik pesan siswa ke fungsi terpisah agar rapi
           }
           if (pageName === "page-account") {
@@ -248,17 +316,74 @@
             console.log("Owner Dashboard Stats Loaded");
             const user = CURRENT_USER;
             const kantinTitle = document.getElementById("kantin-title");
+            console.log(user);
             if (user.role == "penjual" && kantinTitle) {
               kantinTitle.textContent =
                 CURRENT_USER?.kantin_name ||
                 CURRENT_USER?.name ||
                 "Dashboard Kantin";
             }
+
+            try {
+              const res = await ApiClient.getOrderByKantin(
+                CURRENT_USER.kantin_id,
+              );
+              console.log(res);
+              const orders = res;
+              const totalTransactions = orders.length;
+              // const omzetToday = orders.reduce((sum, order) => {
+              //   const createdAt = new Date(order.created_at);
+              //   const today = new Date();
+              //   if (
+              //     createdAt.getDate() === today.getDate() &&
+              //     createdAt.getMonth() === today.getMonth() &&
+              //     createdAt.getFullYear() === today.getFullYear()
+              //   ) {
+              //     return sum + Number(order.total_price);
+              //   }
+              //   return sum;
+              // }, 0);
+
+              // const omzetElement = document.getElementById("omzet-hari-ini");
+              // if (omzetElement) {
+              //   omzetElement.textContent = `Rp ${Utils.formatCurrency(omzetToday)}`;
+              // }
+
+              const totalTransaksiElement =
+                document.getElementById("total-transaksi");
+              if (totalTransaksiElement) {
+                totalTransaksiElement.textContent = String(totalTransactions);
+              }
+            } catch (err) {
+              console.error("Gagal load data dashboard:", err);
+            }
           }
-          if (pageName === "owner-menu" && typeof renderMenu === "function") {
-            renderMenu();
+          if (pageName === "owner-menu") {
+            console.log("Owner Dashboard Stats Loaded");
+            const user = CURRENT_USER;
+            const kantinTitle = document.getElementById("kantin-title");
+            console.log(user);
+            if (user.role == "penjual" && kantinTitle) {
+              kantinTitle.textContent =
+                CURRENT_USER?.kantin_name ||
+                CURRENT_USER?.name ||
+                "Dashboard Kantin";
+            }
+            setTimeout(() => {
+              if (typeof renderMenu === "function") renderMenu();
+            }, 1000); // Tunggu 100ms
           }
           if (pageName === "owner-status" && typeof initKanban === "function") {
+            console.log("Owner Dashboard Stats Loaded");
+            const user = CURRENT_USER;
+            const kantinTitle = document.getElementById("kantin-title");
+            console.log(user);
+            if (user.role == "penjual" && kantinTitle) {
+              kantinTitle.textContent =
+                CURRENT_USER?.kantin_name ||
+                CURRENT_USER?.name ||
+                "Dashboard Kantin";
+            }
             initKanban();
           }
 
@@ -349,6 +474,10 @@
 
               const order = await ApiClient.createOrder(payload);
               total = Number(order.total_price);
+              // Simpan orderId aktif agar real-time update bisa filter pesanan ini
+              if (OrderStateMachine.setActiveOrderId) {
+                OrderStateMachine.setActiveOrderId(order.id);
+              }
               OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
               UI.renderOrderStatus(String(order.id), summary, total);
             } else {
