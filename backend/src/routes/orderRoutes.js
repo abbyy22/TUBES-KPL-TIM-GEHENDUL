@@ -4,7 +4,7 @@ const express = require('express');
 const asyncHandler = require('../utils/asyncHandler');
 const { authenticate, authorize } = require('../middleware/auth');
 const {
-  createOrder, listMyOrders, listAllOrders, getOrder, updateOrderStatus,
+  createOrder, listMyOrders, listAllOrders, getOrder, updateOrderStatus, listOrdersByKantin
 } = require('../controllers/orderController');
 
 const router = express.Router();
@@ -19,6 +19,7 @@ router.get('/', authenticate, authorize('admin'), asyncHandler(listAllOrders));
 // Detail order: pelanggan untuk milik sendiri, admin untuk semua (cek di handler)
 router.get('/:id', authenticate, asyncHandler(getOrder));
 
+router.get('/kantin/:kantin_id', authenticate, asyncHandler(listOrdersByKantin));
 // Update status: admin only
 router.patch('/:id/status', authenticate, authorize('admin'), asyncHandler(updateOrderStatus));
 
