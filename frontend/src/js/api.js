@@ -1,12 +1,13 @@
 const ApiClient = (() => {
-  const DEFAULT_BASE_URL = 'http://localhost:3000/api';
-  const TOKEN_KEY = 'telfood.token';
-  const USER_KEY = 'telfood.user';
-  const API_BASE_KEY = 'telfood.apiBaseUrl';
+  const DEFAULT_BASE_URL = "http://localhost:3000/api";
+  const TOKEN_KEY = "telfood.token";
+  const USER_KEY = "telfood.user";
+  const API_BASE_KEY = "telfood.apiBaseUrl";
 
   function getBaseUrl() {
-    const configured = window.TELFOOD_API_BASE_URL || localStorage.getItem(API_BASE_KEY);
-    return (configured || DEFAULT_BASE_URL).replace(/\/$/, '');
+    const configured =
+      window.TELFOOD_API_BASE_URL || localStorage.getItem(API_BASE_KEY);
+    return (configured || DEFAULT_BASE_URL).replace(/\/$/, "");
   }
 
   function getToken() {
@@ -15,24 +16,16 @@ const ApiClient = (() => {
 
   function getUser() {
     try {
-      return JSON.parse(localStorage.getItem(USER_KEY) || 'null');
+      return JSON.parse(localStorage.getItem(USER_KEY) || "null");
     } catch (err) {
       return null;
     }
   }
 
-  /**
-   * normalizeRole – maps raw DB role → frontend role group.
-   * DB roles:   'user'     → 'siswa'  (pelanggan)
-   *             'penjual'  → 'owner'  (admin kantin)
-   *             'admin'    → 'owner'
-   *             'owner'    → 'owner'
-   *             'pelanggan'→ 'siswa'  (legacy)
-   */
   function normalizeRole(role) {
-    if (role === 'admin' || role === 'owner' || role === 'penjual') return 'owner';
-    // 'user', 'pelanggan', or any other → siswa
-    return 'siswa';
+    if (role === "admin" || role === "owner" || role === "penjual")
+      return "owner";
+    return "siswa";
   }
 
   function saveSession(data) {
@@ -48,15 +41,16 @@ const ApiClient = (() => {
 
   function logout() {
     clearSession();
-    // Redirect to login based on current path depth
-    const inPages = window.location.pathname.includes('/pages/');
-    window.location.href = inPages ? '../auth/login.html' : './pages/auth/login.html';
+    const inPages = window.location.pathname.includes("/pages/");
+    window.location.href = inPages
+      ? "../auth/login.html"
+      : "./pages/auth/login.html";
   }
 
   function isTokenExpired(token) {
     if (!token) return true;
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const now = Math.floor(Date.now() / 1000);
       return payload.exp && payload.exp < now;
     } catch (e) {
@@ -67,7 +61,6 @@ const ApiClient = (() => {
   function isAuthenticated() {
     const token = getToken();
     if (!token) return false;
-
     if (isTokenExpired(token)) {
       clearSession();
       return false;
@@ -76,27 +69,22 @@ const ApiClient = (() => {
   }
 
   async function request(path, options = {}) {
-    const {
-      method = 'GET',
-      body,
-      auth = true,
-      headers = {},
-    } = options;
+    const { method = "GET", body, auth = true, headers = {} } = options;
 
     const requestHeaders = {
-      Accept: 'application/json',
+      Accept: "application/json",
       ...headers,
     };
 
     if (body !== undefined) {
-      requestHeaders['Content-Type'] = 'application/json';
+      requestHeaders["Content-Type"] = "application/json";
     }
 
     const token = getToken();
     if (auth) {
       if (token && isTokenExpired(token)) {
         logout();
-        throw new Error('Sesi telah berakhir, silakan login kembali');
+        throw new Error("Sesi telah berakhir, silakan login kembali");
       }
       if (token) {
         requestHeaders.Authorization = `Bearer ${token}`;
@@ -117,7 +105,8 @@ const ApiClient = (() => {
     }
 
     if (!response.ok) {
-      const message = payload?.error?.message || `Request gagal (${response.status})`;
+      const message =
+        payload?.error?.message || `Request gagal (${response.status})`;
       throw new Error(message);
     }
 
@@ -125,8 +114,8 @@ const ApiClient = (() => {
   }
 
   async function login(email, password) {
-    const data = await request('/auth/login', {
-      method: 'POST',
+    const data = await request("/auth/login", {
+      method: "POST",
       auth: false,
       body: { email, password },
     });
@@ -134,13 +123,9 @@ const ApiClient = (() => {
     return data;
   }
 
-  /**
-   * register – sends full_name (not name) to match backend Joi validator.
-   * Role is always forced to 'user' by backend; no need to send it.
-   */
   async function register(full_name, email, password) {
-    const data = await request('/auth/register', {
-      method: 'POST',
+    const data = await request("/auth/register", {
+      method: "POST",
       auth: false,
       body: { full_name, email, password },
     });
@@ -149,20 +134,40 @@ const ApiClient = (() => {
   }
 
   function getKantins() {
-    return request('/kantins');
+    return request("/kantins");
   }
 
   function getMenus(params = {}) {
     const query = new URLSearchParams();
-    if (params.kantin_id !== undefined) query.set('kantin_id', params.kantin_id);
-    if (params.available !== undefined) query.set('available', String(params.available));
-    const suffix = query.toString() ? `?${query}` : '';
+    if (params.kantin_id !== undefined)
+      query.set("kantin_id", params.kantin_id);
+    if (params.available !== undefined)
+      query.set("available", String(params.available));
+    const suffix = query.toString() ? `?${query}` : "";
     return request(`/menus${suffix}`);
   }
 
+  function getMenuById(id) {
+    return request(`/menus/${id}`);
+  }
+
+  // ─── Menu CRUD (penjual / admin) ─────────────────────────────────────────────
+  function createMenu(menuData) {
+    return request("/menus", { method: "POST", body: menuData });
+  }
+
+  function updateMenu(id, menuData) {
+    return request(`/menus/${id}`, { method: "PUT", body: menuData });
+  }
+
+  function deleteMenu(id) {
+    return request(`/menus/${id}`, { method: "DELETE" });
+  }
+
+  // ─── Orders ──────────────────────────────────────────────────────────────────
   function createOrder(order) {
-    return request('/orders', {
-      method: 'POST',
+    return request("/orders", {
+      method: "POST",
       body: order,
     });
   }
@@ -172,27 +177,39 @@ const ApiClient = (() => {
   }
 
   function listMyOrders() {
-    return request('/orders/me');
+    return request("/orders/me");
   }
 
-  function listAllOrders() {
-    return request('/orders');
+  function listAllOrders(params = {}) {
+    const query = new URLSearchParams();
+    if (params.status) query.set("status", params.status);
+    if (params.kantin_id) query.set("kantin_id", params.kantin_id);
+    const suffix = query.toString() ? `?${query}` : "";
+    return request(`/orders${suffix}`);
+  }
+
+  function getOrderByKantin(kantinId) {
+    return request(`/orders/kantin/${kantinId}`);
   }
 
   function updateOrderStatus(id, status) {
     return request(`/orders/${id}/status`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: { status },
     });
   }
 
   return {
     clearSession,
+    createMenu,
     createOrder,
+    deleteMenu,
     getBaseUrl,
     getKantins,
+    getMenuById,
     getMenus,
     getOrder,
+    getOrderByKantin,
     getToken,
     getUser,
     isAuthenticated,
@@ -203,6 +220,7 @@ const ApiClient = (() => {
     normalizeRole,
     register,
     saveSession,
+    updateMenu,
     updateOrderStatus,
   };
 })();

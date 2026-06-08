@@ -1,49 +1,95 @@
 <div class="flex flex-col gap-3.5 min-h-[calc(100vh-40px)] animate-fadeSlideIn">
-
-  <header class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center gap-6">
-    <h1 class="text-2xl font-bold text-brand-mid tracking-tight flex-1">Kantin NEO 2</h1>
-    <div class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80">
-      <svg class="w-4 h-4 text-brand-muted shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
-        type="text" placeholder="Search" id="searchInput" oninput="filterOrders()">
+  <header
+    class="bg-brand-panel rounded-lg-custom px-8 py-5 flex items-center gap-6"
+  >
+    <div class="flex-1">
+      <h1
+        id="kantin-title"
+        class="text-2xl font-bold text-brand-mid tracking-tight"
+      >
+        Dashboard Kantin
+      </h1>
+      <p id="dashboard-date" class="text-xs text-brand-muted mt-0.5"></p>
+    </div>
+    <div
+      class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80"
+    >
+      <i data-lucide="search"></i>
+      <input
+        class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
+        type="text"
+        placeholder="Search"
+        id="searchInput"
+        oninput="filterOrders()"
+      />
     </div>
   </header>
 
   <main class="flex flex-col gap-3.5 flex-1">
-
     <div class="grid grid-cols-4 gap-3.5">
-      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+      <div
+        class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm"
+      >
         <div class="text-2xl font-bold text-brand-mid" id="stat-pesanan">0</div>
         <div class="text-xs text-brand-muted font-medium">Pesanan</div>
       </div>
-      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+      <div
+        class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm"
+      >
         <div class="text-2xl font-bold text-brand-mid" id="stat-dimasak">0</div>
         <div class="text-xs text-brand-muted font-medium">Dimasak</div>
       </div>
-      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+      <div
+        class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm"
+      >
         <div class="text-2xl font-bold text-brand-mid" id="stat-siap">0</div>
         <div class="text-xs text-brand-muted font-medium">Siap Diambil</div>
       </div>
-      <div class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm">
+      <div
+        class="bg-brand-card rounded-lg-custom p-5 flex flex-col gap-0.5 shadow-sm"
+      >
         <div class="text-2xl font-bold text-brand-mid" id="stat-selesai">0</div>
         <div class="text-xs text-brand-muted font-medium">Selesai</div>
       </div>
     </div>
 
-    <div class="flex items-center gap-2.5 p-3 px-4 rounded-full" style="background:#F7F2EA;border:1px solid #DDD0C4;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <input type="text" id="inp-menu" placeholder="Nama menu (cth: Nasi Goreng)"
-        class="flex-1 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted">
-      <input type="text" id="inp-jml" placeholder="Jml"
-        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center" style="border-left: 1px solid #DDD0C4;">
-      <input type="text" id="inp-meja" placeholder="Meja"
-        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center" style="border-left: 1px solid #DDD0C4;">
+    <div
+      class="flex items-center gap-2.5 p-3 px-4 rounded-full"
+      style="
+        background: #f7f2ea;
+        border: 1px solid #ddd0c4;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      "
+    >
+      <input
+        type="text"
+        id="inp-menu"
+        placeholder="Nama menu (cth: Nasi Goreng)"
+        class="flex-1 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted"
+      />
+      <input
+        type="text"
+        id="inp-jml"
+        placeholder="Jml"
+        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center"
+        style="border-left: 1px solid #ddd0c4"
+      />
+      <input
+        type="text"
+        id="inp-meja"
+        placeholder="Meja"
+        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center"
+        style="border-left: 1px solid #ddd0c4"
+      />
       <button
         class="bg-brand-primary hover:bg-brand-light text-white font-bold text-xs px-5 py-2 rounded-full flex items-center gap-1.5 shrink-0"
-        style="background-color:#C05A1F;color:#fff;"
-        onmouseover="this.style.backgroundColor='#E8784A'"
-        onmouseout="this.style.backgroundColor='#C05A1F'"
-        onclick="openModal()">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Tambah Pesanan
+        style="background-color: #c05a1f; color: #fff"
+        onmouseover="this.style.backgroundColor = '#E8784A'"
+        onmouseout="this.style.backgroundColor = '#C05A1F'"
+        onclick="openModal()"
+      >
+        <i data-lucide="plus" class="text-white w-4 h-4"></i>
+        Tambah Pesanan
       </button>
     </div>
 
@@ -51,71 +97,137 @@
   </main>
 </div>
 
-<div class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" id="modal">
-  <div class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-sm border border-black/10 shadow-xl">
+<div
+  class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center"
+  id="modal"
+>
+  <div
+    class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-sm border border-black/10 shadow-xl"
+  >
     <h2 class="text-base font-bold text-brand-mid mb-4">Tambah Pesanan</h2>
     <div class="space-y-3">
       <div>
-        <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Nama Menu</label>
-        <input type="text" id="m-menu" placeholder="cth: Nasi Goreng, Es Teh"
-          class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid">
+        <label
+          class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+          >Nama Menu</label
+        >
+        <input
+          type="text"
+          id="m-menu"
+          placeholder="cth: Nasi Goreng, Es Teh"
+          class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
+        />
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Jumlah</label>
-          <input type="number" id="m-jml" placeholder="1" min="1"
-            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid">
+          <label
+            class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+            >Jumlah</label
+          >
+          <input
+            type="number"
+            id="m-jml"
+            placeholder="1"
+            min="1"
+            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
+          />
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Nomor Meja</label>
-          <input type="text" id="m-meja" placeholder="cth: 3"
-            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid">
+          <label
+            class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
+            >Nomor Meja</label
+          >
+          <input
+            type="text"
+            id="m-meja"
+            placeholder="cth: 3"
+            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
+          />
         </div>
       </div>
     </div>
     <div class="flex justify-end gap-2 mt-6">
-      <button class="px-4 py-2 border border-[#DDD0C4] bg-white hover:bg-gray-50 rounded-xl text-xs font-bold text-brand-mid transition-colors"
-        onclick="closeModal()">Batal</button>
-      <button class="px-5 py-2 bg-brand-primary hover:bg-brand-light rounded-xl text-xs font-bold text-white transition-colors"
-        onclick="addOrder()">Tambah</button>
+      <button
+        class="px-4 py-2 border border-[#DDD0C4] bg-white hover:bg-gray-50 rounded-xl text-xs font-bold text-brand-mid transition-colors"
+        onclick="closeModal()"
+      >
+        Batal
+      </button>
+      <button
+        class="px-5 py-2 bg-brand-primary hover:bg-brand-light rounded-xl text-xs font-bold text-white transition-colors"
+        onclick="addOrder()"
+      >
+        Tambah
+      </button>
     </div>
   </div>
 </div>
 
 <div
   class="fixed bottom-6 right-6 z-50 bg-brand-mid text-white font-bold text-xs p-3 px-5 rounded-xl border border-black/10 shadow-lg hidden opacity-0 transition-all duration-300"
-  id="toast"></div>
+  id="toast"
+></div>
 
 <script>
   (() => {
-    const STATUSES = ['Pesanan', 'Dimasak', 'Siap Diambil', 'Selesai'];
-    const API_STATUSES = ['ORDERED', 'COOKING', 'READY', 'DONE'];
-    const NEXT_BTN = ['Mulai Masak', 'Siap Diambil', 'Selesai', 'Selesai'];
+    const STATUSES = ["Pesanan", "Dimasak", "Siap Diambil", "Selesai"];
+    const API_STATUSES = ["ORDERED", "COOKING", "READY", "DONE"];
+    const NEXT_BTN = ["Mulai Masak", "Siap Diambil", "Selesai", "Selesai"];
     const IS_FINAL = [false, false, false, true];
 
     window.orders = window.orders || [
-      { id: '001', time: '18.07', items: 'Nasi goreng, Es teh x 1', status: 0, meja: '' },
-      { id: '001b', time: '18.07', items: 'Nasi goreng, Es teh x 1', status: 0, meja: '' },
-      { id: '002', time: '18.11', items: 'Serbu 1 x 1', status: 1, meja: '' },
-      { id: '003', time: '18.15', items: 'Soto Ayam, Es teh x 1', status: 2, meja: '' },
-      { id: '004', time: '18.59', items: 'Nasi rames x4, Jus jeruk x3', status: 3, meja: '' },
+      {
+        id: "001",
+        time: "18.07",
+        items: "Nasi goreng, Es teh x 1",
+        status: 0,
+        meja: "",
+      },
+      {
+        id: "001b",
+        time: "18.07",
+        items: "Nasi goreng, Es teh x 1",
+        status: 0,
+        meja: "",
+      },
+      { id: "002", time: "18.11", items: "Serbu 1 x 1", status: 1, meja: "" },
+      {
+        id: "003",
+        time: "18.15",
+        items: "Soto Ayam, Es teh x 1",
+        status: 2,
+        meja: "",
+      },
+      {
+        id: "004",
+        time: "18.59",
+        items: "Nasi rames x4, Jus jeruk x3",
+        status: 3,
+        meja: "",
+      },
     ];
     window.counter = window.counter || 5;
 
-    window.render = function (filter = '') {
+    window.render = function (filter = "") {
       updateStats();
-      const kanban = document.getElementById('kanban');
+      const kanban = document.getElementById("kanban");
       if (!kanban) return;
-      kanban.innerHTML = '';
+      kanban.innerHTML = "";
 
       STATUSES.forEach((status, si) => {
-        const col = document.createElement('div');
-        col.className = "flex flex-col gap-3 p-4 rounded-lg-custom min-h-[400px]";
-        col.style.cssText = "background:#F7F2EA;border:1px solid rgba(221,208,196,0.2);";
+        const col = document.createElement("div");
+        col.className =
+          "flex flex-col gap-3 p-4 rounded-lg-custom min-h-[400px]";
+        col.style.cssText =
+          "background:#F7F2EA;border:1px solid rgba(221,208,196,0.2);";
 
-        const filtered = orders.filter(o => o.status === si && (
-          filter === '' || o.items.toLowerCase().includes(filter.toLowerCase()) || o.id.includes(filter)
-        ));
+        const filtered = orders.filter(
+          (o) =>
+            o.status === si &&
+            (filter === "" ||
+              o.items.toLowerCase().includes(filter.toLowerCase()) ||
+              o.id.includes(filter)),
+        );
 
         col.innerHTML = `
           <div class="flex items-center justify-between p-3 px-4 rounded-xl text-sm font-bold shadow-sm"
@@ -129,10 +241,11 @@
           col.innerHTML += `<p style="text-align:center;padding:40px 0;font-size:12px;color:#9E8E84;font-style:italic;">Tidak ada pesanan</p>`;
         }
 
-        filtered.forEach(o => {
-          const card = document.createElement('div');
-          card.className = 'p-4 rounded-xl shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-0.5 duration-150';
-          card.style.cssText = 'background:#ffffff;border:1px solid #DDD0C4;';
+        filtered.forEach((o) => {
+          const card = document.createElement("div");
+          card.className =
+            "p-4 rounded-xl shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-0.5 duration-150";
+          card.style.cssText = "background:#ffffff;border:1px solid #DDD0C4;";
           const isFinal = IS_FINAL[si];
 
           card.innerHTML = `
@@ -144,11 +257,11 @@
             <button
               class="w-full text-xs font-bold py-2 mt-1 rounded-lg transition-all"
               style="
-                background-color: ${isFinal ? '#EDE5D8' : '#C05A1F'};
-                color: ${isFinal ? '#9E8E84' : '#ffffff'};
-                cursor: ${isFinal ? 'not-allowed' : 'pointer'};
+                background-color: ${isFinal ? "#EDE5D8" : "#C05A1F"};
+                color: ${isFinal ? "#9E8E84" : "#ffffff"};
+                cursor: ${isFinal ? "not-allowed" : "pointer"};
               "
-              ${isFinal ? 'disabled' : `onclick="advance('${o.id}')" onmouseover="this.style.backgroundColor='#E8784A'" onmouseout="this.style.backgroundColor='#C05A1F'"`}
+              ${isFinal ? "disabled" : `onclick="advance('${o.id}')" onmouseover="this.style.backgroundColor='#E8784A'" onmouseout="this.style.backgroundColor='#C05A1F'"`}
             >${NEXT_BTN[si]}</button>
           `;
           col.appendChild(card);
@@ -158,89 +271,129 @@
     };
 
     window.updateStats = function () {
-      if (!document.getElementById('stat-pesanan')) return;
-      document.getElementById('stat-pesanan').textContent = orders.filter(o => o.status === 0).length;
-      document.getElementById('stat-dimasak').textContent = orders.filter(o => o.status === 1).length;
-      document.getElementById('stat-siap').textContent = orders.filter(o => o.status === 2).length;
-      document.getElementById('stat-selesai').textContent = orders.filter(o => o.status === 3).length;
+      if (!document.getElementById("stat-pesanan")) return;
+      document.getElementById("stat-pesanan").textContent = orders.filter(
+        (o) => o.status === 0,
+      ).length;
+      document.getElementById("stat-dimasak").textContent = orders.filter(
+        (o) => o.status === 1,
+      ).length;
+      document.getElementById("stat-siap").textContent = orders.filter(
+        (o) => o.status === 2,
+      ).length;
+      document.getElementById("stat-selesai").textContent = orders.filter(
+        (o) => o.status === 3,
+      ).length;
     };
 
     window.advance = async function (id) {
-      const o = orders.find(o => o.id === id);
+      const o = orders.find((o) => o.id === id);
       if (!o || o.status >= 3) return;
 
       try {
         if (window.ApiClient && ApiClient.isAuthenticated() && o.backendId) {
-          await ApiClient.updateOrderStatus(o.backendId, API_STATUSES[o.status + 1]);
+          await ApiClient.updateOrderStatus(
+            o.backendId,
+            API_STATUSES[o.status + 1],
+          );
         }
         o.status++;
         render();
-        showToast('Status pesanan diperbarui ✓');
+        showToast("Status pesanan diperbarui ✓");
       } catch (err) {
-        showToast(err.message || 'Gagal memperbarui status');
+        showToast(err.message || "Gagal memperbarui status");
       }
     };
 
     window.filterOrders = function () {
-      render(document.getElementById('searchInput').value);
+      render(document.getElementById("searchInput").value);
     };
 
     window.openModal = function () {
-      const menu = document.getElementById('inp-menu').value.trim();
-      const jml = document.getElementById('inp-jml').value.trim();
-      const meja = document.getElementById('inp-meja').value.trim();
-      if (menu) document.getElementById('m-menu').value = menu;
-      if (jml) document.getElementById('m-jml').value = jml;
-      if (meja) document.getElementById('m-meja').value = meja;
-      document.getElementById('modal').classList.remove('hidden');
+      const menu = document.getElementById("inp-menu").value.trim();
+      const jml = document.getElementById("inp-jml").value.trim();
+      const meja = document.getElementById("inp-meja").value.trim();
+      if (menu) {
+        document.getElementById("m-menu").value = menu;
+      }
+      if (jml) document.getElementById("m-jml").value = jml;
+      if (meja) document.getElementById("m-meja").value = meja;
+      document.getElementById("modal").classList.remove("hidden");
     };
 
     window.closeModal = function () {
-      document.getElementById('modal').classList.add('hidden');
+      document.getElementById("modal").classList.add("hidden");
     };
 
     window.addOrder = function () {
-      const menu = document.getElementById('m-menu').value.trim();
-      const jml = document.getElementById('m-jml').value.trim();
-      const meja = document.getElementById('m-meja').value.trim();
-      if (!menu) { document.getElementById('m-menu').focus(); return; }
+      const menu = document.getElementById("m-menu").value.trim();
+      menu.disabled = true;
+      const jml = document.getElementById("m-jml").value.trim();
+      jml.disabled = true;
+      const meja = document.getElementById("m-meja").value.trim();
+      meja.disabled = true;
+      if (!menu) {
+        document.getElementById("m-menu").focus();
+        return;
+      }
 
       const itemStr = jml ? `${menu} x ${jml}` : menu;
-      function pad(n) { return String(n).padStart(3, '0'); }
-      function getTime() { const d = new Date(); return d.getHours() + '.' + String(d.getMinutes()).padStart(2, '0'); }
+      function pad(n) {
+        return String(n).padStart(3, "0");
+      }
+      function getTime() {
+        const d = new Date();
+        return d.getHours() + "." + String(d.getMinutes()).padStart(2, "0");
+      }
 
-      orders.push({ id: pad(counter++), time: getTime(), items: itemStr, status: 0, meja });
-      ['inp-menu', 'inp-jml', 'inp-meja', 'm-menu', 'm-jml', 'm-meja'].forEach(id => { document.getElementById(id).value = ''; });
+      orders.push({
+        id: pad(counter++),
+        time: getTime(),
+        items: itemStr,
+        status: 0,
+        meja,
+      });
+      ["inp-menu", "inp-jml", "inp-meja", "m-menu", "m-jml", "m-meja"].forEach(
+        (id) => {
+          document.getElementById(id).value = "";
+        },
+      );
       closeModal();
       render();
-      showToast('Pesanan #' + pad(counter - 1) + ' ditambahkan ✓');
+      showToast("Pesanan #" + pad(counter - 1) + " ditambahkan ✓");
     };
 
     window.showToast = function (msg) {
-      const t = document.getElementById('toast');
+      const t = document.getElementById("toast");
       if (!t) return;
       t.innerText = msg;
-      t.classList.remove('hidden', 'opacity-0');
-      setTimeout(() => { t.classList.add('opacity-0'); }, 2200);
+      t.classList.remove("hidden", "opacity-0");
+      setTimeout(() => {
+        t.classList.add("opacity-0");
+      }, 2200);
     };
 
     function formatOrderTime(value) {
-      if (!value) return '';
+      if (!value) return "";
       const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return '';
-      return date.toLocaleTimeString('id-ID', {
-        hour: '2-digit',
-        minute: '2-digit',
-      }).replace(':', '.');
+      if (Number.isNaN(date.getTime())) return "";
+      return date
+        .toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+        .replace(":", ".");
     }
 
     function formatOrderItems(order) {
       if (Array.isArray(order.items) && order.items.length > 0) {
         return order.items
-          .map(item => `${item.menu_name} x ${item.quantity}`)
-          .join(', ');
+          .map((item) => `${item.menu_name} x ${item.quantity}`)
+          .join(", ");
       }
-      return order.customer_name ? `Pesanan ${order.customer_name}` : `Order #${order.id}`;
+      return order.customer_name
+        ? `Pesanan ${order.customer_name}`
+        : `Order #${order.id}`;
     }
 
     function mapBackendOrder(order) {
@@ -251,41 +404,74 @@
         time: formatOrderTime(order.created_at),
         items: formatOrderItems(order),
         status: statusIndex >= 0 ? statusIndex : 0,
-        meja: '',
+        meja: "",
       };
     }
 
     async function loadBackendOrders() {
       if (!window.ApiClient || !ApiClient.isAuthenticated()) return false;
-      if (ApiClient.normalizeRole(ApiClient.getUser()?.role) !== 'owner') return false;
+      const user = ApiClient.getUser();
+      if (ApiClient.normalizeRole(user?.role) !== "owner") return false;
 
-      const summaries = await ApiClient.listAllOrders();
+      let summaries = [];
+      if (user.kantin_id) {
+        // Penjual: hanya ambil pesanan kantin miliknya
+        summaries = await ApiClient.getOrderByKantin(user.kantin_id);
+      } else {
+        // Admin tanpa kantin_id: lihat semua pesanan
+        summaries = await ApiClient.listAllOrders();
+      }
+
+      // Fetch detail (termasuk items) untuk setiap pesanan
       const details = await Promise.all(
-        summaries.map(order => ApiClient.getOrder(order.id).catch(() => order))
+        summaries.map((order) =>
+          ApiClient.getOrder(order.id).catch(() => order),
+        ),
       );
       orders = details.map(mapBackendOrder);
       return true;
     }
 
+    // Set judul kantin dari user session
+    (() => {
+      const user =
+        window.ApiClient && ApiClient.getUser ? ApiClient.getUser() : null;
+      const titleEl = document.querySelector("h1");
+      if (titleEl && user) {
+        titleEl.textContent = user.kantin_name || user.name || "Kantin";
+      }
+    })();
+
     window.initKanban = async function () {
       try {
         await loadBackendOrders();
       } catch (err) {
-        console.warn('[update_status] Gagal ambil order dari API, pakai data lokal:', err.message);
+        console.warn(
+          "[update_status] Gagal ambil order dari API, pakai data lokal:",
+          err.message,
+        );
       }
       render();
 
       // Real-time: listen to socket order:status events
       // socket is set up in index.html parent scope
       if (window.socket) {
-        window.socket.off('order:status'); // prevent duplicate listeners
-        window.socket.on('order:status', async (payload) => {
-          console.log('[update_status] socket order:status →', payload.orderId, payload.status);
+        window.socket.off("order:status"); // prevent duplicate listeners
+        window.socket.on("order:status", async (payload) => {
+          console.log(
+            "[update_status] socket order:status →",
+            payload.orderId,
+            payload.status,
+          );
           try {
             await loadBackendOrders();
           } catch (e) {
             // fallback: update local array if backend fails
-            const o = orders.find(x => x.backendId === payload.orderId || String(x.id) === String(payload.orderId));
+            const o = orders.find(
+              (x) =>
+                x.backendId === payload.orderId ||
+                String(x.id) === String(payload.orderId),
+            );
             if (o) {
               const idx = API_STATUSES.indexOf(payload.status);
               if (idx >= 0) o.status = idx;

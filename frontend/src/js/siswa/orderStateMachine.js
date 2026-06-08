@@ -1,92 +1,104 @@
 const OrderStateMachine = (() => {
+  const STATES = {
+    IDLE: "IDLE",
+    ORDERED: "ORDERED",
+    COOKING: "COOKING",
+    READY: "READY",
+    DONE: "DONE",
+  };
 
-    const STATES = {
-        IDLE: 'IDLE',
-        ORDERED: 'ORDERED',
-        COOKING: 'COOKING',
-        READY: 'READY',
-        DONE: 'DONE',
-    };
+  const STEPS = [STATES.ORDERED, STATES.COOKING, STATES.READY, STATES.DONE];
 
-    const STEPS = [
-        STATES.ORDERED,
-        STATES.COOKING,
-        STATES.READY,
-        STATES.DONE,
-    ];
+  const LABELS = {
+    ORDERED: "Dipesan",
+    COOKING: "Dimasak",
+    READY: "Siap Diambil",
+    DONE: "Selesai",
+  };
 
-    const LABELS = {
-        ORDERED: 'Dipesan',
-        COOKING: 'Dimasak',
-        READY: 'Siap Diambil',
-        DONE: 'Selesai',
-    };
+  const TRANSITIONS = {
+    IDLE: [STATES.ORDERED],
+    ORDERED: [STATES.COOKING],
+    COOKING: [STATES.READY],
+    READY: [STATES.DONE],
+    DONE: [],
+  };
 
-    const TRANSITIONS = {
-        IDLE: [STATES.ORDERED],
-        ORDERED: [STATES.COOKING],
-        COOKING: [STATES.READY],
-        READY: [STATES.DONE],
-        DONE: [],
-    };
+  let currentState = STATES.IDLE;
+  // Menyimpan orderId aktif milik pelanggan ini
+  let activeOrderId = null;
 
-    let currentState = STATES.IDLE;
+  function transition(toState) {
+    if (!canTransition(toState)) return false;
+    currentState = toState;
+    return true;
+  }
 
-    function transition(toState) {
-        if (!canTransition(toState)) return false;
-        currentState = toState;
-        return true;
+  /**
+   * forceState – dipakai oleh socket.io event handler di index.html
+   * untuk langsung set state tanpa validasi transisi.
+   * Contoh: server bilang READY, kita paksa set ke READY.
+   */
+  function forceState(state) {
+    if (Object.values(STATES).includes(state)) {
+      currentState = state;
+      return true;
     }
+    return false;
+  }
 
-    function getState() {
-        return currentState;
-    }
+  function getState() {
+    return currentState;
+  }
 
-    function reset() {
-        currentState = STATES.IDLE;
-    }
+  function reset() {
+    currentState = STATES.IDLE;
+    activeOrderId = null;
+  }
 
-    function getSteps() {
-        return STEPS;
-    }
+  function setActiveOrderId(id) {
+    activeOrderId = id;
+  }
 
-    function getLabels() {
-        return LABELS;
-    }
+  function getActiveOrderId() {
+    return activeOrderId;
+  }
 
-    function canTransition(toState) {
-        return (TRANSITIONS[currentState] || []).includes(toState);
-    }
+  function getSteps() {
+    return STEPS;
+  }
 
-    function getStepStatus(step) {
-        const steps = getSteps();
+  function getLabels() {
+    return LABELS;
+  }
 
-        const currentIndex =
-            steps.indexOf(currentState);
+  function canTransition(toState) {
+    return (TRANSITIONS[currentState] || []).includes(toState);
+  }
 
-        const stepIndex =
-            steps.indexOf(step);
+  function getStepStatus(step) {
+    const steps = getSteps();
+    const currentIndex = steps.indexOf(currentState);
+    const stepIndex = steps.indexOf(step);
 
-        if (stepIndex < currentIndex) {
-            return 'done';
-        }
+    if (stepIndex < currentIndex) return "done";
+    if (stepIndex === currentIndex) return "active";
+    return "inactive";
+  }
 
-        if (stepIndex === currentIndex) {
-            return 'active';
-        }
-
-        return 'inactive';
-    }
-
-    return {
-        STATES,
-        transition,
-        reset,
-        getState,
-        canTransition,
-        getSteps,
-        getLabels,
-        getStepStatus,
-    };
-
+  return {
+    STATES,
+    transition,
+    forceState,
+    reset,
+    getState,
+    setActiveOrderId,
+    getActiveOrderId,
+    canTransition,
+    getSteps,
+    getLabels,
+    getStepStatus,
+  };
 })();
+
+window.OrderStateMachine = OrderStateMachine;

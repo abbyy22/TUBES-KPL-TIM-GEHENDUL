@@ -78,7 +78,16 @@ async function createMenu(req, res) {
   );
 
   const [rows] = await pool.query(SELECT_MENU + ' WHERE m.id = ?', [result.insertId]);
-  res.status(201).json({ success: true, data: mapMenuRow(rows[0]) });
+  const menuData = mapMenuRow(rows[0]);
+
+  // Emit real-time menu update so pelanggan's menu grid refreshes
+  const io = req.app.locals.io;
+  if (io) {
+    io.emit('menu:updated', { action: 'create', menu: menuData });
+    console.log(`[socket.io] emitted menu:updated (create) for menu #${menuData.id}`);
+  }
+
+  res.status(201).json({ success: true, data: menuData });
 }
 
 async function updateMenu(req, res) {
@@ -102,15 +111,37 @@ async function updateMenu(req, res) {
   if (result.affectedRows === 0) throw ApiError.notFound('Menu tidak ditemukan');
 
   const [rows] = await pool.query(SELECT_MENU + ' WHERE m.id = ?', [id]);
-  res.json({ success: true, data: mapMenuRow(rows[0]) });
+  const menuData = mapMenuRow(rows[0]);
+
+  // Emit real-time menu update so pelanggan's menu grid refreshes
+  const io = req.app.locals.io;
+  if (io) {
+    io.emit('menu:updated', { action: 'update', menu: menuData });
+    console.log(`[socket.io] emitted menu:updated (update) for menu #${menuData.id}`);
+  }
+
+  res.json({ success: true, data: menuData });
 }
 
 async function deleteMenu(req, res) {
   const id = parseInt(req.params.id, 10);
   if (!isPositiveInt(id)) throw ApiError.badRequest('id menu tidak valid');
 
+  // Fetch before delete to get kantin_id for socket emit
+  const [rows] = await pool.query(SELECT_MENU + ' WHERE m.id = ?', [id]);
+  if (rows.length === 0) throw ApiError.notFound('Menu tidak ditemukan');
+  const menuData = mapMenuRow(rows[0]);
+
   const [result] = await pool.query('DELETE FROM menus WHERE id = ?', [id]);
   if (result.affectedRows === 0) throw ApiError.notFound('Menu tidak ditemukan');
+
+  // Emit real-time menu update so pelanggan's menu grid refreshes
+  const io = req.app.locals.io;
+  if (io) {
+    io.emit('menu:updated', { action: 'delete', menu: { id, kantin_id: menuData.kantin_id } });
+    console.log(`[socket.io] emitted menu:updated (delete) for menu #${id}`);
+  }
+
   res.json({ success: true, data: { id, deleted: true } });
 }
 

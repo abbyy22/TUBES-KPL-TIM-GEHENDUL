@@ -199,10 +199,21 @@ async function updateOrderStatus(req, res) {
   res.json({ success: true, data: orderData });
 }
 
+async function listOrdersByKantin(req, res) {
+  const kantinId = parseInt(req.params.kantin_id, 10);
+  if (!isPositiveInt(kantinId)) throw ApiError.badRequest('kantin_id tidak valid');
+  const [rows] = await pool.query(
+    SELECT_ORDER + ' WHERE o.kantin_id = ? ORDER BY o.created_at DESC',
+    [kantinId],
+  );
+  res.json({ success: true, data: rows.map(mapOrderRow) });
+}
+
 module.exports = {
   createOrder,
   listMyOrders,
   listAllOrders,
   getOrder,
   updateOrderStatus,
+  listOrdersByKantin
 };
