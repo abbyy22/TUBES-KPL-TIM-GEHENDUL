@@ -195,12 +195,15 @@ const AccountPage = (() => {
       return [];
     }
 
-    const summaries = await ApiClient.listMyOrders();
-    const orders    = await Promise.all(
-      summaries.map((o) => ApiClient.getOrder(o.id).catch(() => o)),
-    );
-    renderHistory(orders);
-    return orders;
+    const allOrders = await ApiClient.listMyOrders();
+    const todayStr = new Date().toDateString();
+    const todayOrders = allOrders.filter((o) => {
+      const orderDate = new Date(o.created_at).toDateString();
+      return orderDate === todayStr;
+    });
+
+    renderHistory(todayOrders);
+    return todayOrders;
   }
 
   function renderNotifications() {
@@ -376,11 +379,7 @@ const AccountPage = (() => {
       fillEl("stat-today-revenue", formatRp(todayRevenue));
       fillEl("stat-today-orders",  todayOrdersSummaries.length);
 
-      // Ambil detail order dengan itemnya untuk daftar riwayat hari ini
-      const todayOrders = await Promise.all(
-        todayOrdersSummaries.map((o) => ApiClient.getOrder(o.id).catch(() => o))
-      );
-      renderOwnerTodayOrders(todayOrders);
+      renderOwnerTodayOrders(todayOrdersSummaries);
     } catch (err) {
       console.warn("[AccountPage] Gagal load statistik owner:", err.message);
       const container = document.getElementById("today-orders-container");
