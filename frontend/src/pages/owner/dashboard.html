@@ -11,18 +11,6 @@
       </h1>
       <p id="dashboard-date" class="text-xs text-brand-muted mt-0.5"></p>
     </div>
-    <div
-      class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80 transition-colors focus-within:border-brand-primary"
-    >
-      <i data-lucide="search" class="w-4 h-4 text-[#7a6555]"></i>
-      <input
-        id="dashSearch"
-        class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
-        type="text"
-        placeholder="Cari pesanan..."
-        oninput="filterDashOrders()"
-      />
-    </div>
     <button
       class="w-10 h-10 rounded-full border border-[#DDD0C4] bg-brand-bg flex items-center justify-center relative transition-all hover:border-brand-primary hover:bg-white"
       title="Refresh"
@@ -43,7 +31,7 @@
             data-lucide="dollar-sign"
             class="w-4 h-4 text-brand-primary shrink-0"
           ></i>
-          Omzet hari ini
+          Total Pemasukan Hari Ini
         </div>
         <div
           id="omzet-hari-ini"
@@ -149,21 +137,6 @@
         year: "numeric",
       });
     }
-
-    window.filterDashOrders = function () {
-      const q = (
-        document.getElementById("dashSearch")?.value || ""
-      ).toLowerCase();
-      renderOrderList(
-        q
-          ? allOrders.filter(
-              (o) =>
-                (o.customer_name || "").toLowerCase().includes(q) ||
-                String(o.id).includes(q),
-            )
-          : allOrders,
-      );
-    };
 
     function renderOrderList(orders) {
       const container = document.getElementById("dash-orders-list");
