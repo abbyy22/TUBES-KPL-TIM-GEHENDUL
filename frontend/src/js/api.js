@@ -180,6 +180,13 @@ const ApiClient = (() => {
     return request("/orders/me");
   }
 
+  async function getMe() {
+    const user = await request("/auth/me");
+    const current = getUser() || {};
+    saveSession({ token: getToken(), user: { ...current, ...user } });
+    return user;
+  }
+
   async function updateProfile(profileData) {
     const user = await request("/auth/me", {
       method: "PATCH",
@@ -188,6 +195,59 @@ const ApiClient = (() => {
     const current = getUser() || {};
     saveSession({ token: getToken(), user: { ...current, ...user } });
     return user;
+  }
+
+  /**
+   * Upload foto profil ke backend (POST /auth/avatar, multipart/form-data).
+   * @param {File} file
+   * @returns {Promise<{photo_url: string}>}
+   */
+  async function uploadAvatar(file) {
+    const token = getToken();
+    const form = new FormData();
+    form.append('photo', file);
+    const response = await fetch(`${getBaseUrl()}/auth/avatar`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    let payload = null;
+    try { payload = await response.json(); } catch (_) {}
+    if (!response.ok) {
+      throw new Error(payload?.error?.message || `Upload gagal (${response.status})`);
+    }
+    const data = payload?.data ?? payload;
+    // Simpan photo_url terbaru ke session
+    const current = getUser() || {};
+    saveSession({ token, user: { ...current, photo_url: data.photo_url } });
+    return data;
+  }
+
+  /**
+   * Upload foto menu ke backend (POST /menus/:id/photo, multipart/form-data).
+   * @param {number|string} menuId
+   * @param {File} file
+   * @returns {Promise<{photo_url: string}>}
+   */
+  async function uploadMenuPhoto(menuId, file) {
+    const token = getToken();
+    const form = new FormData();
+    form.append('photo', file);
+    const response = await fetch(`${getBaseUrl()}/menus/${menuId}/photo`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    let payload = null;
+    try { payload = await response.json(); } catch (_) {}
+    if (!response.ok) {
+      throw new Error(payload?.error?.message || `Upload foto menu gagal (${response.status})`);
+    }
+    return payload?.data ?? payload;
+  }
+
+  async function deleteMenuPhoto(menuId) {
+    return request(`/menus/${menuId}/photo`, { method: 'DELETE' });
   }
 
   function listAllOrders(params = {}) {
@@ -214,10 +274,12 @@ const ApiClient = (() => {
     createMenu,
     createOrder,
     deleteMenu,
+    deleteMenuPhoto,
     getBaseUrl,
     getKantins,
     getMenuById,
     getMenus,
+    getMe,
     getOrder,
     getOrderByKantin,
     getToken,
@@ -233,6 +295,8 @@ const ApiClient = (() => {
     updateMenu,
     updateOrderStatus,
     updateProfile,
+    uploadAvatar,
+    uploadMenuPhoto,
   };
 })();
 

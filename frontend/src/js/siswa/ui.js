@@ -22,12 +22,18 @@ const UI = (function () {
     const topMenus = MenuTable.getTopMenu();
 
     container.innerHTML = topMenus
-      .map(
-        (item, i) => `
+      .map((item, i) => {
+        const dbItem = MenuTable.findMenuItemById(item.menu_id);
+        const photoUrl = dbItem?.photo_url || "";
+        const imgContent = photoUrl
+          ? `<img src="${photoUrl}" alt="${Utils.sanitize(item.name)}" class="w-full h-full object-cover rounded-full" />`
+          : `<svg style="width:40px;height:40px;color:#D4622A" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`;
+
+        return `
       <div class="menu-card">
         <div class="menu-food-wrap">
-          <div class="menu-food-img" style="background:linear-gradient(135deg,#f5e6c8,#e8c97a);display:flex;align-items:center;justify-content:center;border-radius:50%;width:80px;height:80px;">
-            <svg style="width:40px;height:40px;color:#D4622A" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+          <div class="menu-food-img" style="background:linear-gradient(135deg,#f5e6c8,#e8c97a);display:flex;align-items:center;justify-content:center;border-radius:50%;width:80px;height:80px;overflow:hidden;">
+            ${imgContent}
           </div>
           <div class="rank-crown">${item.crown || ""}</div>
         </div>
@@ -39,8 +45,8 @@ const UI = (function () {
           </svg>
         </button>
       </div>
-    `,
-      )
+    `;
+      })
       .join("");
 
     if (typeof lucide !== "undefined") lucide.createIcons();
@@ -85,14 +91,18 @@ const UI = (function () {
     }
 
     container.innerHTML = menus
-      .map(
-        (m) => `
+      .map((m) => {
+        const imgContent = m.photo_url
+          ? `<img src="${m.photo_url}" alt="${Utils.sanitize(m.name)}" class="w-full h-full object-cover" />`
+          : `<svg class="w-6 h-6 text-[#9E8E84]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/>
+              <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+            </svg>`;
+
+        return `
       <div class="menu-item-card">
-        <div class="menu-item-img-placeholder">
-          <svg class="w-6 h-6 text-[#9E8E84]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/>
-            <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
-          </svg>
+        <div class="menu-item-img-placeholder" style="overflow:hidden; display:flex; align-items:center; justify-content:center;">
+          ${imgContent}
         </div>
         <div class="menu-item-info">
           <div>
@@ -102,8 +112,8 @@ const UI = (function () {
           <button class="menu-item-add" data-id="${m.id}" title="Tambah">+</button>
         </div>
       </div>
-    `,
-      )
+    `;
+      })
       .join("");
 
     container.querySelectorAll(".menu-item-add").forEach((btn) => {

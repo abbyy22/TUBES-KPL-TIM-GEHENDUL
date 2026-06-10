@@ -24,6 +24,7 @@ router.get("/", authenticate, authorize("admin"), asyncHandler(listAllOrders));
 router.get(
   "/kantin/:kantin_id",
   authenticate,
+  authorize("admin"),
   asyncHandler(listOrdersByKantin),
 );
 

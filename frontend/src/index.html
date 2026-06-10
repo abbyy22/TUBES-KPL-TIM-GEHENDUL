@@ -35,14 +35,11 @@
         },
       };
     </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-      lucide.createIcons();
-    </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
       .sidebar-nav a.active-menu {
-        color: #c1500e !important;
+        color: #C1500E !important;
         font-weight: 600;
       }
     </style>
@@ -82,9 +79,8 @@
         window.location.href = "./pages/auth/login.html";
       }
 
-      const CURRENT_USER = ApiClient.getUser();
-      // const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
-      const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
+      let CURRENT_USER = ApiClient.getUser();
+      let CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
 
       // ─── Socket.io connection for real-time order updates ────────────────────
       window.socket = null;
@@ -210,17 +206,26 @@
       }
       async function initApp() {
         try {
+          if (ApiClient.isAuthenticated()) {
+            try {
+              const updatedUser = await ApiClient.getMe();
+              CURRENT_USER = updatedUser;
+              CURRENT_ROLE = ApiClient.normalizeRole(updatedUser.role);
+            } catch (err) {
+              console.warn("Gagal sinkronisasi data user dari API:", err.message);
+            }
+          }
           const resSidebar = await fetch("./partials/sidebar.html");
           const sidebarHtml = await resSidebar.text();
           document.getElementById("sidebar-placeholder").innerHTML =
             sidebarHtml;
           if (typeof lucide !== "undefined") lucide.createIcons();
 
+          const GRAY_PERSON_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af' style='background-color:%23e5e7eb;'><path fill-rule='evenodd' d='M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z' clip-rule='evenodd' /></svg>";
           const avatar = document.getElementById("sidebar-avatar");
-          if (avatar)
-            avatar.src =
-              localStorage.getItem("telfood.profilePhoto") ||
-              "./assets/profile.png";
+          if (avatar) {
+            avatar.src = CURRENT_ROLE === "owner" ? GRAY_PERSON_SVG : (CURRENT_USER?.photo_url || GRAY_PERSON_SVG);
+          }
           const sidebarName = document.getElementById("sidebar-user-name");
           const sidebarEmail = document.getElementById("sidebar-user-email");
           if (CURRENT_USER && sidebarName)
@@ -276,7 +281,10 @@
         else if (pageName === "owner-status")
           filePath = "./pages/owner/update_status.html";
         else if (pageName === "page-account")
-          filePath = "./pages/account/index.html";
+          // Pilih halaman profil sesuai role
+          filePath = CURRENT_ROLE === "owner"
+            ? "./pages/account/owner.html"
+            : "./pages/account/siswa.html";
 
         try {
           const response = await fetch(filePath);
@@ -322,15 +330,17 @@
             initBookingEvents(); // Pindahkan setup klik pesan siswa ke fungsi terpisah agar rapi
           }
           if (pageName === "page-account") {
-            initAccountPage();
+            if (CURRENT_ROLE === "owner") {
+              await AccountPage.initOwner();
+            } else {
+              await AccountPage.init();
+            }
           }
 
           if (pageName === "owner-dashboard") {
-            console.log("Owner Dashboard Stats Loaded");
             const user = CURRENT_USER;
             const kantinTitle = document.getElementById("kantin-title");
-            console.log(user);
-            if (user.role == "penjual" && kantinTitle) {
+            if (CURRENT_ROLE === "owner" && kantinTitle) {
               kantinTitle.textContent =
                 CURRENT_USER?.kantin_name ||
                 CURRENT_USER?.name ||
@@ -338,29 +348,29 @@
             }
 
             try {
-              const res = await ApiClient.getOrderByKantin(
+              const orders = await ApiClient.getOrderByKantin(
                 CURRENT_USER.kantin_id,
               );
-              console.log(res);
-              const orders = res;
               const totalTransactions = orders.length;
-              // const omzetToday = orders.reduce((sum, order) => {
-              //   const createdAt = new Date(order.created_at);
-              //   const today = new Date();
-              //   if (
-              //     createdAt.getDate() === today.getDate() &&
-              //     createdAt.getMonth() === today.getMonth() &&
-              //     createdAt.getFullYear() === today.getFullYear()
-              //   ) {
-              //     return sum + Number(order.total_price);
-              //   }
-              //   return sum;
-              // }, 0);
 
-              // const omzetElement = document.getElementById("omzet-hari-ini");
-              // if (omzetElement) {
-              //   omzetElement.textContent = `Rp ${Utils.formatCurrency(omzetToday)}`;
-              // }
+              const today = new Date();
+              const omzetToday = orders.reduce((sum, order) => {
+                const createdAt = new Date(order.created_at);
+                if (
+                  createdAt.getDate() === today.getDate() &&
+                  createdAt.getMonth() === today.getMonth() &&
+                  createdAt.getFullYear() === today.getFullYear() &&
+                  order.status === "DONE"
+                ) {
+                  return sum + Number(order.total_price);
+                }
+                return sum;
+              }, 0);
+
+              const omzetElement = document.getElementById("omzet-hari-ini");
+              if (omzetElement) {
+                omzetElement.textContent = "Rp " + omzetToday.toLocaleString("id-ID");
+              }
 
               const totalTransaksiElement =
                 document.getElementById("total-transaksi");
@@ -372,11 +382,9 @@
             }
           }
           if (pageName === "owner-menu") {
-            console.log("Owner Dashboard Stats Loaded");
             const user = CURRENT_USER;
             const kantinTitle = document.getElementById("kantin-title");
-            console.log(user);
-            if (user.role == "penjual" && kantinTitle) {
+            if (CURRENT_ROLE === "owner" && kantinTitle) {
               kantinTitle.textContent =
                 CURRENT_USER?.kantin_name ||
                 CURRENT_USER?.name ||
@@ -384,14 +392,12 @@
             }
             setTimeout(() => {
               if (typeof renderMenu === "function") renderMenu();
-            }, 1000); // Tunggu 100ms
+            }, 100);
           }
           if (pageName === "owner-status" && typeof initKanban === "function") {
-            console.log("Owner Dashboard Stats Loaded");
             const user = CURRENT_USER;
             const kantinTitle = document.getElementById("kantin-title");
-            console.log(user);
-            if (user.role == "penjual" && kantinTitle) {
+            if (CURRENT_ROLE === "owner" && kantinTitle) {
               kantinTitle.textContent =
                 CURRENT_USER?.kantin_name ||
                 CURRENT_USER?.name ||
@@ -523,95 +529,6 @@
         });
       }
 
-      function initAccountPage() {
-        const orders = [
-          {
-            id: "#78093",
-            date: "Rabu, 25 April 2026",
-            pesan: [
-              { menu: "Nasi Goreng Mozarella", qty: 1 },
-              { menu: "Es Teh Manis", qty: 1 },
-            ],
-            canteen: "Kantin NEO 1",
-            total: "Rp 15.000",
-          },
-          {
-            id: "#78094",
-            date: "Selasa, 24 April 2026",
-            pesan: [
-              { menu: "Mie Ayam Spesial", qty: 2 },
-              { menu: "Jus Alpukat", qty: 1 },
-            ],
-            canteen: "Kantin NEO 2",
-            total: "Rp 28.000",
-          },
-          {
-            id: "#78095",
-            date: "Senin, 23 April 2026",
-            pesan: [{ menu: "Soto Ayam", qty: 1 }],
-            canteen: "Kantin NEO 1",
-            total: "Rp 12.000",
-          },
-        ];
-
-        const container = document.getElementById("history-container");
-        if (!container) {
-          console.log("container history masih null!");
-          return;
-        }
-
-        container.innerHTML = orders
-          .map(
-            (order) => `
-    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[#C1500E] transition-colors">
-      <div class="flex items-start justify-between gap-4">
-        <div>${order.pesan.map((item) => `<p class="text-sm text-gray-700">${item.qty}x <span class="font-medium">${item.menu}</span></p>`).join("")}</div>
-        <div class="text-right">
-          <p class="text-sm font-bold text-gray-800">${order.canteen}</p>
-          <p class="text-xs text-gray-400 mt-0.5">${order.date}</p>
-        </div>
-      </div>
-      <div class="flex justify-between mt-3 pt-3 border-t border-gray-100">
-        <span class="text-xs text-gray-400 font-mono">${order.id}</span>
-        <span class="text-xs font-bold text-[#C1500E]">${order.total}</span>
-      </div>
-    </div>
-  `,
-          )
-          .join("");
-
-        const searchInput = document.getElementById("search");
-        if (searchInput) {
-          searchInput.addEventListener("input", (e) => {
-            const keyword = e.target.value.toLowerCase();
-            const filtered = orders.filter(
-              (order) =>
-                order.pesan.some((item) =>
-                  item.menu.toLowerCase().includes(keyword),
-                ) || order.canteen.toLowerCase().includes(keyword),
-            );
-            container.innerHTML = filtered
-              .map(
-                (order) => `
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[#C1500E] transition-colors">
-          <div class="flex items-start justify-between gap-4">
-            <div>${order.pesan.map((item) => `<p class="text-sm text-gray-700">${item.qty}x <span class="font-medium">${item.menu}</span></p>`).join("")}</div>
-            <div class="text-right">
-              <p class="text-sm font-bold text-gray-800">${order.canteen}</p>
-              <p class="text-xs text-gray-400 mt-0.5">${order.date}</p>
-            </div>
-          </div>
-          <div class="flex justify-between mt-3 pt-3 border-t border-gray-100">
-            <span class="text-xs text-gray-400 font-mono">${order.id}</span>
-            <span class="text-xs font-bold text-[#C1500E]">${order.total}</span>
-          </div>
-        </div>
-      `,
-              )
-              .join("");
-          });
-        }
-      }
 
       window.onload = initApp;
     </script>

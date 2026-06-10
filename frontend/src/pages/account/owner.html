@@ -1,0 +1,143 @@
+<!-- Profil Penjual / Owner Kantin -->
+<div class="flex flex-col lg:flex-row gap-10 min-h-[95vh]">
+
+  <!-- ── Kiri: Form Profil ─────────────────────────────────────────────── -->
+  <section class="w-full lg:w-2/5 bg-[#F4EFE2] p-10 rounded-4xl shadow-2xl self-start">
+    <h2 class="text-center text-2xl font-bold mb-8">Profil Penjual</h2>
+
+    <form id="profile-form" class="flex flex-col items-center">
+      <!-- Foto Profil -->
+      <div class="relative w-28 h-28 mb-4">
+        <div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white">
+          <img
+            id="profile-photo"
+            src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af' style='background-color:%23e5e7eb;'><path fill-rule='evenodd' d='M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z' clip-rule='evenodd' /></svg>"
+            alt="Foto profil"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+
+      <!-- Data Diri -->
+      <div class="w-full space-y-4 mt-6">
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <label for="profile-name-input" class="text-[10px] text-gray-400">Nama Lengkap:</label>
+          <input
+            id="profile-name-input"
+            type="text"
+            class="w-full bg-transparent font-bold text-sm outline-none mt-1"
+            placeholder="Nama penjual"
+          />
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <label for="profile-email-input" class="text-[10px] text-gray-400">Email:</label>
+          <input
+            id="profile-email-input"
+            type="email"
+            disabled
+            class="w-full bg-transparent font-bold text-sm text-gray-500 outline-none mt-1"
+          />
+        </div>
+
+        <!-- Ganti Password -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <label for="current-password" class="text-[10px] text-gray-400">Password lama:</label>
+            <input
+              id="current-password"
+              type="password"
+              class="w-full bg-transparent font-bold text-sm outline-none mt-1"
+              placeholder="Isi jika ingin ubah"
+            />
+          </div>
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <label for="new-password" class="text-[10px] text-gray-400">Password baru:</label>
+            <input
+              id="new-password"
+              type="password"
+              class="w-full bg-transparent font-bold text-sm outline-none mt-1"
+              placeholder="Minimal 6 karakter"
+            />
+          </div>
+        </div>
+      </div>
+
+      <p id="profile-message" class="w-full text-sm mt-4 min-h-5"></p>
+      <button
+        type="submit"
+        class="w-full bg-[#D2691E] hover:bg-[#B8561A] text-white py-2 px-4 rounded-lg mt-4 transition-colors font-semibold"
+      >
+        Simpan perubahan
+      </button>
+    </form>
+  </section>
+
+  <!-- ── Kanan: Riwayat Transaksi Harian ──────────────────────────────── -->
+  <section class="w-full lg:flex-1 flex flex-col gap-5">
+
+    <!-- Header Kantin + Tanggal -->
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs text-gray-500 uppercase tracking-widest mb-0.5">Riwayat Transaksi</p>
+        <h2 id="kantin-name-display" class="text-xl font-extrabold text-gray-800">—</h2>
+      </div>
+      <div class="text-right">
+        <p id="today-date-label" class="text-sm font-semibold text-[#C1500E]"></p>
+        <p id="kantin-code-display" class="text-xs text-gray-400 font-mono mt-0.5"></p>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-[#F4EFE2] p-5 rounded-3xl shadow-xl text-center">
+        <p id="stat-today-revenue" class="text-base font-extrabold text-[#C1500E] leading-tight">Rp 0</p>
+        <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">Pendapatan</p>
+      </div>
+      <div class="bg-[#F4EFE2] p-5 rounded-3xl shadow-xl text-center">
+        <p id="stat-today-orders" class="text-2xl font-extrabold text-[#C1500E]">0</p>
+        <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">Total Order</p>
+      </div>
+      <div class="bg-[#F4EFE2] p-5 rounded-3xl shadow-xl text-center">
+        <p id="stat-done-orders" class="text-2xl font-extrabold text-emerald-600">—</p>
+        <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">Selesai</p>
+      </div>
+    </div>
+
+    <!-- Daftar Transaksi Harian -->
+    <div class="bg-[#F4EFE2] rounded-4xl shadow-2xl flex-1 flex flex-col overflow-hidden">
+      <!-- Toolbar -->
+      <div class="flex items-center justify-between px-7 pt-6 pb-4 border-b border-[#EDE5D8]">
+        <h3 class="font-extrabold text-gray-800 text-sm flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#C1500E]" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+          Daftar Transaksi Hari Ini
+        </h3>
+        <span id="today-orders-count-badge"
+          class="text-[10px] font-bold bg-[#C1500E]/10 text-[#C1500E] px-2.5 py-1 rounded-full">
+          0 transaksi
+        </span>
+      </div>
+
+      <!-- List -->
+      <div
+        id="today-orders-container"
+        class="flex-1 overflow-y-auto px-5 py-4 space-y-3
+               [&::-webkit-scrollbar]:w-1.5
+               [&::-webkit-scrollbar-thumb]:bg-[#DDD0C4]
+               [&::-webkit-scrollbar-thumb]:rounded-full
+               [&::-webkit-scrollbar-track]:bg-transparent"
+        style="max-height: calc(100vh - 340px); min-height: 240px;"
+      >
+        <p class="text-xs text-gray-400 italic text-center py-10 animate-pulse">Memuat transaksi hari ini...</p>
+      </div>
+    </div>
+
+  </section>
+</div>

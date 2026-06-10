@@ -10,6 +10,7 @@ function mapOrderRow(r) {
     id: r.id,
     user_id: r.user_id,
     kantin_id: r.kantin_id,
+    kantin_name: r.kantin_name || null,
     customer_name: r.customer_name,
     total_price: r.total_price,
     status: r.status,
@@ -19,9 +20,10 @@ function mapOrderRow(r) {
 }
 
 const SELECT_ORDER = `
-  SELECT o.id, o.user_id, o.kantin_id, o.customer_name,
-         o.total_price, o.status, o.created_at, o.updated_at
+  SELECT o.id, o.user_id, o.kantin_id, k.name AS kantin_name,
+         o.customer_name, o.total_price, o.status, o.created_at, o.updated_at
   FROM orders o
+  JOIN kantins k ON k.id = o.kantin_id
 `;
 
 async function fetchOrderItems(orderId) {
@@ -31,6 +33,29 @@ async function fetchOrderItems(orderId) {
     [orderId],
   );
   return rows;
+}
+
+async function fetchItemsForOrders(orders) {
+  if (!orders || orders.length === 0) return [];
+  const orderIds = orders.map((o) => o.id);
+  const [items] = await pool.query(
+    `SELECT id, order_id, menu_id, menu_name, quantity, price_at_order
+     FROM order_items WHERE order_id IN (?) ORDER BY id ASC`,
+    [orderIds],
+  );
+
+  const itemsMap = {};
+  for (const item of items) {
+    if (!itemsMap[item.order_id]) {
+      itemsMap[item.order_id] = [];
+    }
+    itemsMap[item.order_id].push(item);
+  }
+
+  return orders.map((o) => ({
+    ...mapOrderRow(o),
+    items: itemsMap[o.id] || [],
+  }));
 }
 
 /**
@@ -62,7 +87,7 @@ async function createOrder(req, res) {
       const m = menuById.get(it.menu_id);
       assert(m, `menu_id ${it.menu_id} tidak ditemukan`);
       assert(m.kantin_id === input.kantin_id,
-        `menu_id ${it.menu_id} bukan milik kantin yang dipilih`);
+         `menu_id ${it.menu_id} bukan milik kantin yang dipilih`);
       assert(m.available === 1, `Menu '${m.name}' sedang tidak tersedia`);
 
       total += m.price * it.quantity;
@@ -113,28 +138,36 @@ async function listMyOrders(req, res) {
     SELECT_ORDER + ' WHERE o.user_id = ? ORDER BY o.created_at DESC',
     [req.user.id],
   );
-  res.json({ success: true, data: rows.map(mapOrderRow) });
+  const data = await fetchItemsForOrders(rows);
+  res.json({ success: true, data });
 }
 
 /**
- * GET /api/orders - admin melihat seluruh pesanan (opsional ?status=, ?kantin_id=).
+ * GET /api/orders - admin/owner melihat pesanan kantinnya sendiri.
+ * Secara otomatis disaring berdasarkan kantin_id dari JWT token — tidak bisa
+ * dimanipulasi via query string untuk alasan keamanan.
+ * Opsional: ?status= untuk filter status pesanan.
  */
 async function listAllOrders(req, res) {
   const where = [];
   const params = [];
+
+  // Paksa filter berdasarkan kantin milik owner dari JWT (tidak boleh override via query)
+  if (req.user.kantin_id) {
+    where.push('o.kantin_id = ?');
+    params.push(req.user.kantin_id);
+  }
+
   if (req.query.status !== undefined) {
     assert(isValidState(req.query.status), 'status tidak valid');
     where.push('o.status = ?'); params.push(req.query.status);
   }
-  if (req.query.kantin_id !== undefined) {
-    const k = parseInt(req.query.kantin_id, 10);
-    assert(isPositiveInt(k), 'kantin_id tidak valid');
-    where.push('o.kantin_id = ?'); params.push(k);
-  }
+
   const sql = SELECT_ORDER + (where.length ? ' WHERE ' + where.join(' AND ') : '') +
     ' ORDER BY o.created_at DESC';
   const [rows] = await pool.query(sql, params);
-  res.json({ success: true, data: rows.map(mapOrderRow) });
+  const data = await fetchItemsForOrders(rows);
+  res.json({ success: true, data });
 }
 
 /**
@@ -202,12 +235,20 @@ async function updateOrderStatus(req, res) {
 async function listOrdersByKantin(req, res) {
   const kantinId = parseInt(req.params.kantin_id, 10);
   if (!isPositiveInt(kantinId)) throw ApiError.badRequest('kantin_id tidak valid');
+
+  // Pastikan admin/owner hanya bisa lihat kantin miliknya sendiri
+  if (req.user.kantin_id && Number(req.user.kantin_id) !== kantinId) {
+    throw ApiError.forbidden('Tidak boleh mengakses pesanan kantin lain');
+  }
+
   const [rows] = await pool.query(
     SELECT_ORDER + ' WHERE o.kantin_id = ? ORDER BY o.created_at DESC',
     [kantinId],
   );
-  res.json({ success: true, data: rows.map(mapOrderRow) });
+  const data = await fetchItemsForOrders(rows);
+  res.json({ success: true, data });
 }
+
 
 module.exports = {
   createOrder,

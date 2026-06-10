@@ -52,6 +52,7 @@ function mapApiMenu(m) {
     price: m.price,
     active: m.available,
     emoji: m.emoji || "",
+    photo_url: m.photo_url || "",
   };
 }
 
@@ -92,7 +93,6 @@ function _doRender() {
   const showing = Math.min((page + 1) * PER, filtered.length);
   const tbody = document.getElementById("menuTbody");
   const empty = document.getElementById("emptyState");
-  console.log(slice)
   if (!tbody) return;
 
   if (filtered.length === 0) {
@@ -106,8 +106,8 @@ function _doRender() {
       <tr style="${m.active ? "" : "opacity:0.5;"} background-color:#EDE5D880;" class="hover:bg-brand-bg transition-colors">
         <td class="px-7 py-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-2xl" style="border:1px solid #DDD0C4;background:#EDE5D8;">
-              ${m.emoji || (m.cat === "drink" ? "🥤" : "🍛")}
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden" style="border:1px solid #DDD0C4;background:#EDE5D8;">
+              ${m.photo_url ? `<img src="${m.photo_url}" alt="${m.name}" class="w-full h-full object-cover" />` : `<div class="text-2xl">${m.emoji || (m.cat === "drink" ? "🥤" : "🍛")}</div>`}
             </div>
             <div class="min-w-0">
               <div class="font-bold truncate" style="font-size:13px;color:#4B3F38;">${m.name}</div>
@@ -270,9 +270,21 @@ function openEdit(id) {
   document.getElementById("fPrice").value = m.price;
   document.getElementById("fEmoji").value = m.emoji || "";
 
-  // Emoji preview sebagai pengganti image
-  currentImageData = null;
-  removeImage();
+  // Preview gambar jika sudah ada
+  if (m.photo_url) {
+    currentImageData = m.photo_url;
+    const preview = document.getElementById("fImagePreview");
+    preview.src = m.photo_url;
+    preview.classList.remove("hidden");
+    document.getElementById("fImagePlaceholder").classList.add("hidden");
+    document.getElementById("btnRemoveImg").classList.remove("hidden");
+    document.getElementById("uploadZone").classList.remove("border-dashed");
+    document.getElementById("uploadZone").style.borderColor = "#C05A1F";
+    document.getElementById("uploadZone").style.borderStyle = "solid";
+  } else {
+    currentImageData = null;
+    removeImage();
+  }
 
   document.getElementById("modalOverlay").style.display = "flex";
   setTimeout(() => document.getElementById("fName").focus(), 50);
@@ -280,13 +292,36 @@ function openEdit(id) {
 
 function closeModal() {
   const modalOverlay = document.getElementById("modalOverlay");
+  if (!modalOverlay) return;
 
-  if (!modalOverlay) {
-    console.error("Modal overlay element not found!");
-    return;
-  }
-  modalOverlay.style.display = "none";
-  modalOverlay.classList.add("hidden");
+  // Animasi fade-out modal
+  modalOverlay.style.transition = "opacity 0.18s ease";
+  modalOverlay.style.opacity = "0";
+  setTimeout(() => {
+    modalOverlay.style.display = "none";
+    modalOverlay.style.opacity = "";
+    modalOverlay.style.transition = "";
+    modalOverlay.classList.add("hidden");
+  }, 180);
+
+  // Reset semua field form
+  const fName  = document.getElementById("fName");
+  const fDesc  = document.getElementById("fDesc");
+  const fCat   = document.getElementById("fCat");
+  const fPrice = document.getElementById("fPrice");
+  const fEmoji = document.getElementById("fEmoji");
+  if (fName)  fName.value  = "";
+  if (fDesc)  fDesc.value  = "";
+  if (fCat)   fCat.value   = "food";
+  if (fPrice) fPrice.value = "";
+  if (fEmoji) fEmoji.value = "";
+
+  // Reset image preview
+  removeImage();
+
+  // Reset state editing
+  editingId = null;
+  currentImageData = null;
 }
 
 async function saveMenu() {
@@ -319,6 +354,10 @@ async function saveMenu() {
     saveBtn.textContent = "Menyimpan...";
   }
 
+  // Ambil file yang dipilih (jika ada)
+  const fileInput = document.getElementById("fImageFile");
+  const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
   try {
     if (editingId) {
       // UPDATE
@@ -329,9 +368,26 @@ async function saveMenu() {
         emoji,
         available: true,
       };
-      const updated = await ApiClient.updateMenu(editingId, payload);
+      let updated = await ApiClient.updateMenu(editingId, payload);
+
+      // Jika ada file gambar baru yang diunggah
+      if (file) {
+        const photoResult = await ApiClient.uploadMenuPhoto(editingId, file);
+        updated.photo_url = photoResult.photo_url;
+      } else if (currentImageData === null) {
+        // Jika owner menghapus foto, hapus juga di backend
+        try {
+          await ApiClient.deleteMenuPhoto(editingId);
+          updated.photo_url = "";
+        } catch (_) {}
+      }
+
       const idx = menus.findIndex((x) => x.id === editingId);
       if (idx >= 0) menus[idx] = mapApiMenu(updated);
+
+      // Tutup modal DULU, baru render dan tampilkan toast
+      closeModal();
+      _doRender();
       showToast("Menu berhasil diperbarui ✓", "success");
     } else {
       // CREATE
@@ -342,14 +398,27 @@ async function saveMenu() {
         price,
         emoji,
         available: true,
-        category_id: cat, // diterima validator, diabaikan di controller
+        category_id: cat,
       };
       const created = await ApiClient.createMenu(payload);
+
+      // Jika ada file gambar baru yang diunggah
+      if (file) {
+        try {
+          const photoResult = await ApiClient.uploadMenuPhoto(created.id, file);
+          created.photo_url = photoResult.photo_url;
+        } catch (uploadErr) {
+          console.warn("Gagal unggah foto untuk menu baru:", uploadErr.message);
+        }
+      }
+
       menus.push(mapApiMenu(created));
+
+      // Tutup modal DULU, baru render dan tampilkan toast
+      closeModal();
+      _doRender();
       showToast("Menu baru ditambahkan ✓", "success");
     }
-    closeModal();
-    _doRender();
   } catch (err) {
     showToast("Gagal menyimpan: " + err.message, "error");
   } finally {

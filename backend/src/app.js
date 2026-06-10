@@ -1,5 +1,6 @@
 "use strict";
 
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -20,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 if (config.env !== "test") {
   app.use(morgan(config.env === "development" ? "dev" : "combined"));
 }
+
+// Serve uploaded photos (foto profil & foto menu) secara statis
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.get("/health", (req, res) => {
   res.json({

@@ -10,6 +10,7 @@ function mapAuthRow(row) {
     email: row.email,
     password_hash: row.password_hash,
     role: row.role,
+    photo_url: row.photo_url || null,
     kantin_id: row.kantin_id,
     kantin_name: row.kantin_name,
     kantin_code: row.kantin_code,
@@ -19,10 +20,13 @@ function mapAuthRow(row) {
 
 async function findByEmail(email) {
   const [rows] = await pool.query(
-    `SELECT u.id, u.name, u.email, u.password_hash, u.role,
+    `SELECT u.id, u.name, u.email, u.password_hash, u.role, u.photo_url,
             k.id as kantin_id, k.name as kantin_name, k.code as kantin_code
      FROM users u
-     LEFT JOIN kantins k ON k.code = SUBSTRING_INDEX(u.email, '@', 1)
+     LEFT JOIN kantins k ON k.code = CASE 
+       WHEN SUBSTRING_INDEX(u.email, '@', 1) = 'admin' THEN 'neo1'
+       ELSE SUBSTRING_INDEX(u.email, '@', 1)
+     END
      WHERE u.email = ?`,
     [email],
   );
@@ -31,7 +35,14 @@ async function findByEmail(email) {
 
 async function findPublicById(id) {
   const [rows] = await pool.query(
-    "SELECT id, name, email, role, created_at FROM users WHERE id = ?",
+    `SELECT u.id, u.name, u.email, u.role, u.photo_url, u.created_at,
+            k.id as kantin_id, k.name as kantin_name, k.code as kantin_code
+     FROM users u
+     LEFT JOIN kantins k ON k.code = CASE 
+       WHEN SUBSTRING_INDEX(u.email, '@', 1) = 'admin' THEN 'neo1'
+       ELSE SUBSTRING_INDEX(u.email, '@', 1)
+     END
+     WHERE u.id = ?`,
     [id],
   );
   return rows[0] || null;
@@ -58,6 +69,7 @@ async function updateUser(id, updates) {
   await pool.query(`UPDATE users SET ${setSql} WHERE id = ?`, params);
   return findPublicById(id);
 }
+
 
 module.exports = {
   createUser,

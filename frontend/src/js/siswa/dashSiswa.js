@@ -16,24 +16,58 @@ const dashSiswa = (() => {
    * 3. Tambah item ke cart
    */
   async function orderTopMenu(kantinId, menuId) {
+    let resolvedKantinId = kantinId;
+    let resolvedMenuId = menuId;
+
+    if (MenuTable.isApiBacked()) {
+      const kantin = MenuTable.getKantinList().find(
+        (k) => k.code === kantinId || String(k.id) === String(kantinId),
+      );
+      if (kantin) {
+        resolvedKantinId = kantin.id;
+        const kantinMenus = MenuTable.getMenuByKantin(resolvedKantinId);
+        let foundMenu = null;
+        if (menuId === "m1") {
+          foundMenu = kantinMenus.find((m) =>
+            m.name.toLowerCase().includes("nasi goreng"),
+          );
+        } else if (menuId === "m3") {
+          foundMenu = kantinMenus.find((m) =>
+            m.name.toLowerCase().includes("bakso"),
+          );
+        } else if (menuId === "m5") {
+          foundMenu = kantinMenus.find(
+            (m) =>
+              m.name.toLowerCase().includes("ayam") ||
+              m.name.toLowerCase().includes("rames"),
+          );
+        }
+        if (foundMenu) {
+          resolvedMenuId = foundMenu.id;
+        } else if (kantinMenus.length > 0) {
+          resolvedMenuId = kantinMenus[0].id;
+        }
+      }
+    }
+
     // Navigasi ke halaman booking dulu
-    await loadPage('siswa-booking');
+    await loadPage("siswa-booking");
 
     // Tunggu DOM siap
-    await new Promise(r => setTimeout(r, 80));
+    await new Promise((r) => setTimeout(r, 80));
 
     // Pilih kantin di select
-    const kantinSelect = document.getElementById('kantinSelect');
-    if (kantinSelect && kantinId) {
-      kantinSelect.value = kantinId;
+    const kantinSelect = document.getElementById("kantinSelect");
+    if (kantinSelect && resolvedKantinId) {
+      kantinSelect.value = resolvedKantinId;
       // Trigger render menu grid
-      booking.renderMenuGrid(kantinId);
+      booking.renderMenuGrid(resolvedKantinId);
     }
 
     // Tambah item ke cart jika menuId tersedia
-    if (menuId) {
-      await new Promise(r => setTimeout(r, 60));
-      const item = MenuTable.findMenuItemById(menuId);
+    if (resolvedMenuId) {
+      await new Promise((r) => setTimeout(r, 60));
+      const item = MenuTable.findMenuItemById(resolvedMenuId);
       if (item) {
         Cart.addItem(item);
         booking.renderOrderItems();
