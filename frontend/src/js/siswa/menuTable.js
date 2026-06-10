@@ -36,16 +36,22 @@ const MenuTable = (() => {
       rank: 1,
       name: 'Nasi Goreng Maza',
       kantin: 'Kantin NEO 1',
+      kantin_id: 'neo1',
+      menu_id: 'm1',
     },
     {
       rank: 2,
       name: 'Bakso Urat',
       kantin: 'Kantin NEO 2',
+      kantin_id: 'neo2',
+      menu_id: 'm3',
     },
     {
       rank: 3,
       name: 'Ayam Geprek',
       kantin: 'Kantin TPB',
+      kantin_id: 'tpb',
+      menu_id: 'm5',
     },
   ];
 

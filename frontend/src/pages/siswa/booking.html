@@ -1,15 +1,6 @@
-<div class="ml-[30px] mr-20 min-h-screen flex-1 px-7 py-6">
+<div class="ml-[30px] mr-20 min-h-screen flex flex-col px-7 py-6">
   <div class="flex items-center justify-between mb-6">
-    <div
-      class="flex items-center gap-2 bg-[#F4EFE2] rounded-[10px] px-4 py-[9px] flex-1 max-w-[480px] shadow-md"
-    >
-      <i data-lucide="search" class="w-4 h-4 text-[#D4622A]"></i>
-      <input
-        type="text"
-        placeholder="Search"
-        class="bg-transparent outline-none border-none text-[12px] text-[#2D2D2D] w-full"
-      />
-    </div>
+    <h2 id="greetingTextBooking" class="text-[20px] font-bold text-[#2D2D2D]">Hai!</h2>
     <div class="flex items-center gap-3">
       <button
         id="clockBtnBooking"
@@ -25,7 +16,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
     <div class="bg-[#F4EFE2] rounded-[22px] p-6 shadow-md flex flex-col">
       <h2 class="text-[22px] font-bold text-[#2D2D2D] mb-1">Form Pemesanan</h2>
       <p class="text-[12px] text-gray-400 mb-5">
@@ -87,7 +78,7 @@
       </button>
     </div>
 
-    <div class="bg-[#F4EFE2] rounded-[22px] p-6 shadow-md">
+    <div class="bg-[#F4EFE2] rounded-[22px] p-6 shadow-md flex flex-col">
       <div class="flex justify-center items-center gap-3 mb-5">
         <div
           id="menuPanelHeader"
@@ -97,7 +88,7 @@
         </div>
       </div>
 
-      <div id="menuGrid" class="grid grid-cols-2 gap-4">
+      <div id="menuGrid" class="grid grid-cols-2 gap-4 flex-1 content-start">
         <div class="col-span-2 text-center py-10 text-gray-400 text-xs italic">
           Pilih kantin untuk melihat menu
         </div>
@@ -105,3 +96,15 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function() {
+    const user = typeof CURRENT_USER !== 'undefined' ? CURRENT_USER : null;
+    const greetEl = document.getElementById('greetingTextBooking');
+    if (greetEl && user && user.name) {
+      greetEl.textContent = 'Hai, ' + user.name + '!';
+    } else if (greetEl) {
+      greetEl.textContent = 'Hai!';
+    }
+  })();
+</script>
