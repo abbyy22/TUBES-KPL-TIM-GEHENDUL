@@ -180,6 +180,13 @@ const ApiClient = (() => {
     return request("/orders/me");
   }
 
+  async function getMe() {
+    const user = await request("/auth/me");
+    const current = getUser() || {};
+    saveSession({ token: getToken(), user: { ...current, ...user } });
+    return user;
+  }
+
   async function updateProfile(profileData) {
     const user = await request("/auth/me", {
       method: "PATCH",
@@ -216,6 +223,29 @@ const ApiClient = (() => {
     return data;
   }
 
+  /**
+   * Upload foto menu ke backend (POST /menus/:id/photo, multipart/form-data).
+   * @param {number|string} menuId
+   * @param {File} file
+   * @returns {Promise<{photo_url: string}>}
+   */
+  async function uploadMenuPhoto(menuId, file) {
+    const token = getToken();
+    const form = new FormData();
+    form.append('photo', file);
+    const response = await fetch(`${getBaseUrl()}/menus/${menuId}/photo`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    let payload = null;
+    try { payload = await response.json(); } catch (_) {}
+    if (!response.ok) {
+      throw new Error(payload?.error?.message || `Upload foto menu gagal (${response.status})`);
+    }
+    return payload?.data ?? payload;
+  }
+
   function listAllOrders(params = {}) {
     const query = new URLSearchParams();
     if (params.status) query.set("status", params.status);
@@ -244,6 +274,7 @@ const ApiClient = (() => {
     getKantins,
     getMenuById,
     getMenus,
+    getMe,
     getOrder,
     getOrderByKantin,
     getToken,
@@ -260,6 +291,7 @@ const ApiClient = (() => {
     updateOrderStatus,
     updateProfile,
     uploadAvatar,
+    uploadMenuPhoto,
   };
 })();
 
