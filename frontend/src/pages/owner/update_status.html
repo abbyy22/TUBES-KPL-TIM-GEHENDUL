@@ -11,18 +11,6 @@
       </h1>
       <p id="dashboard-date" class="text-xs text-brand-muted mt-0.5"></p>
     </div>
-    <div
-      class="flex items-center gap-2.5 bg-brand-bg border border-[#DDD0C4] rounded-full px-5 py-2.5 w-80"
-    >
-      <i data-lucide="search"></i>
-      <input
-        class="border-none bg-transparent outline-none text-sm text-brand-mid w-full placeholder-brand-muted"
-        type="text"
-        placeholder="Search"
-        id="searchInput"
-        oninput="filterOrders()"
-      />
-    </div>
   </header>
 
   <main class="flex flex-col gap-3.5 flex-1">
@@ -53,114 +41,9 @@
       </div>
     </div>
 
-    <div
-      class="flex items-center gap-2.5 p-3 px-4 rounded-full"
-      style="
-        background: #f7f2ea;
-        border: 1px solid #ddd0c4;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      "
-    >
-      <input
-        type="text"
-        id="inp-menu"
-        placeholder="Nama menu (cth: Nasi Goreng)"
-        class="flex-1 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted"
-      />
-      <input
-        type="text"
-        id="inp-jml"
-        placeholder="Jml"
-        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center"
-        style="border-left: 1px solid #ddd0c4"
-      />
-      <input
-        type="text"
-        id="inp-meja"
-        placeholder="Meja"
-        class="w-16 bg-transparent border-none outline-none text-sm text-brand-mid placeholder-brand-muted text-center"
-        style="border-left: 1px solid #ddd0c4"
-      />
-      <button
-        class="bg-brand-primary hover:bg-brand-light text-white font-bold text-xs px-5 py-2 rounded-full flex items-center gap-1.5 shrink-0"
-        style="background-color: #c05a1f; color: #fff"
-        onmouseover="this.style.backgroundColor = '#E8784A'"
-        onmouseout="this.style.backgroundColor = '#C05A1F'"
-        onclick="openModal()"
-      >
-        <i data-lucide="plus" class="text-white w-4 h-4"></i>
-        Tambah Pesanan
-      </button>
-    </div>
 
     <div class="grid grid-cols-4 gap-3.5 items-start flex-1" id="kanban"></div>
   </main>
-</div>
-
-<div
-  class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center"
-  id="modal"
->
-  <div
-    class="bg-brand-sidebar rounded-lg-custom p-6 w-full max-w-sm border border-black/10 shadow-xl"
-  >
-    <h2 class="text-base font-bold text-brand-mid mb-4">Tambah Pesanan</h2>
-    <div class="space-y-3">
-      <div>
-        <label
-          class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
-          >Nama Menu</label
-        >
-        <input
-          type="text"
-          id="m-menu"
-          placeholder="cth: Nasi Goreng, Es Teh"
-          class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
-        />
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label
-            class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
-            >Jumlah</label
-          >
-          <input
-            type="number"
-            id="m-jml"
-            placeholder="1"
-            min="1"
-            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
-          />
-        </div>
-        <div>
-          <label
-            class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1"
-            >Nomor Meja</label
-          >
-          <input
-            type="text"
-            id="m-meja"
-            placeholder="cth: 3"
-            class="w-full text-sm bg-white border border-[#DDD0C4] rounded-xl px-4 py-2 outline-none text-brand-mid"
-          />
-        </div>
-      </div>
-    </div>
-    <div class="flex justify-end gap-2 mt-6">
-      <button
-        class="px-4 py-2 border border-[#DDD0C4] bg-white hover:bg-gray-50 rounded-xl text-xs font-bold text-brand-mid transition-colors"
-        onclick="closeModal()"
-      >
-        Batal
-      </button>
-      <button
-        class="px-5 py-2 bg-brand-primary hover:bg-brand-light rounded-xl text-xs font-bold text-white transition-colors"
-        onclick="addOrder()"
-      >
-        Tambah
-      </button>
-    </div>
-  </div>
 </div>
 
 <div
@@ -303,10 +186,6 @@
       } catch (err) {
         showToast(err.message || "Gagal memperbarui status");
       }
-    };
-
-    window.filterOrders = function () {
-      render(document.getElementById("searchInput").value);
     };
 
     window.openModal = function () {
