@@ -14,6 +14,7 @@ function mapMenuRow(r) {
     emoji: r.emoji,
     description: r.description,
     available: r.available === 1,
+    photo_url: r.photo_url || null,
     created_at: r.created_at,
     updated_at: r.updated_at,
   };
@@ -21,7 +22,7 @@ function mapMenuRow(r) {
 
 const SELECT_MENU = `
   SELECT m.id, m.kantin_id, k.name AS kantin_name, m.name, m.price, m.emoji,
-         m.description, m.available, m.created_at, m.updated_at
+         m.description, m.available, m.photo_url, m.created_at, m.updated_at
   FROM menus m
   JOIN kantins k ON k.id = m.kantin_id
 `;
