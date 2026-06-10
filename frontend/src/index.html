@@ -65,6 +65,9 @@
     <script src="./js/siswa/orderStateMachine.js"></script>
     <script src="./js/siswa/cart.js"></script>
     <script src="./js/siswa/ui.js"></script>
+    <script src="./js/shared/renderCollection.js"></script>
+    <script src="./js/shared/orderStatusMeta.js"></script>
+    <script src="./js/account.js"></script>
 
     <script src="./js/owner/edit-menu.js"></script>
 
@@ -121,6 +124,13 @@
         // Real-time order status – notify pelanggan
         window.socket.on("order:status", (payload) => {
           console.log("[socket.io] order:status received:", payload);
+          if (window.AccountPage && CURRENT_ROLE === "siswa") {
+            window.AccountPage.addNotification({
+              title: `Status pesanan #${payload.orderId}`,
+              message: `Pesanan kamu sekarang ${payload.status}.`,
+            });
+            window.AccountPage.renderNotifications?.();
+          }
           // If kanban (owner status page) is rendered, refresh it
           if (
             typeof window.render === "function" &&
@@ -204,7 +214,10 @@
           if (typeof lucide !== "undefined") lucide.createIcons();
 
           const avatar = document.getElementById("sidebar-avatar");
-          if (avatar) avatar.src = "./assets/profile.png";
+          if (avatar)
+            avatar.src =
+              localStorage.getItem("telfood.profilePhoto") ||
+              "./assets/profile.png";
           const sidebarName = document.getElementById("sidebar-user-name");
           const sidebarEmail = document.getElementById("sidebar-user-email");
           if (CURRENT_USER && sidebarName)

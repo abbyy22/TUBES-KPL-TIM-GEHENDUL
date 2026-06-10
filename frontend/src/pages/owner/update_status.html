@@ -322,7 +322,9 @@
     };
 
     window.closeModal = function () {
-      document.getElementById("modal").classList.add("hidden");
+      const modal = document.getElementById("modal");
+      if (!modal) return;
+      modal.classList.add("hidden");
     };
 
     window.addOrder = function () {
