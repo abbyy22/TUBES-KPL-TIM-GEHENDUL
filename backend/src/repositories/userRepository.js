@@ -31,7 +31,7 @@ async function findByEmail(email) {
 
 async function findPublicById(id) {
   const [rows] = await pool.query(
-    "SELECT id, name, email, role, created_at FROM users WHERE id = ?",
+    "SELECT id, name, email, role, photo_url, created_at FROM users WHERE id = ?",
     [id],
   );
   return rows[0] || null;

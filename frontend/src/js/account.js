@@ -1,31 +1,38 @@
+/**
+ * account.js
+ *
+ * Mengelola halaman Profil — dua varian:
+ *  - AccountPage.init()       → profil Siswa/Pelanggan (foto, edit data, riwayat, notifikasi)
+ *  - AccountPage.initOwner()  → profil Owner/Penjual  (foto, edit data, info kantin, statistik)
+ *
+ * Teknik: Parameterization (initProfileForm/initPhotoPicker dipakai keduanya),
+ *         Code reuse (shared helpers formatRp, formatDate, getAvatarUrl, dll.)
+ */
 const AccountPage = (() => {
-  const PROFILE_PHOTO_KEY = "telfood.profilePhoto";
+  // ─── Konstanta ──────────────────────────────────────────────────────────────
   const NOTIFICATIONS_KEY = "telfood.notifications";
-  const DEFAULT_AVATAR = "./assets/profile.png";
+  const DEFAULT_AVATAR    = "./assets/profile.png";
 
+  // ══════════════════════════════════════════════════════════════════════════════
+  // SHARED HELPERS
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  // ─── Notifikasi ─────────────────────────────────────────────────────────────
   function getNotifications() {
-    try {
-      return JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY) || "[]");
-    } catch (err) {
-      return [];
-    }
+    try { return JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY) || "[]"); }
+    catch (_) { return []; }
   }
 
-  function saveNotifications(notifications) {
-    localStorage.setItem(
-      NOTIFICATIONS_KEY,
-      JSON.stringify(notifications.slice(0, 20)),
-    );
+  function saveNotifications(list) {
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(list.slice(0, 20)));
   }
 
   function addNotification(notification) {
-    const notifications = getNotifications();
-    saveNotifications([
-      { id: Date.now(), read: false, ...notification },
-      ...notifications,
-    ]);
+    const list = getNotifications();
+    saveNotifications([{ id: Date.now(), read: false, ...notification }, ...list]);
   }
 
+  // ─── Formatters ─────────────────────────────────────────────────────────────
   function formatRp(n) {
     return "Rp " + Number(n || 0).toLocaleString("id-ID");
   }
@@ -36,17 +43,122 @@ const AccountPage = (() => {
     return Number.isNaN(d.getTime())
       ? ""
       : d.toLocaleDateString("id-ID", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric",
+          weekday: "long", day: "numeric", month: "long", year: "numeric",
         });
   }
 
-  function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value || "—";
+  // ─── Foto Profil ─────────────────────────────────────────────────────────────
+  function getAvatarUrl() {
+    const user = ApiClient.getUser();
+    return user?.photo_url || DEFAULT_AVATAR;
   }
+
+  function syncProfilePhoto() {
+    const url = getAvatarUrl();
+    const profileImg    = document.getElementById("profile-photo");
+    const sidebarAvatar = document.getElementById("sidebar-avatar");
+    if (profileImg)    profileImg.src    = url;
+    if (sidebarAvatar) sidebarAvatar.src = url;
+  }
+
+  /**
+   * Inisialisasi tombol Edit Foto — shared antara siswa & owner.
+   * Upload ke backend; preview lokal dulu sebelum upload selesai.
+   */
+  function initPhotoPicker() {
+    const btn   = document.getElementById("edit-photo-btn");
+    const input = document.getElementById("profile-photo-input");
+    const msg   = document.getElementById("profile-message");
+    if (!btn || !input) return;
+
+    btn.addEventListener("click", () => input.click());
+
+    input.addEventListener("change", async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      // Preview lokal dulu (responsif)
+      const reader = new FileReader();
+      reader.onload = () => {
+        const profileImg    = document.getElementById("profile-photo");
+        const sidebarAvatar = document.getElementById("sidebar-avatar");
+        if (profileImg)    profileImg.src    = reader.result;
+        if (sidebarAvatar) sidebarAvatar.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+
+      if (!ApiClient.isAuthenticated()) return;
+
+      btn.textContent = "Mengupload...";
+      btn.disabled    = true;
+      try {
+        await ApiClient.uploadAvatar(file);
+        syncProfilePhoto();
+        if (msg) { msg.textContent = "Foto profil berhasil diperbarui."; msg.style.color = "#16a34a"; }
+      } catch (err) {
+        if (msg) { msg.textContent = "Gagal upload foto: " + err.message; msg.style.color = "#ef4444"; }
+      } finally {
+        btn.textContent = "Edit Foto";
+        btn.disabled    = false;
+      }
+    });
+  }
+
+  /**
+   * Inisialisasi form edit profil (nama + password) — shared antara siswa & owner.
+   */
+  function initProfileForm(user) {
+    const nameInput  = document.getElementById("profile-name-input");
+    const emailInput = document.getElementById("profile-email-input");
+    const form       = document.getElementById("profile-form");
+    const message    = document.getElementById("profile-message");
+
+    if (nameInput)  nameInput.value  = user?.name  || "";
+    if (emailInput) emailInput.value = user?.email || "";
+
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!ApiClient.isAuthenticated()) return;
+
+      const name        = nameInput?.value.trim();
+      const curPassword = document.getElementById("current-password")?.value;
+      const newPassword = document.getElementById("new-password")?.value;
+
+      if (!name && !newPassword) {
+        if (message) { message.textContent = "Isi nama atau password baru untuk menyimpan."; message.style.color = "#ef4444"; }
+        return;
+      }
+
+      const payload = {};
+      if (name) payload.name = name;
+      if (newPassword) {
+        payload.current_password = curPassword || "";
+        payload.new_password     = newPassword;
+      }
+
+      const submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Menyimpan..."; }
+
+      try {
+        const updated = await ApiClient.updateProfile(payload);
+        const sidebarName = document.getElementById("sidebar-user-name");
+        if (sidebarName) sidebarName.textContent = updated.name || user?.name;
+        if (nameInput)  nameInput.value  = updated.name  || "";
+        if (emailInput) emailInput.value = updated.email || "";
+        if (document.getElementById("current-password")) document.getElementById("current-password").value = "";
+        if (document.getElementById("new-password"))     document.getElementById("new-password").value     = "";
+        if (message) { message.textContent = "✓ Profil berhasil diperbarui."; message.style.color = "#16a34a"; }
+      } catch (err) {
+        if (message) { message.textContent = err.message; message.style.color = "#ef4444"; }
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Simpan perubahan"; }
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // SISWA — Riwayat Pesanan & Notifikasi
+  // ══════════════════════════════════════════════════════════════════════════════
 
   function renderHistory(orders) {
     const container = document.getElementById("history-container");
@@ -59,22 +171,21 @@ const AccountPage = (() => {
         const itemsHtml =
           Array.isArray(order.items) && order.items.length
             ? order.items
-                .map(
-                  (it) =>
-                    `<p class="text-sm text-gray-700">${it.quantity}x <span class="font-medium">${it.menu_name}</span></p>`,
-                )
+                .map((it) => `<p class="text-sm text-gray-700">${it.quantity}x <span class="font-medium">${it.menu_name}</span></p>`)
                 .join("")
             : `<p class="text-sm text-gray-700">Pesanan #${order.id}</p>`;
-        const meta = getOrderStatusMeta(order.status);
+
+        const meta  = getOrderStatusMeta(order.status);
         const color = meta.color;
 
         return `
         <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[#C1500E] transition-colors">
           <div class="flex items-start justify-between gap-4">
-            <div>${itemsHtml}</div>
-            <div class="text-right">
+            <div class="flex-1">${itemsHtml}</div>
+            <div class="text-right shrink-0">
               <p class="text-xs text-gray-400 mt-0.5">${formatDate(order.created_at)}</p>
-              <span class="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full" style="color:${color};background:${color}15">${meta.label}</span>
+              <span class="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full"
+                style="color:${color};background:${color}18">${meta.label}</span>
             </div>
           </div>
           <div class="flex justify-between mt-3 pt-3 border-t border-gray-100">
@@ -87,16 +198,34 @@ const AccountPage = (() => {
     );
   }
 
+  async function loadHistory() {
+    const container = document.getElementById("history-container");
+    if (!container) return [];
+
+    container.innerHTML = '<p class="text-sm text-gray-400 italic text-center py-8 animate-pulse">Memuat riwayat...</p>';
+    if (!ApiClient.isAuthenticated()) {
+      container.innerHTML = '<p class="text-sm text-gray-400 italic text-center py-8">Login untuk melihat riwayat</p>';
+      return [];
+    }
+
+    const summaries = await ApiClient.listMyOrders();
+    const orders    = await Promise.all(
+      summaries.map((o) => ApiClient.getOrder(o.id).catch(() => o)),
+    );
+    renderHistory(orders);
+    return orders;
+  }
+
   function renderNotifications() {
     const container = document.getElementById("notification-list");
-    const badge = document.getElementById("notification-badge");
+    const badge     = document.getElementById("notification-badge");
     if (!container) return;
 
     const notifications = getNotifications();
-    const unreadCount = notifications.filter((item) => !item.read).length;
+    const unread        = notifications.filter((n) => !n.read).length;
     if (badge) {
-      badge.textContent = unreadCount;
-      badge.classList.toggle("hidden", unreadCount === 0);
+      badge.textContent = unread > 9 ? "9+" : String(unread);
+      badge.classList.toggle("hidden", unread === 0);
     }
 
     renderCollection(
@@ -111,90 +240,14 @@ const AccountPage = (() => {
     );
   }
 
-  function syncProfilePhoto() {
-    const photo = localStorage.getItem(PROFILE_PHOTO_KEY) || DEFAULT_AVATAR;
-    const img = document.getElementById("profile-photo");
-    if (img) img.src = photo;
-    const sidebarAvatar = document.getElementById("sidebar-avatar");
-    if (sidebarAvatar) sidebarAvatar.src = photo;
-  }
-
-  function initProfileForm(user) {
-    const nameInput = document.getElementById("profile-name-input");
-    const emailInput = document.getElementById("profile-email-input");
-    const form = document.getElementById("profile-form");
-    const message = document.getElementById("profile-message");
-
-    if (nameInput) nameInput.value = user?.name || "";
-    if (emailInput) emailInput.value = user?.email || "";
-    setText("profile-name-text", user?.name);
-    setText("profile-email-text", user?.email);
-
-    form?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!ApiClient.isAuthenticated()) return;
-      const payload = {
-        name: nameInput?.value.trim(),
-        current_password: document.getElementById("current-password")?.value,
-        new_password: document.getElementById("new-password")?.value,
-      };
-      if (!payload.new_password) {
-        delete payload.current_password;
-        delete payload.new_password;
-      }
-      try {
-        const updated = await ApiClient.updateProfile(payload);
-        const sidebarName = document.getElementById("sidebar-user-name");
-        if (sidebarName) sidebarName.textContent = updated.name;
-        setText("profile-name-text", updated.name);
-        if (message) message.textContent = "Profil berhasil diperbarui.";
-        form.reset();
-        if (nameInput) nameInput.value = updated.name || "";
-        if (emailInput) emailInput.value = updated.email || "";
-      } catch (err) {
-        if (message) message.textContent = err.message;
-      }
-    });
-  }
-
-  function initPhotoPicker() {
-    const input = document.getElementById("profile-photo-input");
-    document
-      .getElementById("edit-photo-btn")
-      ?.addEventListener("click", () => input?.click());
-    input?.addEventListener("change", () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        localStorage.setItem(PROFILE_PHOTO_KEY, reader.result);
-        syncProfilePhoto();
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  async function loadHistory() {
-    const container = document.getElementById("history-container");
-    if (!container) return [];
-    container.innerHTML =
-      '<p class="text-sm text-gray-400 italic text-center py-8">Memuat riwayat...</p>';
-    if (!ApiClient.isAuthenticated()) {
-      container.innerHTML =
-        '<p class="text-sm text-gray-400 italic text-center py-8">Login untuk melihat riwayat</p>';
-      return [];
-    }
-    const summaries = await ApiClient.listMyOrders();
-    const orders = await Promise.all(
-      summaries.map((o) => ApiClient.getOrder(o.id).catch(() => o)),
-    );
-    renderHistory(orders);
-    return orders;
-  }
-
+  /**
+   * Init halaman Profil SISWA.
+   * Berisi: foto, edit profil, riwayat pesanan, notifikasi.
+   */
   async function init() {
     const user = ApiClient.getUser();
     let orders = [];
+
     syncProfilePhoto();
     initPhotoPicker();
     initProfileForm(user);
@@ -205,39 +258,98 @@ const AccountPage = (() => {
     } catch (err) {
       const container = document.getElementById("history-container");
       if (container)
-        container.innerHTML = `<p class="text-sm text-red-400 italic text-center py-8">Gagal memuat: ${err.message}</p>`;
+        container.innerHTML = `<p class="text-sm text-red-400 italic text-center py-8">Gagal memuat riwayat: ${err.message}</p>`;
     }
 
-    document.getElementById("search")?.addEventListener("input", (event) => {
-      const keyword = event.target.value.toLowerCase();
+    // Pencarian riwayat
+    document.getElementById("search")?.addEventListener("input", (e) => {
+      const keyword = e.target.value.toLowerCase();
       const filtered = keyword
         ? orders.filter(
-            (order) =>
-              String(order.id).includes(keyword) ||
-              (order.items || []).some((item) =>
-                item.menu_name.toLowerCase().includes(keyword),
-              ),
+            (o) =>
+              String(o.id).includes(keyword) ||
+              (o.items || []).some((it) => it.menu_name.toLowerCase().includes(keyword)),
           )
         : orders;
       renderHistory(filtered);
     });
 
-    document
-      .getElementById("notification-btn")
-      ?.addEventListener("click", () => {
-        document
-          .getElementById("notification-panel")
-          ?.classList.toggle("hidden");
-        const marked = getNotifications().map((item) => ({
-          ...item,
-          read: true,
-        }));
-        saveNotifications(marked);
-        renderNotifications();
-      });
+    // Panel notifikasi
+    document.getElementById("notification-btn")?.addEventListener("click", () => {
+      document.getElementById("notification-panel")?.classList.toggle("hidden");
+      saveNotifications(getNotifications().map((n) => ({ ...n, read: true })));
+      renderNotifications();
+    });
+
+    // Tutup notifikasi klik di luar
+    document.addEventListener("click", (e) => {
+      const panel = document.getElementById("notification-panel");
+      const btn   = document.getElementById("notification-btn");
+      if (panel && !panel.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
+        panel.classList.add("hidden");
+      }
+    }, { capture: true });
   }
 
-  return { addNotification, init, renderNotifications, syncProfilePhoto };
+  // ══════════════════════════════════════════════════════════════════════════════
+  // OWNER — Info Kantin & Statistik
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  function fillEl(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? "—";
+  }
+
+  async function loadOwnerStats(kantinId) {
+    if (!kantinId) return;
+    try {
+      const orders = await ApiClient.listAllOrders({ kantin_id: kantinId });
+
+      const active  = orders.filter((o) => o.status !== "DONE").length;
+      const done    = orders.filter((o) => o.status === "DONE").length;
+      const revenue = orders
+        .filter((o) => o.status === "DONE")
+        .reduce((sum, o) => sum + Number(o.total_price || 0), 0);
+
+      fillEl("stat-total-orders",  orders.length);
+      fillEl("stat-active-orders", active);
+      fillEl("stat-done-orders",   done);
+      fillEl("stat-total-revenue", formatRp(revenue));
+    } catch (err) {
+      console.warn("[AccountPage] Gagal load statistik owner:", err.message);
+    }
+  }
+
+  /**
+   * Init halaman Profil OWNER.
+   * Berisi: foto, edit profil, info kantin, statistik ringkasan.
+   */
+  async function initOwner() {
+    const user = ApiClient.getUser();
+
+    syncProfilePhoto();
+    initPhotoPicker();
+    initProfileForm(user);
+
+    // Isi info kantin
+    fillEl("kantin-name-display", user?.kantin_name || "—");
+    fillEl("kantin-code-display", user?.kantin_code || "—");
+    fillEl("owner-role-display",  user?.role || "—");
+
+    // Load statistik
+    await loadOwnerStats(user?.kantin_id);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // PUBLIC API
+  // ══════════════════════════════════════════════════════════════════════════════
+  return {
+    addNotification,
+    init,
+    initOwner,
+    renderNotifications,
+    syncProfilePhoto,
+  };
 })();
 
 window.AccountPage = AccountPage;

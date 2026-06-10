@@ -190,6 +190,32 @@ const ApiClient = (() => {
     return user;
   }
 
+  /**
+   * Upload foto profil ke backend (POST /auth/avatar, multipart/form-data).
+   * @param {File} file
+   * @returns {Promise<{photo_url: string}>}
+   */
+  async function uploadAvatar(file) {
+    const token = getToken();
+    const form = new FormData();
+    form.append('photo', file);
+    const response = await fetch(`${getBaseUrl()}/auth/avatar`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    let payload = null;
+    try { payload = await response.json(); } catch (_) {}
+    if (!response.ok) {
+      throw new Error(payload?.error?.message || `Upload gagal (${response.status})`);
+    }
+    const data = payload?.data ?? payload;
+    // Simpan photo_url terbaru ke session
+    const current = getUser() || {};
+    saveSession({ token, user: { ...current, photo_url: data.photo_url } });
+    return data;
+  }
+
   function listAllOrders(params = {}) {
     const query = new URLSearchParams();
     if (params.status) query.set("status", params.status);
@@ -233,6 +259,7 @@ const ApiClient = (() => {
     updateMenu,
     updateOrderStatus,
     updateProfile,
+    uploadAvatar,
   };
 })();
 

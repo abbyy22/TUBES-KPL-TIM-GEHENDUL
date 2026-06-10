@@ -18,8 +18,10 @@ function toPublicUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
+    photo_url: user.photo_url || null,
     kantin_id: user.kantin_id,
     kantin_name: user.kantin_name,
+    kantin_code: user.kantin_code || null,
     created_at: user.created_at,
   };
 }
@@ -35,6 +37,7 @@ function createSession(user) {
     name: publicUser.name,
     kantin_id: publicUser.kantin_id,
     kantin_name: publicUser.kantin_name,
+    kantin_code: publicUser.kantin_code,
   });
 
   postcondition(isNonEmptyString(token), "Token gagal dibuat");
