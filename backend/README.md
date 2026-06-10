@@ -24,22 +24,28 @@ backend/
 ├── scripts/
 │   ├── initDb.js               # Jalankan schema.sql
 │   ├── seedDb.js               # Jalankan seed.sql
-│   └── migratePhotos.js        # Jalankan migrate_add_photos.sql
+│   ├── migratePhotos.js        # Jalankan migrate_add_photos.sql
+│   ├── seedPhotos.js           # Jalankan seed default photo_url untuk demo
+│   └── seedTodayOrders.js      # Jalankan seed order hari ini untuk simulasi
 ├── uploads/                    # Folder penyimpanan foto (gitignore'd)
 │   ├── avatars/                # Foto profil user
 │   └── menus/                  # Foto menu
 ├── src/
-│   ├── config/                 # env.js, db.js (mysql2 pool)
-│   ├── controllers/            # auth, kantin, menu, order, upload
-│   ├── middleware/             # auth (JWT + role), errorHandler, upload (Multer)
-│   ├── routes/                 # /api/auth, /api/kantins, /api/menus, /api/orders
-│   ├── utils/                  # ApiError, asyncHandler, jwt, orderStateMachine
-│   ├── validators/             # input validators
-│   ├── app.js                  # Express app
-│   └── index.js                # Server entry
-├── .env.example
-├── package.json
-└── README.md
+│   ├── app.js                  # Setup Express app, middleware, Socket.io, & router
+│   ├── index.js                # Server entry point, inisialisasi server HTTP & Socket.io
+│   ├── config/                 # env.js (variabel lingkungan), db.js (koneksi MySQL pool)
+│   ├── controllers/            # Controller logic (auth, kantin, menu, order, upload)
+│   ├── middleware/             # Middleware (auth JWT/role, errorHandler, security, upload Multer)
+│   ├── repositories/           # Akses langsung ke database (userRepository)
+│   ├── routes/                 # Routing endpoint API (/api/auth, /api/kantins, /api/menus, /api/orders)
+│   ├── services/               # Logic bisnis terisolasi (authService)
+│   ├── utils/                  # Helper & utilitas (ApiError, asyncHandler, contract DbC, jwt, FSM)
+│   └── validators/             # Skema validasi skema input (auth, menu, order)
+├── test/
+│   └── validators.test.js      # Pengujian unit untuk validator backend
+├── .env.example                # Templat konfigurasi env
+├── package.json                # Pengelolaan dependencies & scripts backend
+└── README.md                   # Dokumentasi backend ini
 ```
 
 ## Setup
@@ -212,7 +218,7 @@ Error:
 
 ## Teknik Konstruksi Perangkat Lunak
 
-Berikut adalah lima teknik konstruksi perangkat lunak yang diterapkan dalam backend ini beserta lokasi dan penjelasan masing-masing.
+Berikut adalah enam teknik konstruksi perangkat lunak yang diterapkan dalam backend ini beserta lokasi dan penjelasan masing-masing.
 
 ---
 
@@ -402,6 +408,7 @@ app.use(morgan(config.env === 'development' ? 'dev' : 'combined'));
 | `bcryptjs` | Hash & compare password | `controllers/authController.js` |
 | `joi` | Schema validation | `validators/menuValidator.js`, `authValidator.js`, `orderValidator.js` |
 | `cors` | CORS middleware siap pakai | `app.js` |
+| `multer` | Handler upload multipart/form-data (foto) | `middleware/upload.js` |
 | `morgan` | HTTP request logger | `app.js` |
 | `socket.io` | Real-time WebSocket server | `app.js` |
 | `dotenv` | Loader variabel lingkungan | `config/env.js` |
@@ -429,4 +436,37 @@ router.post('/', asyncHandler(menuController.create));
 ```js
 // Cukup satu import dari satu tempat
 const { validateRegister, validateMenuInput, validateOrderInput } = require('../validators');
+```
+
+---
+
+### f. Design by Contract (DbC)
+
+**Lokasi:** `src/utils/contract.js` dan `src/services/authService.js`
+
+Backend ini menerapkan konsep **Design by Contract (DbC)** untuk memastikan kebenaran input (precondition), keluaran (postcondition), dan kondisi objek (invariant) sebelum dan sesudah suatu operasi bisnis dieksekusi.
+
+**1. Penegasan Precondition (Prasyarat)**
+Sebelum melakukan operasi register, sistem memeriksa kelayakan objek input:
+```js
+// src/services/authService.js
+precondition(
+  hasRequiredKeys(input, ["name", "email", "password"]),
+  "Data registrasi tidak lengkap"
+);
+precondition(isNonEmptyString(input.email), "Email wajib diisi");
+```
+
+**2. Penegasan Postcondition (Pasca-syarat)**
+Setelah token JWT digenerasikan, sistem memverifikasi keabsahan token yang dihasilkan sebelum dikembalikan ke client:
+```js
+// src/services/authService.js
+postcondition(isNonEmptyString(token), "Token gagal dibuat");
+```
+
+**3. Penegasan Invariant (Kondisi Konstan)**
+Memastikan kondisi bernilai benar (true) setelah operasi database selesai:
+```js
+// src/services/authService.js
+invariant(created.id > 0, "User gagal dibuat");
 ```
