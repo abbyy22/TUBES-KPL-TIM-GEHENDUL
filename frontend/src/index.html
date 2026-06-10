@@ -338,11 +338,9 @@
           }
 
           if (pageName === "owner-dashboard") {
-            console.log("Owner Dashboard Stats Loaded");
             const user = CURRENT_USER;
             const kantinTitle = document.getElementById("kantin-title");
-            console.log(user);
-            if (user.role == "penjual" && kantinTitle) {
+            if (CURRENT_ROLE === "owner" && kantinTitle) {
               kantinTitle.textContent =
                 CURRENT_USER?.kantin_name ||
                 CURRENT_USER?.name ||
@@ -350,29 +348,29 @@
             }
 
             try {
-              const res = await ApiClient.getOrderByKantin(
+              const orders = await ApiClient.getOrderByKantin(
                 CURRENT_USER.kantin_id,
               );
-              console.log(res);
-              const orders = res;
               const totalTransactions = orders.length;
-              // const omzetToday = orders.reduce((sum, order) => {
-              //   const createdAt = new Date(order.created_at);
-              //   const today = new Date();
-              //   if (
-              //     createdAt.getDate() === today.getDate() &&
-              //     createdAt.getMonth() === today.getMonth() &&
-              //     createdAt.getFullYear() === today.getFullYear()
-              //   ) {
-              //     return sum + Number(order.total_price);
-              //   }
-              //   return sum;
-              // }, 0);
 
-              // const omzetElement = document.getElementById("omzet-hari-ini");
-              // if (omzetElement) {
-              //   omzetElement.textContent = `Rp ${Utils.formatCurrency(omzetToday)}`;
-              // }
+              const today = new Date();
+              const omzetToday = orders.reduce((sum, order) => {
+                const createdAt = new Date(order.created_at);
+                if (
+                  createdAt.getDate() === today.getDate() &&
+                  createdAt.getMonth() === today.getMonth() &&
+                  createdAt.getFullYear() === today.getFullYear() &&
+                  order.status === "DONE"
+                ) {
+                  return sum + Number(order.total_price);
+                }
+                return sum;
+              }, 0);
+
+              const omzetElement = document.getElementById("omzet-hari-ini");
+              if (omzetElement) {
+                omzetElement.textContent = "Rp " + omzetToday.toLocaleString("id-ID");
+              }
 
               const totalTransaksiElement =
                 document.getElementById("total-transaksi");
@@ -384,11 +382,9 @@
             }
           }
           if (pageName === "owner-menu") {
-            console.log("Owner Dashboard Stats Loaded");
             const user = CURRENT_USER;
             const kantinTitle = document.getElementById("kantin-title");
-            console.log(user);
-            if (user.role == "penjual" && kantinTitle) {
+            if (CURRENT_ROLE === "owner" && kantinTitle) {
               kantinTitle.textContent =
                 CURRENT_USER?.kantin_name ||
                 CURRENT_USER?.name ||
@@ -396,14 +392,12 @@
             }
             setTimeout(() => {
               if (typeof renderMenu === "function") renderMenu();
-            }, 1000); // Tunggu 100ms
+            }, 100);
           }
           if (pageName === "owner-status" && typeof initKanban === "function") {
-            console.log("Owner Dashboard Stats Loaded");
             const user = CURRENT_USER;
             const kantinTitle = document.getElementById("kantin-title");
-            console.log(user);
-            if (user.role == "penjual" && kantinTitle) {
+            if (CURRENT_ROLE === "owner" && kantinTitle) {
               kantinTitle.textContent =
                 CURRENT_USER?.kantin_name ||
                 CURRENT_USER?.name ||
