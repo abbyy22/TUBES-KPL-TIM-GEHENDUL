@@ -63,6 +63,11 @@ async function getMenu(req, res) {
 async function createMenu(req, res) {
   const input = validateMenuInput(req.body, { partial: false });
 
+  // Owner hanya boleh membuat menu untuk kantinnya sendiri
+  if (req.user.kantin_id && Number(req.user.kantin_id) !== Number(input.kantin_id)) {
+    throw ApiError.forbidden('Tidak boleh menambah menu untuk kantin lain');
+  }
+
   const [kantin] = await pool.query('SELECT id FROM kantins WHERE id = ?', [input.kantin_id]);
   if (kantin.length === 0) throw ApiError.badRequest('Kantin tidak ditemukan');
 
@@ -94,6 +99,15 @@ async function createMenu(req, res) {
 async function updateMenu(req, res) {
   const id = parseInt(req.params.id, 10);
   if (!isPositiveInt(id)) throw ApiError.badRequest('id menu tidak valid');
+
+  // Cek kepemilikan: owner hanya boleh update menu kantinnya sendiri
+  if (req.user.kantin_id) {
+    const [check] = await pool.query('SELECT kantin_id FROM menus WHERE id = ?', [id]);
+    if (check.length === 0) throw ApiError.notFound('Menu tidak ditemukan');
+    if (Number(check[0].kantin_id) !== Number(req.user.kantin_id)) {
+      throw ApiError.forbidden('Tidak boleh mengubah menu kantin lain');
+    }
+  }
 
   const input = validateMenuInput(req.body, { partial: true });
   const keys = Object.keys(input);
@@ -128,10 +142,15 @@ async function deleteMenu(req, res) {
   const id = parseInt(req.params.id, 10);
   if (!isPositiveInt(id)) throw ApiError.badRequest('id menu tidak valid');
 
-  // Fetch before delete to get kantin_id for socket emit
+  // Fetch before delete to get kantin_id for socket emit and ownership check
   const [rows] = await pool.query(SELECT_MENU + ' WHERE m.id = ?', [id]);
   if (rows.length === 0) throw ApiError.notFound('Menu tidak ditemukan');
   const menuData = mapMenuRow(rows[0]);
+
+  // Cek kepemilikan: owner hanya boleh hapus menu kantinnya sendiri
+  if (req.user.kantin_id && Number(req.user.kantin_id) !== Number(menuData.kantin_id)) {
+    throw ApiError.forbidden('Tidak boleh menghapus menu kantin lain');
+  }
 
   const [result] = await pool.query('DELETE FROM menus WHERE id = ?', [id]);
   if (result.affectedRows === 0) throw ApiError.notFound('Menu tidak ditemukan');
