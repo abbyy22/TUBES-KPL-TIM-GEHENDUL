@@ -66,17 +66,15 @@ Smart Canteen adalah aplikasi web yang memungkinkan pelanggan memesan makanan da
 
 | Nama | Halaman | DbC | Teknik 1 | Teknik 2 |
 |------|---------|-----|----------|----------|
-| Fatikhah Sukma Arti | Dashboard, Edit Menu | ✅ | Table-driven construction | Code reuse / Library |
-| Ryvanda | Status Pesanan (Kanban) | ✅ | Parameterization / Generics | Runtime configuration |
+| Fatikhah Sukma Arti | Dashboard, Edit Menu | ✅ | Table-driven construction | Parameterization / Generics  |
+| Ryvanda | Status Pesanan (Kanban) | ✅ | API | Runtime configuration |
 
 ### 🧑‍💻 Page Pelanggan
 
 | Nama | Halaman | DbC | Teknik 1 | Teknik 2 |
 |------|---------|-----|----------|----------|
 | Abidah Fatimatuzzahrahh | Dashboard, Booking | ✅ | Automata | Code reuse / Library |
-| Najwa Areefa Ghaisani | Dashboard, Booking | ✅ | API | Parameterization / Generics |
-
-> Setiap anggota juga menerapkan **Defensive Programming / Design by Contract (DbC)** pada bagian kode yang dikerjakan masing-masing.
+| Najwa Areefa Ghaisani | Dashboard, Booking | ✅ | Code reuse / Library | Parameterization / Generics |
 
 ---
 
@@ -159,15 +157,13 @@ npm install
 npm run dev
 ```
 
-> Pastikan MySQL sudah berjalan dan konfigurasi `.env` sudah diisi.
-
 ### Frontend
 
 ```bash
 cd frontend
 npm install
-npm run dev    # Build Tailwind CSS (watch mode)
-npm run serve  # Jalankan server di http://localhost:8080
+npm run dev    
+npm run serve  
 ```
 
 ---
