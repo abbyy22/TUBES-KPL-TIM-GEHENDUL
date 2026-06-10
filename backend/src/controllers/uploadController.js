@@ -124,9 +124,14 @@ async function uploadMenuPhoto(req, res) {
 
   const url = buildPublicUrl(SUBFOLDER.menuPhoto, req.file.filename, req);
 
-  // Ambil foto lama
-  const [rows] = await pool.query('SELECT photo_url FROM menus WHERE id = ?', [menuId]);
+  // Ambil foto lama + cek kepemilikan kantin
+  const [rows] = await pool.query('SELECT photo_url, kantin_id FROM menus WHERE id = ?', [menuId]);
   if (rows.length === 0) throw ApiError.notFound('Menu tidak ditemukan');
+
+  if (req.user.kantin_id && Number(req.user.kantin_id) !== Number(rows[0].kantin_id)) {
+    throw ApiError.forbidden('Tidak boleh mengubah foto menu kantin lain');
+  }
+
   const oldUrl = rows[0].photo_url;
 
   // Update DB
@@ -164,8 +169,12 @@ async function deleteMenuPhoto(req, res) {
   const menuId = parseInt(req.params.id, 10);
   if (!menuId || menuId <= 0) throw ApiError.badRequest('id menu tidak valid');
 
-  const [rows] = await pool.query('SELECT photo_url FROM menus WHERE id = ?', [menuId]);
+  const [rows] = await pool.query('SELECT photo_url, kantin_id FROM menus WHERE id = ?', [menuId]);
   if (rows.length === 0) throw ApiError.notFound('Menu tidak ditemukan');
+
+  if (req.user.kantin_id && Number(req.user.kantin_id) !== Number(rows[0].kantin_id)) {
+    throw ApiError.forbidden('Tidak boleh menghapus foto menu kantin lain');
+  }
 
   const oldUrl = rows[0].photo_url;
   if (!oldUrl) throw ApiError.badRequest('Menu belum memiliki foto');
