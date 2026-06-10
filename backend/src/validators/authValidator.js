@@ -71,7 +71,7 @@ function validateRegister(body) {
     name: value.full_name, // map full_name → name (DB column)
     email: value.email,
     password: value.password,
-    role: "user", // default role for public register
+    // role TIDAK dikirim — selalu di-hardcode 'pelanggan' di service layer
   };
 }
 

@@ -46,7 +46,7 @@ function createSession(user) {
 
 async function registerUser(input) {
   precondition(
-    hasRequiredKeys(input, ["name", "email", "password", "role"]),
+    hasRequiredKeys(input, ["name", "email", "password"]),
     "Data registrasi tidak lengkap",
   );
   precondition(isNonEmptyString(input.email), "Email wajib diisi");
@@ -60,7 +60,7 @@ async function registerUser(input) {
     name: input.name,
     email: input.email,
     password_hash: passwordHash,
-    role: input.role,
+    role: "pelanggan", // selalu pelanggan — admin hanya bisa diset manual di DB
   });
 
   invariant(created.id > 0, "User gagal dibuat");
