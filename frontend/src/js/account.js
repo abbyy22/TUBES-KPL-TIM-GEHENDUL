@@ -11,7 +11,7 @@
 const AccountPage = (() => {
   // ─── Konstanta ──────────────────────────────────────────────────────────────
   const NOTIFICATIONS_KEY = "telfood.notifications";
-  const DEFAULT_AVATAR    = "./assets/profile.png";
+  const GRAY_PERSON_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af' style='background-color:%23e5e7eb;'><path fill-rule='evenodd' d='M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z' clip-rule='evenodd' /></svg>";
 
   // ══════════════════════════════════════════════════════════════════════════════
   // SHARED HELPERS
@@ -48,13 +48,11 @@ const AccountPage = (() => {
   }
 
   // ─── Foto Profil ─────────────────────────────────────────────────────────────
-  function getAvatarUrl() {
-    const user = ApiClient.getUser();
-    return user?.photo_url || DEFAULT_AVATAR;
-  }
-
   function syncProfilePhoto() {
-    const url = getAvatarUrl();
+    const user = ApiClient.getUser();
+    const role = ApiClient.normalizeRole(user?.role);
+    const url = role === "owner" ? GRAY_PERSON_SVG : (user?.photo_url || GRAY_PERSON_SVG);
+
     const profileImg    = document.getElementById("profile-photo");
     const sidebarAvatar = document.getElementById("sidebar-avatar");
     if (profileImg)    profileImg.src    = url;
@@ -89,8 +87,13 @@ const AccountPage = (() => {
 
       if (!ApiClient.isAuthenticated()) return;
 
-      btn.textContent = "Mengupload...";
-      btn.disabled    = true;
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = `
+        <svg class="animate-spin w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+      `;
+      btn.disabled = true;
       try {
         await ApiClient.uploadAvatar(file);
         syncProfilePhoto();
@@ -98,8 +101,8 @@ const AccountPage = (() => {
       } catch (err) {
         if (msg) { msg.textContent = "Gagal upload foto: " + err.message; msg.style.color = "#ef4444"; }
       } finally {
-        btn.textContent = "Edit Foto";
-        btn.disabled    = false;
+        btn.innerHTML = originalHTML;
+        btn.disabled  = false;
       }
     });
   }
@@ -328,7 +331,6 @@ const AccountPage = (() => {
     const user = ApiClient.getUser();
 
     syncProfilePhoto();
-    initPhotoPicker();
     initProfileForm(user);
 
     // Isi info kantin
