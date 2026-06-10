@@ -134,15 +134,30 @@
     </div>
 
     <!-- Riwayat Pesanan -->
-    <div class="w-full bg-[#F4EFE2] p-8 rounded-4xl shadow-2xl flex-1">
-      <h2 class="text-xl font-extrabold mb-6 text-gray-800">Riwayat Pesanan Harian</h2>
+    <div class="w-full bg-[#F4EFE2] rounded-4xl shadow-2xl flex-1 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div style="padding:22px 28px 16px;border-bottom:1px solid #EDE5D8;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:linear-gradient(135deg,#C05A1F,#E8784A);border-radius:10px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+            </div>
+            <div>
+              <h2 style="font-size:16px;font-weight:800;color:#1F2937;margin:0;line-height:1.2;">Riwayat Pesanan Harian</h2>
+              <p style="font-size:11px;color:#9E8E84;margin:2px 0 0;">Pesanan kamu hari ini</p>
+            </div>
+          </div>
+          <div id="history-count-badge" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(192,90,31,0.10);color:#C05A1F;">0 pesanan</div>
+        </div>
+      </div>
+      <!-- List -->
       <div
         id="history-container"
-        class="space-y-4 overflow-y-auto max-h-[62vh] pr-2
-               [&::-webkit-scrollbar]:w-2
-               [&::-webkit-scrollbar-thumb]:bg-gray-300
-               [&::-webkit-scrollbar-thumb]:rounded-full
-               [&::-webkit-scrollbar-track]:bg-transparent"
+        style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;max-height:62vh;"
       ></div>
     </div>
   </section>
