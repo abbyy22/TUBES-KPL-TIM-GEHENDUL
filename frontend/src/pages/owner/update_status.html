@@ -317,7 +317,7 @@
     (() => {
       const user =
         window.ApiClient && ApiClient.getUser ? ApiClient.getUser() : null;
-      const titleEl = document.querySelector("h1");
+      const titleEl = document.getElementById("kantin-title");
       if (titleEl && user) {
         titleEl.textContent = user.kantin_name || user.name || "Kantin";
       }

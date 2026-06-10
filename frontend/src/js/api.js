@@ -23,7 +23,8 @@ const ApiClient = (() => {
   }
 
   function normalizeRole(role) {
-    if (role === "admin" || role === "owner" || role === "penjual")
+    const normalized = String(role || "").trim().toLowerCase();
+    if (normalized === "admin" || normalized === "owner" || normalized === "penjual")
       return "owner";
     return "siswa";
   }
@@ -182,8 +183,7 @@ const ApiClient = (() => {
 
   async function getMe() {
     const user = await request("/auth/me");
-    const current = getUser() || {};
-    saveSession({ token: getToken(), user: { ...current, ...user } });
+    saveSession({ token: getToken(), user });
     return user;
   }
 
@@ -192,8 +192,7 @@ const ApiClient = (() => {
       method: "PATCH",
       body: profileData,
     });
-    const current = getUser() || {};
-    saveSession({ token: getToken(), user: { ...current, ...user } });
+    saveSession({ token: getToken(), user });
     return user;
   }
 

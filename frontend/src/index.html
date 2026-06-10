@@ -39,6 +39,7 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
       .sidebar-nav a.active-menu {
+        background-color: #E8D5C4 !important;
         color: #C1500E !important;
         font-weight: 600;
       }
@@ -60,8 +61,8 @@
     ></div>
 
     <script src="./js/api.js"></script>
-    <script src="./js/siswa/utils.js"></script>
-    <script src="./js/siswa/menuTable.js"></script>
+    <script src="./js/shared/utils.js"></script>
+    <script src="./js/shared/menuTable.js"></script>
     <script src="./js/siswa/orderStateMachine.js"></script>
     <script src="./js/siswa/cart.js"></script>
     <script src="./js/siswa/ui.js"></script>
@@ -129,6 +130,9 @@
               message: `Pesanan kamu sekarang ${payload.status}.`,
             });
             window.AccountPage.renderNotifications?.();
+            if (document.getElementById("history-container")) {
+              window.AccountPage.init().catch(console.warn);
+            }
           }
           // If kanban (owner status page) is rendered, refresh it
           if (
@@ -208,12 +212,20 @@
         try {
           if (ApiClient.isAuthenticated()) {
             try {
-              const updatedUser = await ApiClient.getMe();
-              CURRENT_USER = updatedUser;
-              CURRENT_ROLE = ApiClient.normalizeRole(updatedUser.role);
+              await ApiClient.getMe();
+              CURRENT_USER = ApiClient.getUser();
+              CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
             } catch (err) {
               console.warn("Gagal sinkronisasi data user dari API:", err.message);
             }
+          }
+
+          // ── Role guard: reject unknown roles early ─────────────────────────
+          if (!CURRENT_ROLE || !['siswa', 'owner'].includes(CURRENT_ROLE)) {
+            console.error('[auth] Unknown role:', CURRENT_ROLE, '— logging out');
+            ApiClient.logout();
+            window.location.href = './pages/auth/login.html';
+            return;
           }
           const resSidebar = await fetch("./partials/sidebar.html");
           const sidebarHtml = await resSidebar.text();
@@ -259,14 +271,21 @@
       async function loadPage(pageName) {
         const contentArea = document.getElementById("main-content");
         let filePath = "";
+        CURRENT_USER = ApiClient.getUser();
+        CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
 
-        // ── Admin page guard ───────────────────────────────────────────────────
-        const ownerPages = ["owner-dashboard", "owner-menu", "owner-status"];
-        if (ownerPages.includes(pageName) && CURRENT_ROLE !== "owner") {
-          console.warn(
-            `[auth] siswa mencoba akses halaman owner: ${pageName} → redirect ke siswa-home`,
-          );
+        // ── Role-based page guards ─────────────────────────────────────────────
+        const ownerOnlyPages = ["owner-dashboard", "owner-menu", "owner-status"];
+        const siswaOnlyPages = ["siswa-home", "siswa-booking"];
+
+        if (ownerOnlyPages.includes(pageName) && CURRENT_ROLE !== "owner") {
+          console.warn(`[auth] siswa mencoba akses halaman owner → redirect`);
           loadPage("siswa-home");
+          return;
+        }
+        if (siswaOnlyPages.includes(pageName) && CURRENT_ROLE !== "siswa") {
+          console.warn(`[auth] owner mencoba akses halaman siswa → redirect`);
+          loadPage("owner-dashboard");
           return;
         }
 
@@ -287,7 +306,7 @@
             : "./pages/account/siswa.html";
 
         try {
-          const response = await fetch(filePath);
+          const response = await fetch(filePath + "?t=" + Date.now());
           if (!response.ok) throw new Error("Gagal ambil file");
           const htmlText = await response.text();
 
@@ -330,10 +349,27 @@
             initBookingEvents(); // Pindahkan setup klik pesan siswa ke fungsi terpisah agar rapi
           }
           if (pageName === "page-account") {
-            if (CURRENT_ROLE === "owner") {
+            // Wait 2 RAF cycles + small buffer so the browser fully settles
+            // the injected innerHTML before account.js queries the DOM.
+            await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+            await new Promise((r) => setTimeout(r, 50));
+
+            // Re-read role fresh at this point to avoid stale closures
+            CURRENT_USER = ApiClient.getUser();
+            CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
+
+            // Verify the rendered HTML actually matches the current role
+            const pageRole = document.querySelector('[data-account-role]')?.dataset.accountRole;
+
+            if (CURRENT_ROLE === 'owner' && pageRole === 'owner') {
               await AccountPage.initOwner();
-            } else {
+            } else if (CURRENT_ROLE === 'siswa' && pageRole === 'siswa') {
               await AccountPage.init();
+            } else {
+              // Role mismatch — the wrong HTML was loaded, reload the correct page
+              console.warn('[auth] role mismatch on page-account, reloading');
+              await loadPage('page-account');
+              return;
             }
           }
 
@@ -499,10 +535,28 @@
               }
               OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
               UI.renderOrderStatus(String(order.id), summary, total);
+
+              // Add notification
+              if (window.AccountPage) {
+                window.AccountPage.addNotification({
+                  title: `Pesanan Baru #${order.id}`,
+                  message: `Pesanan kamu telah berhasil dibuat dan dikirim.`,
+                });
+                window.AccountPage.renderNotifications?.();
+              }
             } else {
               const orderId = Utils.generateOrderId();
               OrderStateMachine.transition(OrderStateMachine.STATES.ORDERED);
               UI.renderOrderStatus(orderId, summary, total);
+
+              // Add notification in mock mode
+              if (window.AccountPage) {
+                window.AccountPage.addNotification({
+                  title: `Pesanan Baru #${orderId}`,
+                  message: `Pesanan simulasi berhasil dibuat.`,
+                });
+                window.AccountPage.renderNotifications?.();
+              }
 
               setTimeout(() => {
                 OrderStateMachine.transition(OrderStateMachine.STATES.COOKING);
