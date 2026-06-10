@@ -37,6 +37,7 @@ function authenticate(req, res, next) {
       role: payload.role,
       email: payload.email,
       name: payload.name,
+      kantin_id: payload.kantin_id || null,  // ID numerik kantin owner (null untuk pelanggan)
     };
     return next();
   } catch (err) {
