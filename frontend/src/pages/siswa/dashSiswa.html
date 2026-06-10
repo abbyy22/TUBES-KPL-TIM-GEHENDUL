@@ -1,17 +1,6 @@
-<div class="ml-[30px] mr-20 px-7 py-6">
+<div class="ml-[30px] mr-20 px-7 py-6 min-h-screen flex flex-col">
   <div class="flex items-center justify-between mb-5">
-    <div
-      class="flex items-center gap-2 bg-[#F4EFE2] rounded-[10px] px-4 py-[9px] flex-1 max-w-[480px] shadow-md"
-    >
-      <!-- Search icon -->
-      <i data-lucide="search" class="w-4 h-4 text-[#D4622A]"></i>
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Search"
-        class="bg-transparent outline-none border-none text-[12px] text-[#2D2D2D] w-full"
-      />
-    </div>
+    <h2 id="greetingText" class="text-[20px] font-bold text-[#2D2D2D]">Hai!</h2>
 
     <div class="flex items-center gap-3">
       <button
@@ -29,7 +18,7 @@
     </div>
   </div>
 
-  <div>
+  <div class="flex flex-col flex-1">
     <div
       class="bg-[#F4EFE2] rounded-[22px] overflow-hidden relative flex items-center shadow-md mb-7"
     >
@@ -83,3 +72,15 @@
     <div id="topMenuGrid" class="grid grid-cols-3 gap-4 mb-8"></div>
   </div>
 </div>
+
+<script>
+  (function() {
+    const user = typeof CURRENT_USER !== 'undefined' ? CURRENT_USER : null;
+    const greetEl = document.getElementById('greetingText');
+    if (greetEl && user && user.name) {
+      greetEl.textContent = 'Hai, ' + user.name + '!';
+    } else if (greetEl) {
+      greetEl.textContent = 'Hai!';
+    }
+  })();
+</script>
