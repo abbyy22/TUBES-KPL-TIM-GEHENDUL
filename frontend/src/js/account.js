@@ -11,7 +11,7 @@
 const AccountPage = (() => {
   // ─── Konstanta ──────────────────────────────────────────────────────────────
   const NOTIFICATIONS_KEY = "telfood.notifications";
-  const GRAY_PERSON_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af' style='background-color:%23e5e7eb;'><path fill-rule='evenodd' d='M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z' clip-rule='evenodd' /></svg>";
+  const GRAY_PERSON_SVG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCcgZmlsbD0nIzljYTNhZicgc3R5bGU9J2JhY2tncm91bmQtY29sb3I6I2U1ZTdlYjsnPjxwYXRoIGZpbGwtcnVsZT0nZXZlbm9kZCcgZD0nTTcuNSA2YTQuNSA0LjUgMCAxMTkgMCA0LjUgNC41IDAgMDEtOSAwek0zLjc1MSAyMC4xMDVhOC4yNSA4LjI1IDAgMDExNi40OTggMCAuNzUuNzUgMCAwMS0uNDM3LjY5NUExOC42ODMgMTguNjgzIDAgMDExMiAyMi41Yy0yLjc4NiAwLTUuNDMzLS42MDgtNy44MTItMS43YS43NS43NSAwIDAxLS40MzctLjY5NXonIGNsaXAtcnVsZT0nZXZlbm9kZCcgLz48L3N2Zz4=";
 
   // ══════════════════════════════════════════════════════════════════════════════
   // SHARED HELPERS
