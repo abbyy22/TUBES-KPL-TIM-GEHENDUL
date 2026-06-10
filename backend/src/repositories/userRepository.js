@@ -59,6 +59,7 @@ async function updateUser(id, updates) {
   return findPublicById(id);
 }
 
+
 module.exports = {
   createUser,
   findByEmail,
