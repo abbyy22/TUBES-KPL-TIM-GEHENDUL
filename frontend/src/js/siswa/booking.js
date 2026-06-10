@@ -1,5 +1,8 @@
 const booking = (() => {
 
+    // In-memory store for menu item photos (keyed by menu id)
+    const menuPhotos = {};
+
     function renderKantinSelect() {
         const select = document.getElementById('kantinSelect');
         if (!select) return;
@@ -43,12 +46,32 @@ const booking = (() => {
             return;
         }
 
-        container.innerHTML = menus.map(m => `
+        container.innerHTML = menus.map(m => {
+            const photoSrc = menuPhotos[m.id] || '';
+            const imgContent = photoSrc
+                ? `<img src="${photoSrc}" alt="${Utils.sanitize(m.name)}" class="w-full h-full object-cover" />`
+                : `<svg class="w-7 h-7 text-[#9E8E84]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`;
+
+            return `
     <div class="bg-[#F0E8D5] rounded-xl overflow-hidden cursor-pointer transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
 
         <div class="w-full h-20 bg-[linear-gradient(135deg,#e8dfd0,#d4c5a9)]
-            flex items-center justify-center">
-            <svg class="w-7 h-7 text-[#9E8E84]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+            flex items-center justify-center relative group overflow-hidden">
+            ${imgContent}
+            <!-- Overlay tombol ganti foto -->
+            <label
+                class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                title="Upload foto menu"
+            >
+                <svg class="w-5 h-5 text-white mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span class="text-white text-[9px] font-semibold">Upload Foto</span>
+                <input
+                    type="file"
+                    accept="image/*"
+                    class="hidden menu-photo-input"
+                    data-id="${m.id}"
+                />
+            </label>
         </div>
 
         <div class="px-[10px] py-2 flex items-center justify-between gap-2">
@@ -92,13 +115,35 @@ const booking = (() => {
         </div>
 
     </div>
-    `).join('');
+    `;
+        }).join('');
 
         // Render Lucide icons in the newly created menu cards
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
         bindAddButtons();
         bindMinButtons();
+        bindPhotoInputs();
+    }
+
+    function bindPhotoInputs() {
+        document.querySelectorAll('.menu-photo-input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const menuId = input.dataset.id;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    menuPhotos[menuId] = ev.target.result;
+                    // Re-render grid to show the new photo
+                    const kantinSelect = document.getElementById('kantinSelect');
+                    if (kantinSelect && kantinSelect.value) {
+                        renderMenuGrid(kantinSelect.value);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        });
     }
 
     function bindAddButtons() {
