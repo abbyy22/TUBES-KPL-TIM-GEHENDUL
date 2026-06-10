@@ -93,7 +93,6 @@ function _doRender() {
   const showing = Math.min((page + 1) * PER, filtered.length);
   const tbody = document.getElementById("menuTbody");
   const empty = document.getElementById("emptyState");
-  console.log(slice)
   if (!tbody) return;
 
   if (filtered.length === 0) {
@@ -293,13 +292,36 @@ function openEdit(id) {
 
 function closeModal() {
   const modalOverlay = document.getElementById("modalOverlay");
+  if (!modalOverlay) return;
 
-  if (!modalOverlay) {
-    console.error("Modal overlay element not found!");
-    return;
-  }
-  modalOverlay.style.display = "none";
-  modalOverlay.classList.add("hidden");
+  // Animasi fade-out modal
+  modalOverlay.style.transition = "opacity 0.18s ease";
+  modalOverlay.style.opacity = "0";
+  setTimeout(() => {
+    modalOverlay.style.display = "none";
+    modalOverlay.style.opacity = "";
+    modalOverlay.style.transition = "";
+    modalOverlay.classList.add("hidden");
+  }, 180);
+
+  // Reset semua field form
+  const fName  = document.getElementById("fName");
+  const fDesc  = document.getElementById("fDesc");
+  const fCat   = document.getElementById("fCat");
+  const fPrice = document.getElementById("fPrice");
+  const fEmoji = document.getElementById("fEmoji");
+  if (fName)  fName.value  = "";
+  if (fDesc)  fDesc.value  = "";
+  if (fCat)   fCat.value   = "food";
+  if (fPrice) fPrice.value = "";
+  if (fEmoji) fEmoji.value = "";
+
+  // Reset image preview
+  removeImage();
+
+  // Reset state editing
+  editingId = null;
+  currentImageData = null;
 }
 
 async function saveMenu() {
@@ -347,7 +369,7 @@ async function saveMenu() {
         available: true,
       };
       let updated = await ApiClient.updateMenu(editingId, payload);
-      
+
       // Jika ada file gambar baru yang diunggah
       if (file) {
         const photoResult = await ApiClient.uploadMenuPhoto(editingId, file);
@@ -362,6 +384,10 @@ async function saveMenu() {
 
       const idx = menus.findIndex((x) => x.id === editingId);
       if (idx >= 0) menus[idx] = mapApiMenu(updated);
+
+      // Tutup modal DULU, baru render dan tampilkan toast
+      closeModal();
+      _doRender();
       showToast("Menu berhasil diperbarui ✓", "success");
     } else {
       // CREATE
@@ -372,7 +398,7 @@ async function saveMenu() {
         price,
         emoji,
         available: true,
-        category_id: cat, // diterima validator, diabaikan di controller
+        category_id: cat,
       };
       const created = await ApiClient.createMenu(payload);
 
@@ -387,10 +413,12 @@ async function saveMenu() {
       }
 
       menus.push(mapApiMenu(created));
+
+      // Tutup modal DULU, baru render dan tampilkan toast
+      closeModal();
+      _doRender();
       showToast("Menu baru ditambahkan ✓", "success");
     }
-    closeModal();
-    _doRender();
   } catch (err) {
     showToast("Gagal menyimpan: " + err.message, "error");
   } finally {
