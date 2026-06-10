@@ -8,6 +8,15 @@ CREATE DATABASE IF NOT EXISTS smart_canteen
 
 USE smart_canteen;
 
+-- Hapus tabel lama jika ada agar reset bersih
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS menus;
+DROP TABLE IF EXISTS kantin_owners;
+DROP TABLE IF EXISTS kantins;
+DROP TABLE IF EXISTS uploads;
+DROP TABLE IF EXISTS users;
+
 -- ---------- USERS ----------
 CREATE TABLE IF NOT EXISTS users (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
