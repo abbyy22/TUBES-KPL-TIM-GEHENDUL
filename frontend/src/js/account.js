@@ -167,22 +167,32 @@ const AccountPage = (() => {
     const container = document.getElementById("history-container");
     if (!container) return;
 
+    // Update badge count
+    const countBadge = document.getElementById("history-count-badge");
+    if (countBadge) {
+      const count = orders ? orders.length : 0;
+      countBadge.textContent = count + " pesanan";
+      countBadge.style.background = count > 0 ? "rgba(192,90,31,0.10)" : "rgba(0,0,0,0.05)";
+      countBadge.style.color = count > 0 ? "#C05A1F" : "#9E8E84";
+    }
+
     if (!orders || orders.length === 0) {
       container.innerHTML = `
-        <div class="flex flex-col items-center justify-center py-16 text-center">
-          <svg class="w-14 h-14 text-gray-200 mb-4" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 0 1-8 0"/>
-          </svg>
-          <p class="text-sm font-semibold text-gray-400">Belum ada riwayat pesanan</p>
-          <p class="text-xs text-gray-300 mt-1">Pesanan kamu akan muncul di sini</p>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;">
+          <div style="width:72px;height:72px;background:linear-gradient(135deg,#FEF3EC,#FDDFC4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C05A1F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <p style="font-size:15px;font-weight:700;color:#6B5E54;margin:0 0 6px;">Belum ada riwayat pesanan</p>
+          <p style="font-size:12px;color:#9E8E84;margin:0;">Pesanan kamu hari ini akan muncul di sini</p>
         </div>`;
       return;
     }
 
-    container.innerHTML = orders.map((order) => renderOrderCard(order)).join("");
+    container.innerHTML = orders.map((order, idx) => renderOrderCard(order, idx)).join("");
   }
 
   async function loadHistory() {
@@ -282,7 +292,8 @@ const AccountPage = (() => {
   }
 
   // ── Shared card renderer — dipakai oleh user & owner ─────────────────────────
-  function renderOrderCard(order) {
+  function renderOrderCard(order, idx) {
+    idx = idx || 0;
     // Escape HTML aman (tidak bergantung pada Utils global)
     function esc(s) {
       return String(s || '').replace(/[<>&"']/g, function(c) {
@@ -290,38 +301,180 @@ const AccountPage = (() => {
       });
     }
 
-    // Items sebagai baris teks biasa
-    const itemLines = Array.isArray(order.items) && order.items.length
-      ? order.items.map(function(it) {
-          return '<p style="font-size:14px;color:#1f2937;margin:2px 0;">' + esc(it.quantity) + 'x ' + esc(it.menu_name) + '</p>';
-        }).join('')
-      : '<p style="font-size:12px;color:#9ca3af;font-style:italic;">Detail tidak tersedia</p>';
+    // Status badge
+    var status = (order.status || '').toUpperCase();
+    var statusConfig = {
+      'DONE':    { label: '✓ Selesai',   bg: '#DCFCE7', color: '#16A34A', border: '#BBF7D0' },
+      'PENDING': { label: '⏳ Menunggu', bg: '#FEF9C3', color: '#CA8A04', border: '#FDE68A' },
+      'PROCESS': { label: '🍳 Diproses', bg: '#DBEAFE', color: '#2563EB', border: '#BFDBFE' },
+      'CANCELLED':{ label:'✕ Dibatalkan',bg: '#FEE2E2', color: '#DC2626', border: '#FECACA' },
+    };
+    var sc = statusConfig[status] || { label: status || 'Baru', bg: '#F3F4F6', color: '#6B7280', border: '#E5E7EB' };
 
-    // Tanggal format panjang (Rabu, 25 April 2026)
+    // Items
+    var itemCount = Array.isArray(order.items) ? order.items.length : 0;
+    var itemLines = Array.isArray(order.items) && order.items.length
+      ? order.items.map(function(it) {
+          return '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">'
+            + '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;background:#FEF3EC;border-radius:6px;font-size:11px;font-weight:700;color:#C05A1F;">' + esc(it.quantity) + '</span>'
+            + '<span style="font-size:13px;color:#374151;font-weight:500;">' + esc(it.menu_name) + '</span>'
+            + (it.price ? '<span style="font-size:11px;color:#9E8E84;margin-left:auto;">@Rp ' + Number(it.price).toLocaleString('id-ID') + '</span>' : '')
+          + '</div>';
+        }).join('')
+      : '<p style="font-size:12px;color:#9ca3af;font-style:italic;padding:4px 0;">Detail tidak tersedia</p>';
+
+    // Tanggal & waktu
     var d = new Date(order.created_at);
-    var tglStr = isNaN(d.getTime()) ? '—' : d.toLocaleDateString('id-ID', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-    });
+    var isValid = !isNaN(d.getTime());
+    var tglStr = isValid ? d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+    var jamStr = isValid ? d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
 
     // Harga
-    var totalStr = 'Rp. ' + Number(order.total_price || 0).toLocaleString('id-ID');
+    var totalNum = Number(order.total_price || 0);
+    var totalStr = 'Rp ' + totalNum.toLocaleString('id-ID');
     var kantinName = esc(order.kantin_name || 'Kantin');
+    var orderId = String(order.id || '').slice(-6) || '—';
 
-    return '<div style="background:#fff;border-radius:12px;border:1px solid #E8E0D5;padding:16px 20px;margin-bottom:0;transition:box-shadow 0.15s;">'
-      + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">'
-        + '<div style="flex:1;min-width:0;">' + itemLines + '</div>'
-        + '<div style="text-align:right;flex-shrink:0;">'
-          + '<p style="font-size:14px;font-weight:700;color:#1f2937;margin:0;">' + kantinName + '</p>'
-          + '<p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">' + esc(tglStr) + '</p>'
+    // Animation delay
+    var delay = (idx * 60) + 'ms';
+
+    return '<div style="background:#fff;border-radius:16px;border:1.5px solid #EDE5D8;padding:0;overflow:hidden;transition:box-shadow 0.2s,transform 0.2s;animation:fadeUp 0.35s ease both;animation-delay:' + delay + ';" '
+      + 'onmouseenter="this.style.boxShadow=\'0 8px 24px rgba(192,90,31,0.13)\';this.style.transform=\'translateY(-2px)\'" '
+      + 'onmouseleave="this.style.boxShadow=\'none\';this.style.transform=\'none\'" >'
+      // Top accent bar
+      + '<div style="height:3px;background:linear-gradient(90deg,#C05A1F,#E8784A);"></div>'
+      // Card body
+      + '<div style="padding:14px 18px;">'
+        // Header row: kantin + status
+        + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">'
+          + '<div style="flex:1;min-width:0;">'
+            + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">'
+              + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C05A1F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+              + '<span style="font-size:14px;font-weight:700;color:#1F2937;">' + kantinName + '</span>'
+            + '</div>'
+            + '<div style="display:flex;align-items:center;gap:10px;">'
+              + '<span style="font-size:10px;color:#9E8E84;font-family:monospace;">#' + orderId + '</span>'
+              + '<span style="font-size:10px;color:#9E8E84;display:flex;align-items:center;gap:3px;">'
+                + '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+                + tglStr + (jamStr ? ', ' + jamStr : '')
+              + '</span>'
+            + '</div>'
+          + '</div>'
+          + '<span style="flex-shrink:0;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:' + sc.bg + ';color:' + sc.color + ';border:1px solid ' + sc.border + ';white-space:nowrap;">' + sc.label + '</span>'
         + '</div>'
-      + '</div>'
-      + '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #f3f4f6;display:flex;align-items:center;gap:4px;">'
-        + '<span style="font-size:11px;color:#9ca3af;">total: </span>'
-        + '<span style="font-size:14px;font-weight:700;color:#1f2937;">' + totalStr + '</span>'
+        // Divider
+        + '<div style="height:1px;background:linear-gradient(90deg,#EDE5D8,transparent);margin-bottom:10px;"></div>'
+        // Items list
+        + '<div style="display:flex;flex-direction:column;gap:2px;margin-bottom:12px;">' + itemLines + '</div>'
+        // Footer: item count + total
+        + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px dashed #EDE5D8;">'
+          + '<span style="font-size:11px;color:#9E8E84;display:flex;align-items:center;gap:4px;">'
+            + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>'
+            + itemCount + ' item'
+          + '</span>'
+          + '<div style="display:flex;align-items:baseline;gap:4px;">'
+            + '<span style="font-size:10px;color:#9E8E84;">Total</span>'
+            + '<span style="font-size:16px;font-weight:800;color:#C05A1F;">' + totalStr + '</span>'
+          + '</div>'
+        + '</div>'
       + '</div>'
     + '</div>';
   }
 
+  // ── Owner-specific card renderer (riwayat penjualan) ──────────────────────────
+  function renderOwnerOrderCard(order, idx) {
+    idx = idx || 0;
+    function esc(s) {
+      return String(s || '').replace(/[<>&"']/g, function(c) {
+        return { '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;', "'":'&#39;' }[c];
+      });
+    }
+
+    // Status
+    var status = (order.status || '').toUpperCase();
+    var statusConfig = {
+      'DONE':      { label: '✓ Selesai',    bg: '#DCFCE7', color: '#16A34A', border: '#BBF7D0', dot: '#22C55E' },
+      'PENDING':   { label: '⏳ Menunggu',  bg: '#FEF9C3', color: '#CA8A04', border: '#FDE68A', dot: '#EAB308' },
+      'PROCESS':   { label: '🍳 Diproses',  bg: '#DBEAFE', color: '#2563EB', border: '#BFDBFE', dot: '#3B82F6' },
+      'CANCELLED': { label: '✕ Batal',      bg: '#FEE2E2', color: '#DC2626', border: '#FECACA', dot: '#EF4444' },
+    };
+    var sc = statusConfig[status] || { label: status || 'Baru', bg: '#F3F4F6', color: '#6B7280', border: '#E5E7EB', dot: '#9CA3AF' };
+
+    // Buyer info
+    var buyerName = esc(order.user_name || order.buyer_name || order.customer_name || '');
+
+    // Items
+    var itemCount = Array.isArray(order.items) ? order.items.length : 0;
+    var itemLines = Array.isArray(order.items) && order.items.length
+      ? order.items.map(function(it) {
+          var subtotal = it.price && it.quantity ? Number(it.price) * Number(it.quantity) : null;
+          return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F9F5F0;">'
+            + '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;background:#FEF3EC;border-radius:6px;font-size:11px;font-weight:700;color:#C05A1F;">' + esc(it.quantity) + '</span>'
+            + '<span style="font-size:13px;color:#374151;font-weight:500;flex:1;">' + esc(it.menu_name) + '</span>'
+            + (subtotal !== null
+                ? '<span style="font-size:12px;font-weight:600;color:#1F2937;">Rp ' + subtotal.toLocaleString('id-ID') + '</span>'
+                : (it.price ? '<span style="font-size:11px;color:#9E8E84;">@Rp ' + Number(it.price).toLocaleString('id-ID') + '</span>' : ''))
+          + '</div>';
+        }).join('')
+      : '<p style="font-size:12px;color:#9ca3af;font-style:italic;padding:4px 0;">Detail tidak tersedia</p>';
+
+    // Tanggal & waktu
+    var d = new Date(order.created_at);
+    var isValid = !isNaN(d.getTime());
+    var tglStr = isValid ? d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+    var jamStr = isValid ? d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+
+    var totalNum = Number(order.total_price || 0);
+    var totalStr = 'Rp ' + totalNum.toLocaleString('id-ID');
+    var orderId = String(order.id || '').slice(-6) || '—';
+    var delay = (idx * 60) + 'ms';
+
+    return '<div style="background:#fff;border-radius:16px;border:1.5px solid #EDE5D8;padding:0;overflow:hidden;transition:box-shadow 0.2s,transform 0.2s;animation:fadeUp 0.35s ease both;animation-delay:' + delay + ';" '
+      + 'onmouseenter="this.style.boxShadow=\'0 8px 24px rgba(192,90,31,0.13)\';this.style.transform=\'translateY(-2px)\'" '
+      + 'onmouseleave="this.style.boxShadow=\'none\';this.style.transform=\'none\'" >'
+      // Status bar top
+      + '<div style="height:3px;background:' + sc.dot + ';"></div>'
+      // Card body
+      + '<div style="padding:14px 18px;">'
+        // Header row: order ID + waktu + status
+        + '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">'
+          + '<div style="display:flex;align-items:center;gap:10px;">'
+            + '<div style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:linear-gradient(135deg,#FEF3EC,#FDDFC4);border-radius:10px;">'
+              + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C05A1F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>'
+            + '</div>'
+            + '<div>'
+              + '<div style="font-size:12px;font-weight:700;color:#1F2937;font-family:monospace;">#' + orderId + '</div>'
+              + '<div style="font-size:10px;color:#9E8E84;display:flex;align-items:center;gap:3px;">'
+                + '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+                + tglStr + (jamStr ? ', ' + jamStr : '')
+              + '</div>'
+            + '</div>'
+          + '</div>'
+          + '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:' + sc.bg + ';color:' + sc.color + ';border:1px solid ' + sc.border + ';white-space:nowrap;">' + sc.label + '</span>'
+        + '</div>'
+        // Buyer info (if available)
+        + (buyerName ? '<div style="display:flex;align-items:center;gap:6px;background:#F9F5F0;border-radius:8px;padding:6px 10px;margin-bottom:10px;">'
+            + '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9E8E84" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path fill-rule="evenodd" d="M12 12c2.7 0 4.5-1.8 4.5-4.5S14.7 3 12 3 7.5 4.8 7.5 7.5 9.3 12 12 12zm0 1.5C9 13.5 3 15 3 18v1.5h18V18c0-3-6-4.5-9-4.5z" clip-rule="evenodd"/></svg>'
+            + '<span style="font-size:11px;color:#6B5E54;font-weight:600;">' + buyerName + '</span>'
+          + '</div>' : '')
+        // Divider
+        + '<div style="height:1px;background:linear-gradient(90deg,#EDE5D8,transparent);margin-bottom:8px;"></div>'
+        // Items list
+        + '<div style="display:flex;flex-direction:column;gap:0;margin-bottom:12px;">' + itemLines + '</div>'
+        // Footer: item count + total
+        + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;">'
+          + '<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#9E8E84;">'
+            + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>'
+            + itemCount + ' item'
+          + '</div>'
+          + '<div style="display:flex;align-items:center;gap:6px;">'
+            + '<span style="font-size:10px;color:#9E8E84;font-weight:500;">Total Bayar</span>'
+            + '<span style="font-size:17px;font-weight:800;color:#C05A1F;letter-spacing:-0.5px;">' + totalStr + '</span>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>';
+  }
 
   function fillEl(id, value) {
     const el = document.getElementById(id);
@@ -334,25 +487,30 @@ const AccountPage = (() => {
 
     // Update badge count
     const badge = document.getElementById("today-orders-count-badge");
-    if (badge) badge.textContent = `${orders.length} transaksi`;
+    if (badge) {
+      badge.textContent = `${orders.length} transaksi`;
+      badge.style.background = orders.length > 0 ? 'rgba(192,90,31,0.12)' : 'rgba(0,0,0,0.05)';
+      badge.style.color = orders.length > 0 ? '#C05A1F' : '#9E8E84';
+    }
 
     if (orders.length === 0) {
       container.innerHTML = `
-        <div class="flex flex-col items-center justify-center py-14 text-center">
-          <svg class="w-12 h-12 text-gray-200 mb-3" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-          <p class="text-sm font-semibold text-gray-400">Belum ada transaksi hari ini</p>
-          <p class="text-xs text-gray-300 mt-1">Order masuk akan muncul di sini secara real-time</p>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 20px;text-align:center;">
+          <div style="width:68px;height:68px;background:linear-gradient(135deg,#FEF3EC,#FDDFC4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C05A1F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <p style="font-size:15px;font-weight:700;color:#6B5E54;margin:0 0 6px;">Belum ada transaksi hari ini</p>
+          <p style="font-size:12px;color:#9E8E84;margin:0;">Order masuk akan muncul di sini secara real-time</p>
         </div>`;
       return;
     }
 
-    container.innerHTML = orders.map((order) => renderOrderCard(order)).join("");
+    container.innerHTML = orders.map((order, idx) => renderOwnerOrderCard(order, idx)).join("");
   }
 
   async function loadOwnerStats(kantinId) {
