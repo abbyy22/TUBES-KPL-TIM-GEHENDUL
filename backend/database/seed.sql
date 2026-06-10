@@ -9,8 +9,11 @@ USE smart_canteen;
 -- ---------- Users ----------
 -- password: password123 untuk semua
 INSERT INTO users (name, email, password_hash, role) VALUES
-  ('Admin Kantin', 'admin@telfood.test',     '$2a$10$ZGuzx7bnwVc4RifsW7zDY.mWfW3HP81G7diBT8msE8wi6wG6/HZkO', 'admin'),
-  ('Mimae',        'pelanggan@telfood.test', '$2a$10$ZGuzx7bnwVc4RifsW7zDY.mWfW3HP81G7diBT8msE8wi6wG6/HZkO', 'pelanggan');
+  ('Admin Kantin NEO 1', 'neo1@telfood.test',      '$2a$10$ZGuzx7bnwVc4RifsW7zDY.mWfW3HP81G7diBT8msE8wi6wG6/HZkO', 'admin'),
+  ('Admin Kantin NEO 2', 'neo2@telfood.test',      '$2a$10$ZGuzx7bnwVc4RifsW7zDY.mWfW3HP81G7diBT8msE8wi6wG6/HZkO', 'admin'),
+  ('Admin Kantin TPB',   'tpb@telfood.test',       '$2a$10$ZGuzx7bnwVc4RifsW7zDY.mWfW3HP81G7diBT8msE8wi6wG6/HZkO', 'admin'),
+  ('Admin Kantin GKM',   'gkm@telfood.test',       '$2a$10$ZGuzx7bnwVc4RifsW7zDY.mWfW3HP81G7diBT8msE8wi6wG6/HZkO', 'admin'),
+  ('Mimae',              'pelanggan@telfood.test', '$2a$10$ZGuzx7bnwVc4RifsW7zDY.mWfW3HP81G7diBT8msE8wi6wG6/HZkO', 'pelanggan');
 
 -- ---------- Kantins ----------
 INSERT INTO kantins (code, name) VALUES
@@ -55,3 +58,15 @@ INSERT INTO menus (kantin_id, name, price, emoji) VALUES
   ((SELECT id FROM kantins WHERE code='gkm'),  'Es teh tawar',          2000, '🍵'),
   ((SELECT id FROM kantins WHERE code='gkm'),  'Batagor',               9000, '🐟'),
   ((SELECT id FROM kantins WHERE code='gkm'),  'Nasi kuning',          14000, '🍚');
+
+-- ---------- Orders ----------
+INSERT INTO orders (id, user_id, kantin_id, customer_name, total_price, status) VALUES
+  (1, (SELECT id FROM users WHERE email='pelanggan@telfood.test'), (SELECT id FROM kantins WHERE code='neo1'), 'Mimae', 17000, 'DONE'),
+  (2, (SELECT id FROM users WHERE email='pelanggan@telfood.test'), (SELECT id FROM kantins WHERE code='neo2'), 'Mimae', 14000, 'READY');
+
+-- ---------- Order Items ----------
+INSERT INTO order_items (order_id, menu_id, menu_name, quantity, price_at_order) VALUES
+  (1, (SELECT id FROM menus WHERE name='Nasi goreng maza' LIMIT 1), 'Nasi goreng maza', 1, 15000),
+  (1, (SELECT id FROM menus WHERE name='Es teh manis' LIMIT 1), 'Es teh manis', 1, 2000),
+  (2, (SELECT id FROM menus WHERE name='Bakso kuah' LIMIT 1), 'Bakso kuah', 1, 14000);
+
