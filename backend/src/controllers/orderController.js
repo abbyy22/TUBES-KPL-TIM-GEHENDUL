@@ -35,6 +35,29 @@ async function fetchOrderItems(orderId) {
   return rows;
 }
 
+async function fetchItemsForOrders(orders) {
+  if (!orders || orders.length === 0) return [];
+  const orderIds = orders.map((o) => o.id);
+  const [items] = await pool.query(
+    `SELECT id, order_id, menu_id, menu_name, quantity, price_at_order
+     FROM order_items WHERE order_id IN (?) ORDER BY id ASC`,
+    [orderIds],
+  );
+
+  const itemsMap = {};
+  for (const item of items) {
+    if (!itemsMap[item.order_id]) {
+      itemsMap[item.order_id] = [];
+    }
+    itemsMap[item.order_id].push(item);
+  }
+
+  return orders.map((o) => ({
+    ...mapOrderRow(o),
+    items: itemsMap[o.id] || [],
+  }));
+}
+
 /**
  * POST /api/orders - pelanggan membuat pesanan baru.
  * Body: { kantin_id, customer_name, items: [{ menu_id, quantity }] }
@@ -64,7 +87,7 @@ async function createOrder(req, res) {
       const m = menuById.get(it.menu_id);
       assert(m, `menu_id ${it.menu_id} tidak ditemukan`);
       assert(m.kantin_id === input.kantin_id,
-        `menu_id ${it.menu_id} bukan milik kantin yang dipilih`);
+         `menu_id ${it.menu_id} bukan milik kantin yang dipilih`);
       assert(m.available === 1, `Menu '${m.name}' sedang tidak tersedia`);
 
       total += m.price * it.quantity;
@@ -115,7 +138,8 @@ async function listMyOrders(req, res) {
     SELECT_ORDER + ' WHERE o.user_id = ? ORDER BY o.created_at DESC',
     [req.user.id],
   );
-  res.json({ success: true, data: rows.map(mapOrderRow) });
+  const data = await fetchItemsForOrders(rows);
+  res.json({ success: true, data });
 }
 
 /**
@@ -142,7 +166,8 @@ async function listAllOrders(req, res) {
   const sql = SELECT_ORDER + (where.length ? ' WHERE ' + where.join(' AND ') : '') +
     ' ORDER BY o.created_at DESC';
   const [rows] = await pool.query(sql, params);
-  res.json({ success: true, data: rows.map(mapOrderRow) });
+  const data = await fetchItemsForOrders(rows);
+  res.json({ success: true, data });
 }
 
 /**
@@ -220,8 +245,10 @@ async function listOrdersByKantin(req, res) {
     SELECT_ORDER + ' WHERE o.kantin_id = ? ORDER BY o.created_at DESC',
     [kantinId],
   );
-  res.json({ success: true, data: rows.map(mapOrderRow) });
+  const data = await fetchItemsForOrders(rows);
+  res.json({ success: true, data });
 }
+
 
 module.exports = {
   createOrder,
