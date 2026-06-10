@@ -246,6 +246,10 @@ const ApiClient = (() => {
     return payload?.data ?? payload;
   }
 
+  async function deleteMenuPhoto(menuId) {
+    return request(`/menus/${menuId}/photo`, { method: 'DELETE' });
+  }
+
   function listAllOrders(params = {}) {
     const query = new URLSearchParams();
     if (params.status) query.set("status", params.status);
@@ -270,6 +274,7 @@ const ApiClient = (() => {
     createMenu,
     createOrder,
     deleteMenu,
+    deleteMenuPhoto,
     getBaseUrl,
     getKantins,
     getMenuById,
