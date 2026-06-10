@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="../../output.css" rel="stylesheet" />
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script><script src="https://cdn.tailwindcss.com"></script>
-</head>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
   <body class="bg-[#F0E8D5] h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
@@ -109,7 +110,7 @@
     <script src="../../js/api.js"></script>
     <script>
       if (ApiClient.isAuthenticated()) {
-        window.location.href = '../../index.html';
+        window.location.href = "../../index.html";
       }
 
       const loginForm = document.getElementById("loginForm");
@@ -135,7 +136,7 @@
 
         try {
           const data = await ApiClient.login(email, password);
-          const role = data?.user?.role || '';
+          const role = data?.user?.role || "";
           const normalizedRole = ApiClient.normalizeRole(role);
 
           setLoginMessage("Login berhasil, mengalihkan...", false);
@@ -152,7 +153,7 @@
         }
       });
 
-      if (typeof lucide !== 'undefined') lucide.createIcons();
+      if (typeof lucide !== "undefined") lucide.createIcons();
 
       function togglePassword() {
         const passwordInput = document.getElementById("password");

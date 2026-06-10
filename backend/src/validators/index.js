@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * validators/index.js
@@ -8,17 +8,25 @@
  * everything for backward compatibility with existing controllers.
  */
 
-const { validateRegister, validateLogin } = require('./authValidator');
-const { validateMenuCreate, validateMenuUpdate, validateMenuInput } = require('./menuValidator');
-const { validateOrderInput } = require('./orderValidator');
-const ApiError = require('../utils/ApiError');
+const {
+  validateRegister,
+  validateLogin,
+  validateUpdateProfile,
+} = require("./authValidator");
+const {
+  validateMenuCreate,
+  validateMenuUpdate,
+  validateMenuInput,
+} = require("./menuValidator");
+const { validateOrderInput } = require("./orderValidator");
+const ApiError = require("../utils/ApiError");
 
 // ─── Legacy helpers used directly in controllers/orderController.js ───────────
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function isNonEmptyString(v) {
-  return typeof v === 'string' && v.trim().length > 0;
+  return typeof v === "string" && v.trim().length > 0;
 }
 
 function isPositiveInt(v) {
@@ -39,6 +47,7 @@ module.exports = {
   // Auth
   validateRegister,
   validateLogin,
+  validateUpdateProfile,
 
   // Menu
   validateMenuCreate,

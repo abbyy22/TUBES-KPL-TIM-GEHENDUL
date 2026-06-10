@@ -180,6 +180,16 @@ const ApiClient = (() => {
     return request("/orders/me");
   }
 
+  async function updateProfile(profileData) {
+    const user = await request("/auth/me", {
+      method: "PATCH",
+      body: profileData,
+    });
+    const current = getUser() || {};
+    saveSession({ token: getToken(), user: { ...current, ...user } });
+    return user;
+  }
+
   function listAllOrders(params = {}) {
     const query = new URLSearchParams();
     if (params.status) query.set("status", params.status);
@@ -222,6 +232,7 @@ const ApiClient = (() => {
     saveSession,
     updateMenu,
     updateOrderStatus,
+    updateProfile,
   };
 })();
 

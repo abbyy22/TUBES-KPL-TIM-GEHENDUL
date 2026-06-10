@@ -1,95 +1,159 @@
-<div class="flex flex-col lg:flex-row gap-10 h-[95vh]">
-  <div class="w-full lg:w-3/5 bg-[#F4EFE2] p-10 rounded-4xl shadow-2xl">
-    <h2 class="text-center font-bold mb-8">Profil Pengguna</h2>
-    <div class="flex flex-col items-center">
-      <div
-        class="w-28 h-28 rounded-full border-4 border-white shadow-lg mb-8 overflow-hidden"
+<div class="flex flex-col lg:flex-row gap-10 min-h-[95vh]">
+  <section class="w-full lg:w-3/5 bg-[#F4EFE2] p-10 rounded-4xl shadow-2xl">
+    <h2 class="text-center text-2xl font-bold mb-8">Profil Pengguna</h2>
+
+    <form id="profile-form" class="flex flex-col items-center">
+      <div class="relative w-28 h-28 mb-4">
+        <div
+          class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white"
+        >
+          <img
+            id="profile-photo"
+            src="./assets/profile.png"
+            alt="Foto profil"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <button
+          id="edit-photo-btn"
+          type="button"
+          class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[#D2691E] text-white text-xs px-3 py-1 rounded-full shadow"
+        >
+          Edit Foto
+        </button>
+        <input
+          id="profile-photo-input"
+          type="file"
+          accept="image/*"
+          class="hidden"
+        />
+      </div>
+
+      <div class="w-full space-y-4 mt-6">
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <label for="profile-name-input" class="text-[10px] text-gray-400"
+            >Nama Lengkap:</label
+          >
+          <input
+            id="profile-name-input"
+            type="text"
+            class="w-full bg-transparent font-bold text-sm outline-none"
+            placeholder="Nama pengguna"
+          />
+          <p id="profile-name-text" class="sr-only"></p>
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <label for="profile-email-input" class="text-[10px] text-gray-400"
+            >Email:</label
+          >
+          <input
+            id="profile-email-input"
+            type="email"
+            disabled
+            class="w-full bg-transparent font-bold text-sm text-gray-500 outline-none"
+          />
+          <p id="profile-email-text" class="sr-only"></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <label for="current-password" class="text-[10px] text-gray-400"
+              >Password lama:</label
+            >
+            <input
+              id="current-password"
+              type="password"
+              class="w-full bg-transparent font-bold text-sm outline-none"
+              placeholder="Isi jika ingin ubah password"
+            />
+          </div>
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <label for="new-password" class="text-[10px] text-gray-400"
+              >Password baru:</label
+            >
+            <input
+              id="new-password"
+              type="password"
+              class="w-full bg-transparent font-bold text-sm outline-none"
+              placeholder="Minimal 6 karakter"
+            />
+          </div>
+        </div>
+      </div>
+
+      <p
+        id="profile-message"
+        class="w-full text-sm text-[#C1500E] mt-4 min-h-5"
+      ></p>
+      <button
+        type="submit"
+        class="w-full bg-[#D2691E] text-white py-2 px-4 rounded-lg mt-4"
       >
-        <img src="./assets/profile.png" class="w-full h-full object-cover" />
-      </div>
-      <div class="w-full space-y-4">
-        <form action=""></form>
-        <div class="bg-gray-50 p-2 rounded-lg relative">
-          <p class="text-[10px] text-gray-400">Nama Lengkap:</p>
-          <p class="font-bold text-sm">Namimaw</p>
-          <span class="absolute right-4 top-4"
-            ><img
-              src="https://www.svgrepo.com/show/520884/pencil.svg"
-              alt="Edit"
-              width="30"
-          /></span>
-        </div>
-        <div class="bg-gray-50 p-2 rounded-lg relative">
-          <p class="text-[10px] text-gray-400">Email:</p>
-          <p class="font-bold text-sm">mimaw@gmail.com</p>
-        </div>
-        <div class="bg-gray-50 p-2 rounded-lg relative">
-          <p class="text-[10px] text-gray-400">Ubah kata sandi:</p>
-          <p class="font-bold text-sm">Namimaw</p>
-          <span class="absolute right-4 top-4"
-            ><img
-              src="https://www.svgrepo.com/show/520884/pencil.svg"
-              alt="Edit"
-              width="30"
-          /></span>
-        </div>
-      </div>
-      <button class="w-full bg-[#D2691E] text-white py-2 px-4 rounded-lg mt-10">
         Simpan perubahan
       </button>
-    </div>
-  </div>
+    </form>
+  </section>
 
-  <div class="w-full lg:w-3/5">
-    <div class="flex items-center justify-between gap-5">
-      <form action="" class="w-full relative">
-        <div class="relative flex items-center">
-          <input
-            type="text"
-            id="search"
-            placeholder="Cari"
-            required
-            class="w-full px-4 py-2 pr-10 rounded-xl outline-none bg-white border border-[#C1500E] focus:ring-2 focus:ring-[#C1500E] transition duration-200 placeholder-gray-400"
-          />
-
-          <button
-            type="button"
-            class="absolute right-3 inset-y-0 flex items-center text-gray-400 hover:text-[#C1500E] transition"
-          >
-            <svg
-              class="w-4 h-4 text-gray-400 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-          </button>
-        </div>
-      </form>
-      <div>
-        <button
-          class="w-10 h-10 bg-white flex justify-center items-center rounded-full"
+  <section class="w-full lg:w-3/5">
+    <div class="flex items-center justify-between gap-5 relative">
+      <div class="w-full relative flex items-center">
+        <input
+          id="search"
+          type="text"
+          placeholder="Cari riwayat pesanan"
+          class="w-full px-4 py-2 pr-10 rounded-xl outline-none bg-white border border-[#C1500E] focus:ring-2 focus:ring-[#C1500E] transition duration-200 placeholder-gray-400"
+        />
+        <svg
+          class="absolute right-3 w-4 h-4 text-gray-400 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          <svg
-            class="w-4 h-4 text-gray-400"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-          </svg>
-        </button>
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+      </div>
+
+      <button
+        id="notification-btn"
+        type="button"
+        class="relative w-10 h-10 bg-white flex justify-center items-center rounded-full"
+      >
+        <span
+          id="notification-badge"
+          class="hidden absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center"
+          >0</span
+        >
+        <svg
+          class="w-4 h-4 text-gray-400"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+        </svg>
+      </button>
+
+      <div
+        id="notification-panel"
+        class="hidden absolute right-0 top-12 z-30 w-80 bg-[#F4EFE2] p-4 rounded-2xl shadow-2xl border border-orange-100"
+      >
+        <h3 class="font-bold text-sm mb-3">Notifikasi</h3>
+        <div
+          id="notification-list"
+          class="space-y-3 max-h-72 overflow-y-auto"
+        ></div>
       </div>
     </div>
+
     <div class="w-full bg-[#F4EFE2] p-10 rounded-4xl shadow-2xl mt-4">
       <h2 class="text-2xl font-extrabold mb-8">Riwayat Pesanan</h2>
       <div
@@ -97,141 +161,5 @@
         class="space-y-4 overflow-y-auto h-[61vh] pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       ></div>
     </div>
-  </div>
+  </section>
 </div>
-
-<script>
-  (() => {
-    const STATUS_LABEL = {
-      ORDERED: "Dipesan",
-      COOKING: "Dimasak",
-      READY: "Siap Diambil",
-      DONE: "Selesai",
-    };
-    const STATUS_COLOR = {
-      ORDERED: "#C05A1F",
-      COOKING: "#EA580C",
-      READY: "#16A34A",
-      DONE: "#64748B",
-    };
-
-    function formatRp(n) {
-      return "Rp " + Number(n).toLocaleString("id-ID");
-    }
-    function formatDate(val) {
-      if (!val) return "";
-      const d = new Date(val);
-      return isNaN(d)
-        ? ""
-        : d.toLocaleDateString("id-ID", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          });
-    }
-
-    let allOrders = [];
-
-    function renderHistory(orders) {
-      const container = document.getElementById("history-container");
-      if (!container) return;
-
-      if (orders.length === 0) {
-        container.innerHTML =
-          '<p class="text-sm text-gray-400 italic text-center py-8">Belum ada riwayat pesanan</p>';
-        return;
-      }
-
-      container.innerHTML = orders
-        .map((order) => {
-          const itemsHtml =
-            Array.isArray(order.items) && order.items.length > 0
-              ? order.items
-                  .map(
-                    (it) =>
-                      `<p class="text-sm text-gray-700">${it.quantity}x <span class="font-medium">${it.menu_name}</span></p>`,
-                  )
-                  .join("")
-              : `<p class="text-sm text-gray-700">Pesanan #${order.id}</p>`;
-          return `
-          <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[#C1500E] transition-colors">
-            <div class="flex items-start justify-between gap-4">
-              <div>${itemsHtml}</div>
-              <div class="text-right">
-                <p class="text-xs text-gray-400 mt-0.5">${formatDate(order.created_at)}</p>
-                <span class="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full" style="color:${STATUS_COLOR[order.status] || "#64748B"};background:${STATUS_COLOR[order.status] || "#64748B"}15">${STATUS_LABEL[order.status] || order.status}</span>
-              </div>
-            </div>
-            <div class="flex justify-between mt-3 pt-3 border-t border-gray-100">
-              <span class="text-xs text-gray-400 font-mono">#${order.id}</span>
-              <span class="text-xs font-bold text-[#C1500E]">${formatRp(order.total_price)}</span>
-            </div>
-          </div>`;
-        })
-        .join("");
-    }
-
-    async function initAccountPage() {
-      // Isi data profil dari session
-      const user =
-        window.ApiClient && ApiClient.getUser ? ApiClient.getUser() : null;
-      if (user) {
-        const nameEl = document.getElementById("profile-name");
-        const emailEl = document.getElementById("profile-email");
-        if (nameEl) nameEl.textContent = user.name || "—";
-        if (emailEl) emailEl.textContent = user.email || "—";
-      }
-
-      const container = document.getElementById("history-container");
-      if (!container) return;
-      container.innerHTML =
-        '<p class="text-sm text-gray-400 italic text-center py-8">Memuat riwayat...</p>';
-
-      try {
-        if (!window.ApiClient || !ApiClient.isAuthenticated()) {
-          container.innerHTML =
-            '<p class="text-sm text-gray-400 italic text-center py-8">Login untuk melihat riwayat</p>';
-          return;
-        }
-
-        // Ambil semua order milik user yang login
-        const summaries = await ApiClient.listMyOrders();
-
-        // Fetch detail setiap order (untuk mendapatkan items)
-        const details = await Promise.all(
-          summaries.map((o) => ApiClient.getOrder(o.id).catch(() => o)),
-        );
-        allOrders = details;
-        renderHistory(allOrders);
-
-        // Search
-        const searchInput = document.getElementById("search");
-        if (searchInput) {
-          searchInput.addEventListener("input", (e) => {
-            const kw = e.target.value.toLowerCase();
-            renderHistory(
-              kw
-                ? allOrders.filter(
-                    (o) =>
-                      (Array.isArray(o.items)
-                        ? o.items.some((it) =>
-                            it.menu_name.toLowerCase().includes(kw),
-                          )
-                        : false) || String(o.id).includes(kw),
-                  )
-                : allOrders,
-            );
-          });
-        }
-      } catch (err) {
-        console.error("[account] Gagal load history:", err);
-        if (container)
-          container.innerHTML = `<p class="text-sm text-red-400 italic text-center py-8">Gagal memuat: ${err.message}</p>`;
-      }
-    }
-
-    // Jalankan langsung
-    initAccountPage();
-  })();
-</script>

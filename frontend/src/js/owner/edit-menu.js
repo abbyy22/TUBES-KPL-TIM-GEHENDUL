@@ -92,6 +92,7 @@ function _doRender() {
   const showing = Math.min((page + 1) * PER, filtered.length);
   const tbody = document.getElementById("menuTbody");
   const empty = document.getElementById("emptyState");
+  console.log(slice)
   if (!tbody) return;
 
   if (filtered.length === 0) {
@@ -278,8 +279,14 @@ function openEdit(id) {
 }
 
 function closeModal() {
-  const el = document.getElementById("modalOverlay");
-  if (el) el.style.display = "none";
+  const modalOverlay = document.getElementById("modalOverlay");
+
+  if (!modalOverlay) {
+    console.error("Modal overlay element not found!");
+    return;
+  }
+  modalOverlay.style.display = "none";
+  modalOverlay.classList.add("hidden");
 }
 
 async function saveMenu() {

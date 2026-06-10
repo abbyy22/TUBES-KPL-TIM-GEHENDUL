@@ -1,29 +1,36 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const http = require('http');
-const { Server: SocketIO } = require('socket.io');
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const http = require("http");
+const { Server: SocketIO } = require("socket.io");
 
-const config = require('./config/env');
-const apiRoutes = require('./routes');
-const { notFound, errorHandler } = require('./middleware/errorHandler');
+const config = require("./config/env");
+const apiRoutes = require("./routes");
+const { notFound, errorHandler } = require("./middleware/errorHandler");
+const { securityHeaders } = require("./middleware/security");
 
 const app = express();
 
+app.use(securityHeaders);
 app.use(cors({ origin: config.corsOrigin }));
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
-if (config.env !== 'test') {
-  app.use(morgan(config.env === 'development' ? 'dev' : 'combined'));
+if (config.env !== "test") {
+  app.use(morgan(config.env === "development" ? "dev" : "combined"));
 }
 
-app.get('/health', (req, res) => {
-  res.json({ success: true, status: 'ok', env: config.env, time: new Date().toISOString() });
+app.get("/health", (req, res) => {
+  res.json({
+    success: true,
+    status: "ok",
+    env: config.env,
+    time: new Date().toISOString(),
+  });
 });
 
-app.use('/api', apiRoutes);
+app.use("/api", apiRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
@@ -33,14 +40,14 @@ const httpServer = http.createServer(app);
 
 const io = new SocketIO(httpServer, {
   cors: {
-    origin: config.corsOrigin === '*' ? '*' : config.corsOrigin.split(','),
-    methods: ['GET', 'POST'],
+    origin: config.corsOrigin === "*" ? "*" : config.corsOrigin.split(","),
+    methods: ["GET", "POST"],
   },
 });
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   console.log(`[socket.io] client connected: ${socket.id}`);
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     console.log(`[socket.io] client disconnected: ${socket.id}`);
   });
 });
