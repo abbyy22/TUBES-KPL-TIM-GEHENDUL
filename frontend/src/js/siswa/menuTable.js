@@ -87,6 +87,7 @@ const MenuTable = (() => {
     kantinList = kantins.map(kantin => ({
       id: kantin.id,
       name: kantin.name,
+      code: kantin.code,
     }));
 
     menuData = {};
@@ -102,6 +103,7 @@ const MenuTable = (() => {
         description: menu.description || '',
         available: menu.available !== false,
         kantin: menu.kantin_name,
+        photo_url: menu.photo_url || '',
       });
     });
 
