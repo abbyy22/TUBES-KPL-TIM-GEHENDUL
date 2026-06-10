@@ -79,9 +79,8 @@
         window.location.href = "./pages/auth/login.html";
       }
 
-      const CURRENT_USER = ApiClient.getUser();
-      // const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
-      const CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
+      let CURRENT_USER = ApiClient.getUser();
+      let CURRENT_ROLE = ApiClient.normalizeRole(CURRENT_USER?.role);
 
       // ─── Socket.io connection for real-time order updates ────────────────────
       window.socket = null;
@@ -207,16 +206,25 @@
       }
       async function initApp() {
         try {
+          if (ApiClient.isAuthenticated()) {
+            try {
+              const updatedUser = await ApiClient.getMe();
+              CURRENT_USER = updatedUser;
+              CURRENT_ROLE = ApiClient.normalizeRole(updatedUser.role);
+            } catch (err) {
+              console.warn("Gagal sinkronisasi data user dari API:", err.message);
+            }
+          }
           const resSidebar = await fetch("./partials/sidebar.html");
           const sidebarHtml = await resSidebar.text();
           document.getElementById("sidebar-placeholder").innerHTML =
             sidebarHtml;
           if (typeof lucide !== "undefined") lucide.createIcons();
 
+          const GRAY_PERSON_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af' style='background-color:%23e5e7eb;'><path fill-rule='evenodd' d='M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z' clip-rule='evenodd' /></svg>";
           const avatar = document.getElementById("sidebar-avatar");
           if (avatar) {
-            // Prioritas: photo_url dari session backend → default avatar
-            avatar.src = CURRENT_USER?.photo_url || "./assets/profile.png";
+            avatar.src = CURRENT_ROLE === "owner" ? GRAY_PERSON_SVG : (CURRENT_USER?.photo_url || GRAY_PERSON_SVG);
           }
           const sidebarName = document.getElementById("sidebar-user-name");
           const sidebarEmail = document.getElementById("sidebar-user-email");
