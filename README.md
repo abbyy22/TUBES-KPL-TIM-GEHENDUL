@@ -81,8 +81,19 @@ Smart Canteen adalah aplikasi web yang memungkinkan pelanggan memesan makanan da
 ## 🏗️ Struktur Proyek
 ```
 ── backend/
+│   ├── database/
+│   │   ├── schema.sql
+│   │   ├── seed.sql
+│   │   └── migrate_add_photos.sql
+│   ├── scripts/
+│   │   ├── initDb.js
+│   │   ├── seedDb.js
+│   │   ├── migratePhotos.js
+│   │   ├── seedPhotos.js
+│   │   └── seedTodayOrders.js
 │   ├── src/
 │   │   ├── app.js
+│   │   ├── index.js
 │   │   ├── config/
 │   │   │   ├── db.js
 │   │   │   └── env.js
@@ -90,59 +101,78 @@ Smart Canteen adalah aplikasi web yang memungkinkan pelanggan memesan makanan da
 │   │   │   ├── authController.js
 │   │   │   ├── kantinController.js
 │   │   │   ├── menuController.js
-│   │   │   └── orderController.js
+│   │   │   ├── orderController.js
+│   │   │   └── uploadController.js
 │   │   ├── middleware/
 │   │   │   ├── auth.js
-│   │   │   └── errorHandler.js
+│   │   │   ├── errorHandler.js
+│   │   │   ├── security.js
+│   │   │   └── upload.js
+│   │   ├── repositories/
+│   │   │   └── userRepository.js
 │   │   ├── routes/
 │   │   │   ├── authRoutes.js
+│   │   │   ├── index.js
 │   │   │   ├── kantinRoutes.js
 │   │   │   ├── menuRoutes.js
 │   │   │   └── orderRoutes.js
-│   │   └── utils/
-│   │       ├── ApiError.js
-│   │       ├── asyncHandler.js
-│   │       ├── jwt.js
-│   │       └── orderStateMachine.js
-│   ├── scripts/
-│   │   ├── initDb.js
-│   │   └── seedDb.js
+│   │   ├── services/
+│   │   │   └── authService.js
+│   │   ├── utils/
+│   │   │   ├── ApiError.js
+│   │   │   ├── asyncHandler.js
+│   │   │   ├── contract.js
+│   │   │   ├── jwt.js
+│   │   │   └── orderStateMachine.js
+│   │   └── validators/
+│   │       ├── authValidator.js
+│   │       ├── index.js
+│   │       ├── menuValidator.js
+│   │       └── orderValidator.js
 │   └── test/
 │       └── validators.test.js
 │
 └── frontend/
-├── src/
-│   ├── index.html              
-│   ├── assets/                 
-│   ├── partials/
-│   │   └── sidebar.html
-│   ├── pages/
-│   │   ├── auth/
-│   │   │   ├── login.html
-│   │   │   └── register.html
-│   │   ├── siswa/
-│   │   │   ├── dashSiswa.html
-│   │   │   └── booking.html
-│   │   ├── owner/
-│   │   │   ├── dashboard.html
-│   │   │   ├── edit-menu.html
-│   │   │   └── update_status.html
-│   │   └── account/
-│   │       └── index.html
-│   └── js/
-│       ├── api.js
-│       ├── siswa/
-│       │   ├── utils.js
-│       │   ├── menuTable.js
-│       │   ├── cart.js
-│       │   ├── orderStateMachine.js
-│       │   ├── booking.js
-│       │   ├── dashSiswa.js
-│       │   └── ui.js
-│       └── owner/
-│           └── edit-menu.js
-└── test/
-└── syntax.test.js
+    ├── src/
+    │   ├── index.html              
+    │   ├── input.css              
+    │   ├── output.css              
+    │   ├── assets/                 
+    │   │   └── auth-bg.png
+    │   ├── partials/
+    │   │   └── sidebar.html
+    │   ├── pages/
+    │   │   ├── auth/
+    │   │   │   ├── login.html
+    │   │   │   └── register.html
+    │   │   ├── siswa/
+    │   │   │   ├── dashSiswa.html
+    │   │   │   └── booking.html
+    │   │   ├── owner/
+    │   │   │   ├── dashboard.html
+    │   │   │   ├── edit-menu.html
+    │   │   │   └── update_status.html
+    │   │   └── account/
+    │   │       ├── owner.html
+    │   │       └── siswa.html
+    │   └── js/
+    │       ├── api.js
+    │       ├── account.js
+    │       ├── owner/
+    │       │   └── edit-menu.js
+    │       ├── shared/
+    │       │   ├── menuTable.js
+    │       │   ├── orderStatusMeta.js
+    │       │   ├── renderCollection.js
+    │       │   └── utils.js
+    │       └── siswa/
+    │           ├── booking.js
+    │           ├── cart.js
+    │           ├── dashSiswa.js
+    │           ├── orderStateMachine.js
+    │           └── ui.js
+    └── test/
+        └── syntax.test.js
 ```
 
 ---
