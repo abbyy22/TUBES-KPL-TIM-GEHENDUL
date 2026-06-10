@@ -8,6 +8,39 @@ const dashSiswa = (() => {
     // salad/plate
     `<i data-lucide="salad" class="w-12 h-12 text-[#D4622A]"></i> `,
   ];
+
+  /**
+   * Navigasi ke halaman booking, lalu otomatis:
+   * 1. Pilih kantin yang sesuai
+   * 2. Tampilkan menu kantin
+   * 3. Tambah item ke cart
+   */
+  async function orderTopMenu(kantinId, menuId) {
+    // Navigasi ke halaman booking dulu
+    await loadPage('siswa-booking');
+
+    // Tunggu DOM siap
+    await new Promise(r => setTimeout(r, 80));
+
+    // Pilih kantin di select
+    const kantinSelect = document.getElementById('kantinSelect');
+    if (kantinSelect && kantinId) {
+      kantinSelect.value = kantinId;
+      // Trigger render menu grid
+      booking.renderMenuGrid(kantinId);
+    }
+
+    // Tambah item ke cart jika menuId tersedia
+    if (menuId) {
+      await new Promise(r => setTimeout(r, 60));
+      const item = MenuTable.findMenuItemById(menuId);
+      if (item) {
+        Cart.addItem(item);
+        booking.renderOrderItems();
+      }
+    }
+  }
+
   function renderTopMenu() {
     const container = document.getElementById("topMenuGrid");
 
@@ -35,17 +68,19 @@ const dashSiswa = (() => {
         </div>
 
         <button
-          onclick="loadPage('siswa-booking')"
+          onclick="dashSiswa.orderTopMenu('${item.kantin_id || ''}', '${item.menu_id || ''}')"
           class="bg-[#D4622A] hover:bg-[#bb5422] text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xl font-bold transition hover:-translate-y-[1px]"
-          title="Pesan"
+          title="Pesan ${Utils.sanitize(item.name)}"
         >+</button>
       </div>
     `,
       )
       .join("");
+
+    if (typeof lucide !== "undefined") lucide.createIcons();
   }
 
-  return { renderTopMenu };
+  return { renderTopMenu, orderTopMenu };
 })();
 
 window.dashSiswa = dashSiswa;
