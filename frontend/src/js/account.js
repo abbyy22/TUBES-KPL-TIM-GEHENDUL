@@ -167,38 +167,22 @@ const AccountPage = (() => {
     const container = document.getElementById("history-container");
     if (!container) return;
 
-    renderCollection(
-      container,
-      orders,
-      (order) => {
-        const itemsHtml =
-          Array.isArray(order.items) && order.items.length
-            ? order.items
-                .map((it) => `<p class="text-sm text-gray-700">${it.quantity}x <span class="font-medium">${it.menu_name}</span></p>`)
-                .join("")
-            : `<p class="text-sm text-gray-700">Pesanan #${order.id}</p>`;
-
-        const meta  = getOrderStatusMeta(order.status);
-        const color = meta.color;
-
-        return `
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[#C1500E] transition-colors">
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex-1">${itemsHtml}</div>
-            <div class="text-right shrink-0">
-              <p class="text-xs text-gray-400 mt-0.5">${formatDate(order.created_at)}</p>
-              <span class="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full"
-                style="color:${color};background:${color}18">${meta.label}</span>
-            </div>
-          </div>
-          <div class="flex justify-between mt-3 pt-3 border-t border-gray-100">
-            <span class="text-xs text-gray-400 font-mono">#${order.id}</span>
-            <span class="text-xs font-bold text-[#C1500E]">${formatRp(order.total_price)}</span>
-          </div>
+    if (!orders || orders.length === 0) {
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <svg class="w-14 h-14 text-gray-200 mb-4" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <p class="text-sm font-semibold text-gray-400">Belum ada riwayat pesanan</p>
+          <p class="text-xs text-gray-300 mt-1">Pesanan kamu akan muncul di sini</p>
         </div>`;
-      },
-      '<p class="text-sm text-gray-400 italic text-center py-8">Belum ada riwayat pesanan</p>',
-    );
+      return;
+    }
+
+    container.innerHTML = orders.map((order) => renderOrderCard(order)).join("");
   }
 
   async function loadHistory() {
@@ -294,32 +278,113 @@ const AccountPage = (() => {
     }, { capture: true });
   }
 
-  // ══════════════════════════════════════════════════════════════════════════════
-  // OWNER — Info Kantin & Statistik
-  // ══════════════════════════════════════════════════════════════════════════════
+  // ── Shared card renderer — dipakai oleh user & owner ─────────────────────────
+  function renderOrderCard(order) {
+    // Escape HTML aman (tidak bergantung pada Utils global)
+    function esc(s) {
+      return String(s || '').replace(/[<>&"']/g, function(c) {
+        return { '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;', "'":'&#39;' }[c];
+      });
+    }
+
+    // Items sebagai baris teks biasa
+    const itemLines = Array.isArray(order.items) && order.items.length
+      ? order.items.map(function(it) {
+          return '<p style="font-size:14px;color:#1f2937;margin:2px 0;">' + esc(it.quantity) + 'x ' + esc(it.menu_name) + '</p>';
+        }).join('')
+      : '<p style="font-size:12px;color:#9ca3af;font-style:italic;">Detail tidak tersedia</p>';
+
+    // Tanggal format panjang (Rabu, 25 April 2026)
+    var d = new Date(order.created_at);
+    var tglStr = isNaN(d.getTime()) ? '—' : d.toLocaleDateString('id-ID', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+
+    // Harga
+    var totalStr = 'Rp. ' + Number(order.total_price || 0).toLocaleString('id-ID');
+    var kantinName = esc(order.kantin_name || 'Kantin');
+
+    return '<div style="background:#fff;border-radius:12px;border:1px solid #E8E0D5;padding:16px 20px;margin-bottom:0;transition:box-shadow 0.15s;">'
+      + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">'
+        + '<div style="flex:1;min-width:0;">' + itemLines + '</div>'
+        + '<div style="text-align:right;flex-shrink:0;">'
+          + '<p style="font-size:14px;font-weight:700;color:#1f2937;margin:0;">' + kantinName + '</p>'
+          + '<p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">' + esc(tglStr) + '</p>'
+        + '</div>'
+      + '</div>'
+      + '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #f3f4f6;display:flex;align-items:center;gap:4px;">'
+        + '<span style="font-size:11px;color:#9ca3af;">total: </span>'
+        + '<span style="font-size:14px;font-weight:700;color:#1f2937;">' + totalStr + '</span>'
+      + '</div>'
+    + '</div>';
+  }
+
 
   function fillEl(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value ?? "—";
   }
 
+  function renderOwnerTodayOrders(orders) {
+    const container = document.getElementById("today-orders-container");
+    if (!container) return;
+
+    // Update badge count
+    const badge = document.getElementById("today-orders-count-badge");
+    if (badge) badge.textContent = `${orders.length} transaksi`;
+
+    if (orders.length === 0) {
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-14 text-center">
+          <svg class="w-12 h-12 text-gray-200 mb-3" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <p class="text-sm font-semibold text-gray-400">Belum ada transaksi hari ini</p>
+          <p class="text-xs text-gray-300 mt-1">Order masuk akan muncul di sini secara real-time</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = orders.map((order) => renderOrderCard(order)).join("");
+  }
+
   async function loadOwnerStats(kantinId) {
     if (!kantinId) return;
     try {
-      const orders = await ApiClient.listAllOrders({ kantin_id: kantinId });
+      const orders = await ApiClient.getOrderByKantin(kantinId);
 
-      const active  = orders.filter((o) => o.status !== "DONE").length;
+      // Statistik Semua Waktu
       const done    = orders.filter((o) => o.status === "DONE").length;
-      const revenue = orders
+
+      fillEl("stat-done-orders", done);
+
+      // Statistik & Riwayat Harian
+      const todayStr = new Date().toDateString();
+      const todayOrdersSummaries = orders.filter((o) => {
+        const orderDate = new Date(o.created_at).toDateString();
+        return orderDate === todayStr;
+      });
+
+      const todayRevenue = todayOrdersSummaries
         .filter((o) => o.status === "DONE")
         .reduce((sum, o) => sum + Number(o.total_price || 0), 0);
 
-      fillEl("stat-total-orders",  orders.length);
-      fillEl("stat-active-orders", active);
-      fillEl("stat-done-orders",   done);
-      fillEl("stat-total-revenue", formatRp(revenue));
+      fillEl("stat-today-revenue", formatRp(todayRevenue));
+      fillEl("stat-today-orders",  todayOrdersSummaries.length);
+
+      // Ambil detail order dengan itemnya untuk daftar riwayat hari ini
+      const todayOrders = await Promise.all(
+        todayOrdersSummaries.map((o) => ApiClient.getOrder(o.id).catch(() => o))
+      );
+      renderOwnerTodayOrders(todayOrders);
     } catch (err) {
       console.warn("[AccountPage] Gagal load statistik owner:", err.message);
+      const container = document.getElementById("today-orders-container");
+      if (container) container.innerHTML = `<p class="text-xs text-red-400 italic text-center py-8">Gagal memuat data. Pastikan server berjalan.</p>`;
     }
   }
 
@@ -333,12 +398,22 @@ const AccountPage = (() => {
     syncProfilePhoto();
     initProfileForm(user);
 
-    // Isi info kantin
+    // Isi header kantin baru
     fillEl("kantin-name-display", user?.kantin_name || "—");
-    fillEl("kantin-code-display", user?.kantin_code || "—");
-    fillEl("owner-role-display",  user?.role || "—");
+    fillEl("kantin-code-display", user?.kantin_code ? `Kode: ${user.kantin_code}` : "");
 
-    // Load statistik
+    // Isi label tanggal hari ini
+    const dateEl = document.getElementById("today-date-label");
+    if (dateEl) {
+      dateEl.textContent = new Date().toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    }
+
+    // Load statistik & daftar transaksi harian
     await loadOwnerStats(user?.kantin_id);
   }
 
