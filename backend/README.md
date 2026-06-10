@@ -78,10 +78,11 @@ Server jalan di `http://localhost:3000` (default).
 
 ## User Demo (setelah seed)
 
-| Role      | Email                     | Password    |
-|-----------|---------------------------|-------------|
-| admin     | `admin@telfood.test`      | `password123` |
-| pelanggan | `pelanggan@telfood.test`  | `password123` |
+| Admin NEO 1| `neo1@telfood.test`       | `password123` |
+| Admin NEO 2| `neo2@telfood.test`       | `password123` |
+| Admin TPB  | `tpb@telfood.test`        | `password123` |
+| Admin GKM  | `gkm@telfood.test`        | `password123` |
+| pelanggan  | `pelanggan@telfood.test`  | `password123` |
 
 ## Daftar Endpoint
 
