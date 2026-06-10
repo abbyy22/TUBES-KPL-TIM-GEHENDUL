@@ -31,7 +31,7 @@
             data-lucide="dollar-sign"
             class="w-4 h-4 text-brand-primary shrink-0"
           ></i>
-          Total Pemasukan Hari Ini
+          Total Pemasukan
         </div>
         <div
           id="omzet-hari-ini"
@@ -39,7 +39,7 @@
         >
           Rp 0
         </div>
-        <div class="text-xs text-brand-muted">Total pendapatan hari ini</div>
+        <div class="text-xs text-brand-muted">Total pendapatan keseluruhan</div>
       </div>
       <div class="bg-brand-card rounded-lg-custom p-7 pb-5 flex flex-col gap-2">
         <div
@@ -166,17 +166,9 @@
     }
 
     function updateStats(orders) {
-      const today = new Date();
-      const todayOrders = orders.filter((o) => {
-        const d = new Date(o.created_at);
-        return (
-          d.getDate() === today.getDate() &&
-          d.getMonth() === today.getMonth() &&
-          d.getFullYear() === today.getFullYear()
-        );
-      });
-
-      const omzet = todayOrders.reduce((s, o) => s + Number(o.total_price), 0);
+      const omzet = orders
+        .filter((o) => o.status === "DONE")
+        .reduce((s, o) => s + Number(o.total_price), 0);
       const antrian = orders.filter(
         (o) => o.status === "ORDERED" || o.status === "COOKING",
       ).length;
