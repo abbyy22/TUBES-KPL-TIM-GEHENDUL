@@ -25,7 +25,7 @@ function fmt(n) {
   return "Rp " + Number(n).toLocaleString("id-ID");
 }
 
-function showToast(message, type = "success") {
+function showMenuToast(message, type = "success") {
   const toast = document.getElementById("toast");
   if (!toast) return;
   const colorClass = type === "error" ? "bg-red-600" : "bg-brand-mid";
@@ -69,7 +69,7 @@ async function loadMenusFromApi() {
     menus = data.map(mapApiMenu);
   } catch (err) {
     console.error("[edit-menu] Gagal load menu:", err.message);
-    showToast("Gagal memuat menu: " + err.message, "error");
+    showMenuToast("Gagal memuat menu: " + err.message, "error");
   }
 }
 
@@ -144,12 +144,12 @@ function _doRender() {
   const footInfo = document.getElementById("footInfo");
   if (footInfo)
     footInfo.textContent = `Menampilkan ${showing} dari ${filtered.length} menu`;
-  updateStats();
+  updateMenuStats();
   if (typeof lucide !== "undefined") lucide.createIcons();
   bindModalListeners();
 }
 
-function updateStats() {
+function updateMenuStats() {
   if (!document.getElementById("totalCount")) return;
   document.getElementById("totalCount").textContent = menus.length;
   document.getElementById("foodCount").textContent = menus.filter(
@@ -174,12 +174,12 @@ async function toggleMenu(id, val) {
 
   try {
     await ApiClient.updateMenu(id, { available: val });
-    showToast(val ? "Menu diaktifkan ✓" : "Menu dinonaktifkan ✓", "success");
+    showMenuToast(val ? "Menu diaktifkan ✓" : "Menu dinonaktifkan ✓", "success");
   } catch (err) {
     // rollback
     m.active = prevActive;
     _doRender();
-    showToast("Gagal update: " + err.message, "error");
+    showMenuToast("Gagal update: " + err.message, "error");
   }
 }
 
@@ -226,7 +226,7 @@ function handleImageUpload(event) {
     document.getElementById("uploadZone").style.borderColor = "#C05A1F";
     document.getElementById("uploadZone").style.borderStyle = "solid";
   } else if (file) {
-    showToast("Ukuran gambar maksimal 2MB!", "error");
+    showMenuToast("Ukuran gambar maksimal 2MB!", "error");
     event.target.value = "";
   }
 }
@@ -344,7 +344,7 @@ async function saveMenu() {
 
   const user = ApiClient.getUser();
   if (!user || !user.kantin_id) {
-    showToast("User tidak terhubung ke kantin!", "error");
+    showMenuToast("User tidak terhubung ke kantin!", "error");
     return;
   }
 
@@ -388,7 +388,7 @@ async function saveMenu() {
       // Tutup modal DULU, baru render dan tampilkan toast
       closeModal();
       _doRender();
-      showToast("Menu berhasil diperbarui ✓", "success");
+      showMenuToast("Menu berhasil diperbarui ✓", "success");
     } else {
       // CREATE
       const payload = {
@@ -417,10 +417,10 @@ async function saveMenu() {
       // Tutup modal DULU, baru render dan tampilkan toast
       closeModal();
       _doRender();
-      showToast("Menu baru ditambahkan ✓", "success");
+      showMenuToast("Menu baru ditambahkan ✓", "success");
     }
   } catch (err) {
-    showToast("Gagal menyimpan: " + err.message, "error");
+    showMenuToast("Gagal menyimpan: " + err.message, "error");
   } finally {
     if (saveBtn) {
       saveBtn.disabled = false;
@@ -456,9 +456,9 @@ async function confirmDel() {
     menus = menus.filter((x) => x.id !== deletingId);
     closeDel();
     _doRender();
-    showToast("Menu berhasil dihapus", "error");
+    showMenuToast("Menu berhasil dihapus", "error");
   } catch (err) {
-    showToast("Gagal hapus: " + err.message, "error");
+    showMenuToast("Gagal hapus: " + err.message, "error");
   } finally {
     if (delBtn) {
       delBtn.disabled = false;
