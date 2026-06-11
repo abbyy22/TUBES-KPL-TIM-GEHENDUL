@@ -13,6 +13,7 @@ const config = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'smart_canteen',
+    ssl: process.env.DB_SSL === 'true',
     connectionLimit: 10,
   },
 
