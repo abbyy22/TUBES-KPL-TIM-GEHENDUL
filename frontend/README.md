@@ -37,15 +37,7 @@ frontend/
 │   ├── output.css              
 │   │
 │   ├── assets/                 
-│   │   ├── profile.png
-│   │   ├── auth-bg.png
-│   │   ├── avatars/
-│   │   │   └── profile.png
-│   │   └── images/             
-│   │       ├── nasi_goreng.png
-│   │       ├── ayam_goreng.png
-│   │       ├── es_teh_manis.png
-│   │       └── jus_jeruk.png
+│   │   └── auth-bg.png
 │   │
 │   ├── partials/               
 │   │   └── sidebar.html        
@@ -62,20 +54,23 @@ frontend/
 │   │   │   ├── edit-menu.html  
 │   │   │   └── update_status.html  
 │   │   └── account/
-│   │       └── index.html     
+│   │       ├── owner.html     
+│   │       └── siswa.html     
 │   │
 │   └── js/
 │       ├── api.js              
-│       │
+│       ├── account.js          
+│       ├── shared/
+│       │   ├── menuTable.js
+│       │   ├── orderStatusMeta.js
+│       │   ├── renderCollection.js
+│       │   └── utils.js
 │       ├── siswa/              
-│       │   ├── utils.js        
-│       │   ├── menuTable.js    
-│       │   ├── cart.js         
-│       │   ├── orderStateMachine.js  
 │       │   ├── booking.js      
+│       │   ├── cart.js         
 │       │   ├── dashSiswa.js    
+│       │   ├── orderStateMachine.js  
 │       │   └── ui.js          
-│       │
 │       └── owner/
 │           └── edit-menu.js    
 │
@@ -129,7 +124,7 @@ ApiClient.updateOrderStatus(id, status)
 
 ---
 
-### `siswa/utils.js` Utils
+### `shared/utils.js` Utils
 Helper fungsi umum yang dipakai di seluruh modul.
 
 | Fungsi | Kegunaan |
@@ -141,7 +136,7 @@ Helper fungsi umum yang dipakai di seluruh modul.
 
 ---
 
-### `siswa/menuTable.js` MenuTable
+### `shared/menuTable.js` MenuTable
 Cache in-memory untuk data menu dan kantin dari API.
 
 ```js
@@ -208,6 +203,59 @@ booking.renderKantinSelect()
 booking.renderMenuGrid(kantinId)    
 booking.renderOrderItems()          
 ```
+
+---
+
+### `account.js` AccountPage
+Mengelola halaman profil pengguna (Siswa & Pemilik Kantin), penanganan unggah/hapus foto profil, data info kantin, daftar riwayat pesanan (siswa), notifikasi, dan data omzet/statistik transaksi (owner).
+
+```js
+AccountPage.init()              // Inisialisasi halaman profil Siswa/Pelanggan
+AccountPage.initOwner()         // Inisialisasi halaman profil Owner/Penjual
+AccountPage.addNotification(n)  // Menambahkan notifikasi baru ke localStorage
+AccountPage.renderNotifications()// Merender daftar notifikasi ke UI
+AccountPage.syncProfilePhoto()  // Menyelaraskan foto profil di header dan sidebar
+```
+
+---
+
+### `siswa/dashSiswa.js` dashSiswa
+Mengelola tampilan beranda/dashboard pelanggan, termasuk menampilkan rekomendasi menu terpopuler.
+
+```js
+dashSiswa.renderTopMenu()              // Render grid menu terpopuler di dashboard
+dashSiswa.orderTopMenu(kantinId, id)   // Navigasi ke pemesanan & otomatis masukkan menu ke keranjang
+```
+
+---
+
+### `owner/edit-menu.js` EditMenu (Manajemen Menu)
+Mengelola CRUD menu makanan/minuman pemilik kantin, filter pencarian menu, pagination, toggle ketersediaan menu, pengunggahan foto menu, dan sinkronisasi real-time.
+
+```js
+window.renderMenu()          // Memuat seluruh menu dari API & merender tabel manajemen menu
+window.openAdd()             // Membuka modal tambah menu baru
+window.openEdit(id)          // Membuka modal edit data menu berdasarkan ID
+window.closeModal()          // Menutup modal form tambah/edit menu
+window.saveMenu()            // Mengirim payload penambahan/pembaruan menu ke API
+window.openDel(id)           // Membuka modal konfirmasi hapus menu
+window.closeDel()            // Menutup modal konfirmasi hapus
+window.confirmDel()          // Mengirim request penghapusan menu ke API
+window.changePage(direction) // Navigasi halaman tabel (pagination)
+window.setFilter(category,el)// Memfilter tampilan menu berdasarkan kategori (makanan/minuman/semua)
+window.onSearch()            // Menyaring tampilan berdasarkan input kata kunci pencarian
+window.toggleMenu(id, val)   // Mengubah status ketersediaan (aktif/nonaktif) menu
+```
+
+---
+
+### `shared/orderStatusMeta.js` OrderStatusMeta
+Metadata helper untuk menerjemahkan status pesanan (baik integer status dari websocket maupun string status) menjadi gaya styling CSS & label yang rapi.
+
+---
+
+### `shared/renderCollection.js` renderCollection
+Helper utilitas untuk rendering list koleksi HTML secara dinamis.
 
 ---
 
