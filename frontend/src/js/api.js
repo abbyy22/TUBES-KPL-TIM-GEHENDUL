@@ -1,5 +1,5 @@
 const ApiClient = (() => {
-  const DEFAULT_BASE_URL = "http://localhost:3000/api";
+  const DEFAULT_BASE_URL = "https://tubes-kpl-tim-gehendul.onrender.com/api";
   const TOKEN_KEY = "telfood.token";
   const USER_KEY = "telfood.user";
   const API_BASE_KEY = "telfood.apiBaseUrl";
