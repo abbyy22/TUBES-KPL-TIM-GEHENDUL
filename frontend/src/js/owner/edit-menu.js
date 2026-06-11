@@ -37,12 +37,31 @@ function showMenuToast(message, type = "success") {
   }, 2500);
 }
 
+const DRINK_EMOJIS = ["🥤", "☕", "🧃", "🍵", "🧋", "🍹", "🥛", "🍊", "🍋", "🍍", "🥭", "🧉", "🍾", "🍷", "🍸", "🍹", "🍺", "🍻", "🥛"];
+
+function isDrinkEmoji(emoji) {
+  return emoji && DRINK_EMOJIS.includes(emoji.trim());
+}
+
+function setFormDisabled(disabled) {
+  const inputs = ["fName", "fDesc", "fEmoji", "fCat", "fPrice", "fImageFile"];
+  inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = disabled;
+  });
+  const saveBtn = document.querySelector('[onclick="saveMenu()"]');
+  if (saveBtn) saveBtn.disabled = disabled;
+  const cancelBtn = document.querySelector('[onclick="closeModal()"]');
+  if (cancelBtn) cancelBtn.disabled = disabled;
+  const removeImgBtn = document.getElementById("btnRemoveImg");
+  if (removeImgBtn) removeImgBtn.disabled = disabled;
+  const uploadBtn = document.querySelector('[onclick="document.getElementById(\'fImageFile\').click()"]');
+  if (uploadBtn) uploadBtn.disabled = disabled;
+}
+
 /** Map API menu object → local format yang dipakai render */
 function mapApiMenu(m) {
-  // Deteksi kategori dari emoji: 🥤/☕/🧃 → drink, sisanya → food
-  const drinkEmojis = ["🥤", "☕", "🧃", "🍵", "🧋", "🍹", "🥛"];
-  const cat =
-    m.emoji && drinkEmojis.includes(m.emoji.trim()) ? "drink" : "food";
+  const cat = isDrinkEmoji(m.emoji) ? "drink" : "food";
   return {
     id: m.id,
     kantin_id: m.kantin_id,
@@ -319,9 +338,10 @@ function closeModal() {
   // Reset image preview
   removeImage();
 
-  // Reset state editing
+  // Reset state editing & disable controls
   editingId = null;
   currentImageData = null;
+  setFormDisabled(false);
 }
 
 async function saveMenu() {
@@ -329,9 +349,14 @@ async function saveMenu() {
   const desc = document.getElementById("fDesc").value.trim();
   const cat = document.getElementById("fCat").value;
   const price = parseInt(document.getElementById("fPrice").value) || 0;
-  const emoji =
-    document.getElementById("fEmoji").value.trim() ||
-    (cat === "drink" ? "🥤" : "🍛");
+  let emoji = document.getElementById("fEmoji").value.trim();
+
+  // Enforce category-emoji sync
+  if (cat === "drink" && !isDrinkEmoji(emoji)) {
+    emoji = "🥤";
+  } else if (cat === "food" && (emoji === "" || isDrinkEmoji(emoji))) {
+    emoji = "🍛";
+  }
 
   if (!name) {
     document.getElementById("fName").focus();
@@ -348,9 +373,9 @@ async function saveMenu() {
     return;
   }
 
+  setFormDisabled(true);
   const saveBtn = document.querySelector('[onclick="saveMenu()"]');
   if (saveBtn) {
-    saveBtn.disabled = true;
     saveBtn.textContent = "Menyimpan...";
   }
 
@@ -422,8 +447,8 @@ async function saveMenu() {
   } catch (err) {
     showMenuToast("Gagal menyimpan: " + err.message, "error");
   } finally {
+    setFormDisabled(false);
     if (saveBtn) {
-      saveBtn.disabled = false;
       saveBtn.textContent = "Simpan";
     }
   }
@@ -483,6 +508,24 @@ function bindModalListeners() {
       if (e.target === e.currentTarget) closeDel();
     });
     delOverlay._bound = true;
+  }
+
+  // Daftarkan event listener untuk perubahan kategori agar otomatis menyesuaikan emoji default
+  const fCatEl = document.getElementById("fCat");
+  if (fCatEl && !fCatEl._bound) {
+    fCatEl.addEventListener("change", (e) => {
+      const cat = e.target.value;
+      const emojiInput = document.getElementById("fEmoji");
+      if (emojiInput) {
+        const currentEmoji = emojiInput.value.trim();
+        if (cat === "drink" && !isDrinkEmoji(currentEmoji)) {
+          emojiInput.value = "🥤";
+        } else if (cat === "food" && (currentEmoji === "" || isDrinkEmoji(currentEmoji))) {
+          emojiInput.value = "🍛";
+        }
+      }
+    });
+    fCatEl._bound = true;
   }
 }
 
